@@ -1,0 +1,9 @@
+inputSpec: /local/spec/openapi.yaml
+gitUserId: sonatype-nexus-community
+gitRepoId: nexus-repo-api-client
+
+# verbose: true
+
+globalProperties:
+  skipFormModel: false
+  # debugModels: true
