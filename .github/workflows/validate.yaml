@@ -57,5 +57,10 @@ jobs:
                   path: out/go
                   key: 'go-${{ github.run_id }}'
                   fail-on-cache-miss: true
-            - name: Check restored from cache
-              run: ls -alR ${{ github.workspace }}
+            - name: Build Go API Client
+              run: go build -v ./
+              working-directory: out/go
+            - name: Run Generated Tests
+              run: |
+                  go get github.com/stretchr/testify/assert
+                  go test -v ./out/go/test/
