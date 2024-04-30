@@ -38,7 +38,7 @@ jobs:
             - name: Save to Cache
               uses: actions/cache/save@v4
               with:
-                  path: ${{ github.workspace }}/out/${{ matrix.language }}
+                  path: out/${{ matrix.language }}
                   key: '${{ matrix.language }}-${{ github.run_id }}'
 
     validate-go:
@@ -54,7 +54,7 @@ jobs:
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
-                  path: ${{ github.workspace }}
+                  path: out/go
                   key: 'go-${{ github.run_id }}'
                   fail-on-cache-miss: true
             - name: Check restored from cache
