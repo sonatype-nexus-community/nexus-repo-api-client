@@ -35,5 +35,26 @@ jobs:
                   image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
                   options: -v ${{ github.workspace }}:/local
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
-            - name: Check Generation
-              run: ls -alR ${{ github.workspace }}/out
+            - name: Save to Cache
+              uses: actions/cache/save@v4
+              with:
+                  path: ${{ matrix.language }}
+                  key: ${{ matrix.language }}
+
+    validate-go:
+        name: Validate Go Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+            - name: Setup Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: 1.22
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: 'go'
+                  key: 'go'
+            - name: Check restored from cache
+              run: ls -alR ${{ github.workspace }}
