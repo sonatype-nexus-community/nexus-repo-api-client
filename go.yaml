@@ -1,0 +1,7 @@
+'!include': 'common.yaml'
+outputDir: /local/out/go
+generatorName: go
+gitRepoId: nexus-repo-api-client-go
+additionalProperties:
+  goImportAlias: sonatyperepo
+  packageName: sonatyperepo

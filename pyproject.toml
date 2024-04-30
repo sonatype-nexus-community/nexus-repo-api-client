@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "nexus-repo-api-client"
+version = "0.1.0"
+description = ""
+authors = ["Paul Horton <phorton@sonatype.com>"]
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyyaml = "^6.0"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
