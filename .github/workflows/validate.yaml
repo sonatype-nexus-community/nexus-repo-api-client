@@ -60,7 +60,8 @@ jobs:
             - name: Build Go API Client
               run: go build -v ./
               working-directory: out/go
+            - name: Install test dependencies
+              run: go get github.com/stretchr/testify/assert
+              working-directory: out/go
             - name: Run Generated Tests
-              run: |
-                  go get github.com/stretchr/testify/assert
-                  go test -v ./out/go/test/
+              run: go test -v ./out/go/test/
