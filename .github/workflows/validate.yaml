@@ -34,6 +34,6 @@ jobs:
               with:
                   image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
                   options: -v ${{ github.workspace }}:/local
-                  run: batch --clean /local/${{ matrix.language }}.yaml
+                  run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
             - name: Check Generation
               run: ls -al ${{ github.workspace }}
