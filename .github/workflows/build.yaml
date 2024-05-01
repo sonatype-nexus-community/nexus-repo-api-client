@@ -65,3 +65,23 @@ jobs:
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
               working-directory: out/go
+
+    validate-typescript:
+        name: Validate Typescript Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: latest
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: out/typescript
+                  key: 'typescript-${{ github.run_id }}'
+                  fail-on-cache-miss: true
+            - name: Build Typescript API Client
+              run: npm i && npm run build
+              working-directory: out/typescript
