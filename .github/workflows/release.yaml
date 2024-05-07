@@ -52,6 +52,7 @@ jobs:
                   repository: sonatype-nexus-community/nexus-repo-api-client-go
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
+                  path: out/go
             - name: Setup git config
               run: |
                   git config --global user.name "GitHub Actions"
@@ -66,15 +67,16 @@ jobs:
               run: ls -lR ${{ github.workspace }}
             - name: Build Go API Client
               run: go build -v ./
-              working-directory: ${{ github.workspace }}
+              working-directory: out/go
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
-              working-directory: ${{ github.workspace }}
+              working-directory: out/go
             - name: Commit, Tag and Push
               run: |
                   git add *
                   git commit -m "Automated Release ${{ github.ref_name }}"
                   #git tag -a ${{ github.ref_name }}" -m "Automated Release ${{ github.ref_name }}"
                   git push
+              working-directory: out/go
