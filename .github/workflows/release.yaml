@@ -1,4 +1,4 @@
-name: Relesae
+name: Release
 
 on:
     push:
@@ -49,7 +49,7 @@ jobs:
             - name: Checkout Go Library Repository
               uses: actions/checkout@v4
               with:
-                  repository: nexus-repo-api-client-go
+                  repository: sonatype-nexus-community/nexus-repo-api-client-go
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
             - name: Setup git config
