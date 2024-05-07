@@ -24,17 +24,16 @@
 [![GitHub forks](https://img.shields.io/github/forks/sonatype-nexus-community/nexus-repo-api-client)](https://github.com/sonatype-nexus-community/nexus-repo-api-client/network)
 [![GitHub stars](https://img.shields.io/github/stars/sonatype-nexus-community/nexus-repo-api-client)](https://github.com/sonatype-nexus-community/nexus-repo-api-client/stargazers)
 
-
-----
+---
 
 This repository produces generated API Clients in various languages and frameworks for use by Customers and other projects.
 
 ## Supported Languages & Frameworks
 
-| Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                   |
-|----------------------|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| Golang / Go | 175 | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-repo-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-repo-api-client-go) |
-| Typescript (fetch)   | 175                       | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-repo-api-client)](https://www.npmjs.com/package/@sonatype/nexus-repo-api-client) |
+| Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                                                                                                                                                             |
+| -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Golang / Go          | 3.67.0                    | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-repo-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-repo-api-client-go) |
+| Typescript (fetch)   | TBC                    | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-repo-api-client)](https://www.npmjs.com/package/@sonatype/nexus-repo-api-client)                                                                                                                                       |
 
 ## Known Issues
 
@@ -67,57 +66,60 @@ Through the use of [Postman](https://www.postman.com) and [opeapi-request-respon
 
 1. Configure the request for which you are not getting a response in Postman exactly as it was sent
 2. To that request (you can do this in a Collection if you are using Collections too), add a Test with the code:
-   ```
-    // define object
-    openapiRequestResponseValidation = {
-    // define function
-    validate: function(pm) {
 
-        const postRequest = {
-            url: 'http://localhost:8080/validate',
-            method: 'POST',
-            header: {'Content-Type': 'application/json'},
-            body: {
-            mode: 'raw',
-            raw: JSON.stringify({ 
-                method: pm.request.method, 
-                path: pm.request.url.getPath(),
-                headers: pm.request.headers,
-                requestAsJson: (pm.request.body != "") ? pm.request.body.raw : null,
-                responseAsJson: pm.response.text(),
-                statusCode: pm.response.code
-                })
-            }
-        };
+    ```
+     // define object
+     openapiRequestResponseValidation = {
+     // define function
+     validate: function(pm) {
 
-        pm.sendRequest(postRequest, (error, response) => {
-            if(error != undefined) {
-                pm.expect.fail('Unexpected error ' + error);
-            } else {
-                var data = response.json();
+         const postRequest = {
+             url: 'http://localhost:8080/validate',
+             method: 'POST',
+             header: {'Content-Type': 'application/json'},
+             body: {
+             mode: 'raw',
+             raw: JSON.stringify({
+                 method: pm.request.method,
+                 path: pm.request.url.getPath(),
+                 headers: pm.request.headers,
+                 requestAsJson: (pm.request.body != "") ? pm.request.body.raw : null,
+                 responseAsJson: pm.response.text(),
+                 statusCode: pm.response.code
+                 })
+             }
+         };
 
-                if(data.valid == false) {
-                    console.log(data.errors);
-                }
+         pm.sendRequest(postRequest, (error, response) => {
+             if(error != undefined) {
+                 pm.expect.fail('Unexpected error ' + error);
+             } else {
+                 var data = response.json();
 
-                pm.test("OpenAPI validation", () => {
-                    pm.expect(data.valid, "Invalid request/response (check Console)").to.equal(true);
-                });
+                 if(data.valid == false) {
+                     console.log(data.errors);
+                 }
 
-            }
-        });  
-      }
-    };
+                 pm.test("OpenAPI validation", () => {
+                     pm.expect(data.valid, "Invalid request/response (check Console)").to.equal(true);
+                 });
 
-    // invoke function
-    openapiRequestResponseValidation.validate(pm);
+             }
+         });
+       }
+     };
+
+     // invoke function
+     openapiRequestResponseValidation.validate(pm);
+    ```
+
 3. Start the `openapi-request-response-validation` Container locally:
-   ```
-   docker run -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
-   ```
-4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two places:  
-   1. The Postman console
-   2. The logs from the running Container 
+    ```
+    docker run -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
+    ```
+4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two places:
+    1. The Postman console
+    2. The logs from the running Container
 
 ## Changelog
 
@@ -125,12 +127,8 @@ See our [Change Log](./CHANGELOG.md).
 
 ## Releasing
 
-We use [semantic-release](https://python-semantic-release.readthedocs.io/en/latest/) to generate releases
-from commits to the `main` branch.
-
-We aim to keep the MINOR version component in-line with the version of Nexus IQ Server for which the API Client is
-generated - i.e. `1.156.x` are all releases generated for the API specification as shipped with Sonatype IQ Server
-version 156.
+We aim to keep the MAJOR and MINOR version component in-line with the version of Sonatype Nexus Repository Manager for which the API Client is
+generated - i.e. `3.67.x` are all releases generated for the API specification as shipped with Sonatype Nexus Repository Manager version `3.67.x`.
 
 For example, to perform a "patch" release, add a commit to `main` with a comment like below. The `fix: ` prefix matters.
 
@@ -145,8 +143,8 @@ Remember:
 It is worth noting that this is **NOT SUPPORTED** by Sonatype, and is a contribution of ours to the open source
 community (read: you!)
 
-* Use this contribution at the risk tolerance that you have
-* Do NOT file Sonatype support tickets related to `nexus-repo-api-client`
-* DO file issues here on GitHub, so that the community can pitch in
+-   Use this contribution at the risk tolerance that you have
+-   Do NOT file Sonatype support tickets related to `nexus-repo-api-client`
+-   DO file issues here on GitHub, so that the community can pitch in
 
 Phew, that was easier than I thought. Last but not least of all - have fun!
