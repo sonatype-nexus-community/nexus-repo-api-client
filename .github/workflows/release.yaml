@@ -1,0 +1,75 @@
+name: Relesae
+
+on:
+    push:
+        tags:
+            - 'v*'
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    OPEN_API_GENERATOR_VERSION: 'v7.3.0'
+
+jobs:
+    generate-library-code:
+        name: Generate Library Code ${{ matrix.language }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                language: ['go', 'typescript']
+        steps:
+            - name: Checkout
+              # see https://github.com/actions/checkout
+              uses: actions/checkout@v4
+            - name: Run OpenAPI Generator
+              uses: addnab/docker-run-action@v3
+              with:
+                  image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
+                  options: -v ${{ github.workspace }}:/local
+                  run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
+            - name: Save to Cache
+              uses: actions/cache/save@v4
+              with:
+                  path: out/${{ matrix.language }}
+                  key: '${{ matrix.language }}-${{ github.run_id }}'
+
+    release-go:
+        name: Release Go Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+            - name: Setup Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: 1.22
+            - name: Checkout Go Library Repository
+              uses: actions/checkout@v4
+              with:
+                  repository: nexus-repo-api-client-go
+                  ref: main
+                  token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
+            - name: Setup git config
+              run: |
+                  git config --global user.name "GitHub Actions"
+                  git config --global user.email "<>"
+            - name: Validate Checked Out Library
+              run: ls -alR ${{ github.workspace }}
+
+            # - name: Get generated code from cache
+            #   uses: actions/cache/restore@v4
+            #   with:
+            #       path: out/go
+            #       key: 'go-${{ github.run_id }}'
+            #       fail-on-cache-miss: true
+            # - name: Build Go API Client
+            #   run: go build -v ./
+            #   working-directory: out/go
+            # - name: Install test dependencies & run generated tests
+            #   run: |
+            #       go get github.com/stretchr/testify/assert
+            #       go test -v ./test/
+            #   working-directory: out/go
