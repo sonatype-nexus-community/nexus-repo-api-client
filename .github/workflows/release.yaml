@@ -59,7 +59,7 @@ jobs:
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
-                  path: ${{ github.workspace }}
+                  path: out/go
                   key: 'go-${{ github.sha }}'
                   fail-on-cache-miss: true
             - name: Validate Checked Out Library
