@@ -34,7 +34,7 @@ jobs:
               uses: actions/cache/save@v4
               with:
                   path: out/${{ matrix.language }}
-                  key: '${{ matrix.language }}-${{ github.run_id }}'
+                  key: '${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt}}'
 
     release-go:
         name: Release Go Library
@@ -60,7 +60,7 @@ jobs:
               uses: actions/cache/restore@v4
               with:
                   path: ${{ github.workspace }}
-                  key: 'go-${{ github.run_id }}'
+                  key: 'go-${{ github.run_id }}-${{ github.run_attempt}}'
                   fail-on-cache-miss: true
             - name: Validate Checked Out Library
               run: ls -lR ${{ github.workspace }}
