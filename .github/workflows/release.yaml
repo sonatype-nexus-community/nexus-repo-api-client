@@ -56,20 +56,25 @@ jobs:
               run: |
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
+            - name: Get generated code from cache
+              uses: actions/cache/restore@v4
+              with:
+                  path: ${{ github.workspace }}
+                  key: 'go-${{ github.run_id }}'
+                  fail-on-cache-miss: true
             - name: Validate Checked Out Library
-              run: ls -alR ${{ github.workspace }}
-
-            # - name: Get generated code from cache
-            #   uses: actions/cache/restore@v4
-            #   with:
-            #       path: out/go
-            #       key: 'go-${{ github.run_id }}'
-            #       fail-on-cache-miss: true
-            # - name: Build Go API Client
-            #   run: go build -v ./
-            #   working-directory: out/go
-            # - name: Install test dependencies & run generated tests
-            #   run: |
-            #       go get github.com/stretchr/testify/assert
-            #       go test -v ./test/
-            #   working-directory: out/go
+              run: ls -lR ${{ github.workspace }}
+            - name: Build Go API Client
+              run: go build -v ./
+              working-directory: ${{ github.workspace }}
+            - name: Install test dependencies & run generated tests
+              run: |
+                  go get github.com/stretchr/testify/assert
+                  go test -v ./test/
+              working-directory: ${{ github.workspace }}
+            - name: Commit, Tag and Push
+              run: |
+                  git add *
+                  git commit -m "Automated Release ${{ github.ref_name }}"
+                  #git tag -a ${{ github.ref_name }}" -m "Automated Release ${{ github.ref_name }}"
+                  git push
