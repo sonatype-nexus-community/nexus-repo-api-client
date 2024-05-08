@@ -81,6 +81,7 @@ jobs:
                   git add *
                   git commit -m "Automated Release v${{ env.THIS_VERSION }}"
                   git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
+                  git push
                   git push --tags
               working-directory: out/go
 
