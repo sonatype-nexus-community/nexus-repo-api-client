@@ -63,21 +63,21 @@ json_spec = json_spec_response.json()
 #         'version': NXRM_VERSION
 #     }
 #
-# # Add `securitySchemes` under `components`
-# if 'components' in json_spec and 'securitySchemes' not in json_spec['components']:
-#     print('Adding `securitySchemes`...')
-#     json_spec['components']['securitySchemes'] = {
-#         'BasicAuth': {
-#             'type': 'http',
-#             'scheme': 'basic'
-#         }
-#     }
-# if 'security' not in json_spec:
-#     json_spec['security'] = [
-#         {
-#             'BasicAuth': []
-#         }
-#     ]
+# Add `securitySchemes` under `components`
+if 'components' in json_spec and 'securitySchemes' not in json_spec['components']:
+    print('Adding `securitySchemes`...')
+    json_spec['components']['securitySchemes'] = {
+        'BasicAuth': {
+            'type': 'http',
+            'scheme': 'basic'
+        }
+    }
+if 'security' not in json_spec:
+    json_spec['security'] = [
+        {
+            'BasicAuth': []
+        }
+    ]
 #
 # # Fix Response schema for GET /api/v2/applications
 # if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:

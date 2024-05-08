@@ -3810,6 +3810,10 @@ components:
           description: Passphrase to access PGP signing key
           type: string
       type: object
+  securitySchemes:
+    BasicAuth:
+      scheme: basic
+      type: http
 info:
   title: Nexus Repository Manager REST API
   version: 3.67.1-01
@@ -9727,7 +9731,7 @@ paths:
       - 'Security management: privileges'
   /v1/security/privileges/application:
     post:
-      operationId: createPrivilege
+      operationId: createPrivilege_1
       requestBody:
         content:
           application/json:
@@ -9748,7 +9752,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/application/{privilegeName}:
     put:
-      operationId: updatePrivilege
+      operationId: updatePrivilege_1
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -9987,7 +9991,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard:
     post:
-      operationId: createPrivilege_1
+      operationId: createPrivilege
       requestBody:
         content:
           application/json:
@@ -10008,7 +10012,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard/{privilegeName}:
     put:
-      operationId: updatePrivilege_1
+      operationId: updatePrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -12130,6 +12134,8 @@ paths:
       summary: Stop task
       tags:
       - Tasks
+security:
+- BasicAuth: []
 servers:
 - url: /service/rest/
 tags:
