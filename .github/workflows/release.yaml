@@ -77,6 +77,7 @@ jobs:
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
               run: |
+                  echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
                   git add *
                   git commit -m "Automated Release v${{ env.THIS_VERSION }}"
                   git tag -a ${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
