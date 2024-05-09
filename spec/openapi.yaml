@@ -1972,6 +1972,8 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
+        url:
+          type: string
       required:
       - maven
       - online
