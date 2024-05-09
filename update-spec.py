@@ -44,16 +44,16 @@ json_spec_v2 = json_spec_response_v2.json()
 json_spec_response = requests.post('https://converter.swagger.io/api/convert', json=json_spec_v2)
 json_spec = json_spec_response.json()
 
-
 # Align OpenAPI Spec Version to 3.1.0
-json_spec['openapi'] = '3.1.0'
+# json_spec['openapi'] = '3.1.0'
 
 # Update OpenAPI Info Block
 print('Updating `info`')
 json_spec['info'] = {
     'title': 'Sonatype Nexus Repository Manager',
+    'summary': 'Public REST API for Sonatype Nexus Repository',
     'description': 'This documents the available APIs into [Sonatype Nexus Repository Manager]'
-                   '(https://www.sonatype.com/products/sonatype-nexus-repository).',
+                   '(https://www.sonatype.com/products/sonatype-nexus-repository) as of version ' + NXRM_VERSION + '.',
     'contact': {
         'name': 'Sonatype Community Maintainers',
         'url': 'https://github.com/sonatype-nexus-community'
@@ -80,7 +80,35 @@ if 'security' not in json_spec:
             'BasicAuth': []
         }
     ]
-#
+
+# Pin/Fix OperationID for GET /v1/repositories
+print('Fixing and pinning OperationID for for GET /v1/repositories')
+json_spec['paths']['/v1/repositories']['get']['operationId'] = 'getAllRepositories'
+
+# Pin/Fix OperationIDs for all /v1/repositories/[FORMAT]/[TYPE]
+print('Fixing and pinning OperationIDs for /v1/repositories/* paths...')
+i = 0
+for path in json_spec['paths']:
+    if str(path).startswith('/v1/repositories/'):
+        path_parts = str(path).split('/')
+        if len(path_parts) > 4:
+            format = path_parts[3]
+            type = path_parts[4]
+            for method in json_spec['paths'][path]:
+                if str(method).lower() == 'get':
+                    json_spec['paths'][path]['get'][
+                        'operationId'] = f'get{format.capitalize()}{type.capitalize()}Repository'
+                    i = i+1
+                if str(method).lower() == 'post':
+                    json_spec['paths'][path]['post'][
+                        'operationId'] = f'create{format.capitalize()}{type.capitalize()}Repository'
+                    i = i + 1
+                if str(method).lower() == 'put':
+                    json_spec['paths'][path]['put'][
+                        'operationId'] = f'update{format.capitalize()}{type.capitalize()}Repository'
+                    i = i + 1
+print(f'   Fixed {i} Repository Operations')
+
 # # Fix Response schema for GET /api/v2/applications
 # if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:
 #     if 'get' in json_spec['paths']['/api/v2/applications']:
