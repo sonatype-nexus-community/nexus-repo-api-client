@@ -1961,7 +1961,7 @@ components:
           $ref: '#/components/schemas/ComponentAttributes'
         format:
           default: maven2
-          type: format
+          type: string
         maven:
           $ref: '#/components/schemas/MavenAttributes'
         name:
@@ -1977,7 +1977,7 @@ components:
           $ref: '#/components/schemas/HostedStorageAttributes'
         type:
           default: hosted
-          type: format
+          type: string
         url:
           type: string
       required:
