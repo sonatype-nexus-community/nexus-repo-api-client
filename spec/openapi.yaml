@@ -3823,7 +3823,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  summary: Public REST API for Sonatype Nexus Repository
   title: Sonatype Nexus Repository Manager
   version: 3.67.1-01
 openapi: 3.0.1

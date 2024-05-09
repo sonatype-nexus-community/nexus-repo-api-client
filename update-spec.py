@@ -51,7 +51,7 @@ json_spec = json_spec_response.json()
 print('Updating `info`')
 json_spec['info'] = {
     'title': 'Sonatype Nexus Repository Manager',
-    'summary': 'Public REST API for Sonatype Nexus Repository',
+    # 'summary': 'Public REST API for Sonatype Nexus Repository',
     'description': 'This documents the available APIs into [Sonatype Nexus Repository Manager]'
                    '(https://www.sonatype.com/products/sonatype-nexus-repository) as of version ' + NXRM_VERSION + '.',
     'contact': {
