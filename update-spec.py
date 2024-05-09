@@ -109,6 +109,12 @@ for path in json_spec['paths']:
                     i = i + 1
 print(f'   Fixed {i} Repository Operations')
 
+# Fix Schema `MavenHostedApiRepository`
+json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['url'] = {
+    'type': 'string'
+}
+
+
 # # Fix Response schema for GET /api/v2/applications
 # if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:
 #     if 'get' in json_spec['paths']['/api/v2/applications']:
