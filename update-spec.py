@@ -30,7 +30,6 @@ if len(sys.argv) != 2:
 
 NXRM_SERVER_URL = sys.argv[1]
 NXRM_SPEC_PATH = '/service/rest/swagger.json'
-NXRM_VERSION = 'DEVELOPMENT'
 
 
 def parse_version_from_server_header(header: str) -> str:
@@ -45,24 +44,27 @@ json_spec_v2 = json_spec_response_v2.json()
 json_spec_response = requests.post('https://converter.swagger.io/api/convert', json=json_spec_v2)
 json_spec = json_spec_response.json()
 
-# Add OpenAPI Info Block
-# if 'info' not in json_spec:
-#     print('Adding `info`')
-#     json_spec['info'] = {
-#         'title': 'Sonatype Nexus Repository Manager',
-#         'description': 'This documents the available APIs into [Sonatype Nexus Repository Manager]'
-#                        '(https://www.sonatype.com/products/sonatype-nexus-repository).',
-#         'contact': {
-#             'name': 'Sonatype Community Maintainers',
-#             'url': 'https://github.com/sonatype-nexus-community'
-#         },
-#         'license': {
-#             'name': 'Apache 2.0',
-#             'url': 'http://www.apache.org/licenses/LICENSE-2.0.html'
-#         },
-#         'version': NXRM_VERSION
-#     }
-#
+
+# Align OpenAPI Spec Version to 3.1.0
+json_spec['openapi'] = '3.1.0'
+
+# Update OpenAPI Info Block
+print('Updating `info`')
+json_spec['info'] = {
+    'title': 'Sonatype Nexus Repository Manager',
+    'description': 'This documents the available APIs into [Sonatype Nexus Repository Manager]'
+                   '(https://www.sonatype.com/products/sonatype-nexus-repository).',
+    'contact': {
+        'name': 'Sonatype Community Maintainers',
+        'url': 'https://github.com/sonatype-nexus-community'
+    },
+    'license': {
+        'name': 'Apache 2.0',
+        'url': 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    },
+    'version': NXRM_VERSION
+}
+
 # Add `securitySchemes` under `components`
 if 'components' in json_spec and 'securitySchemes' not in json_spec['components']:
     print('Adding `securitySchemes`...')

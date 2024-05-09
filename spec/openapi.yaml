@@ -3815,9 +3815,16 @@ components:
       scheme: basic
       type: http
 info:
-  title: Nexus Repository Manager REST API
+  contact:
+    name: Sonatype Community Maintainers
+    url: https://github.com/sonatype-nexus-community
+  description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository).
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Sonatype Nexus Repository Manager
   version: 3.67.1-01
-openapi: 3.0.1
+openapi: 3.1.0
 paths:
   /v1/assets:
     get:
