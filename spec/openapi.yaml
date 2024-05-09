@@ -1959,6 +1959,9 @@ components:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         component:
           $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          default: maven2
+          type: format
         maven:
           $ref: '#/components/schemas/MavenAttributes'
         name:
@@ -1972,6 +1975,9 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          default: hosted
+          type: format
         url:
           type: string
       required:

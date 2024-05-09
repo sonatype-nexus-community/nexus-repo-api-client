@@ -110,6 +110,14 @@ for path in json_spec['paths']:
 print(f'   Fixed {i} Repository Operations')
 
 # Fix Schema `MavenHostedApiRepository`
+json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['format'] = {
+    'type': 'format',
+    'default': 'maven2'
+}
+json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['type'] = {
+    'type': 'format',
+    'default': 'hosted'
+}
 json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['url'] = {
     'type': 'string'
 }
