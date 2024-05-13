@@ -3372,6 +3372,14 @@ components:
             for the repository format
           example: true
           type: boolean
+        writePolicy:
+          description: Controls if deployments of and updates to assets are allowed
+          enum:
+          - allow
+          - allow_once
+          - deny
+          example: allow_once
+          type: string
       required:
       - blobStoreName
       - strictContentTypeValidation
