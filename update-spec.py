@@ -122,6 +122,13 @@ json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['ur
     'type': 'string'
 }
 
+# Fix Schema `StorageAttributes` - missing Write Policy
+json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {
+    'description': 'Controls if deployments of and updates to assets are allowed',
+    'enum': ['allow', 'allow_once', 'deny'],
+    'example': 'allow_once',
+    'type': 'string'
+}
 
 # # Fix Response schema for GET /api/v2/applications
 # if 'paths' in json_spec and '/api/v2/applications' in json_spec['paths']:
