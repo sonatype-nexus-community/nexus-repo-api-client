@@ -122,6 +122,11 @@ json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['ur
     'type': 'string'
 }
 
+# Fix Schema `MavenProxyApiRepository`
+json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['url'] = {
+    'type': 'string'
+}
+
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {
     'description': 'Controls if deployments of and updates to assets are allowed',
