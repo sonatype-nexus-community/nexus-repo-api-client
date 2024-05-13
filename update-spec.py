@@ -123,6 +123,14 @@ json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['ur
 }
 
 # Fix Schema `MavenProxyApiRepository`
+json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['format'] = {
+    'type': 'string',
+    'default': 'maven2'
+}
+json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['type'] = {
+    'type': 'string',
+    'default': 'hosted'
+}
 json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['url'] = {
     'type': 'string'
 }

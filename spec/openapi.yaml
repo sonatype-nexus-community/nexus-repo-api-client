@@ -2014,6 +2014,9 @@ components:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          default: maven2
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         maven:
@@ -2038,6 +2041,9 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: hosted
+          type: string
         url:
           type: string
       required:
