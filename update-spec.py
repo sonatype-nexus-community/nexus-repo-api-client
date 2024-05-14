@@ -109,31 +109,27 @@ for path in json_spec['paths']:
                     i = i + 1
 print(f'   Fixed {i} Repository Operations')
 
-# Fix Schema `MavenHostedApiRepository`
-json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['format'] = {
-    'type': 'string',
-    'default': 'maven2'
-}
-json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['type'] = {
-    'type': 'string',
-    'default': 'hosted'
-}
-json_spec['components']['schemas']['MavenHostedApiRepository']['properties']['url'] = {
-    'type': 'string'
-}
+# Fix Schemas relating to Repositories that are missing `format`, `type` and `url`
+repository_schemas_to_fix = [
+    'MavenHostedApiRepository',
+    'MavenProxyApiRepository',
+    'SimpleApiGroupRepository'
+]
+print('Fixing Repository Schemas...')
+for s in repository_schemas_to_fix:
+    json_spec['components']['schemas'][s]['properties']['format'] = {
+        'type': 'string',
+        'default': 'maven2'
+    }
+    json_spec['components']['schemas'][s]['properties']['type'] = {
+        'type': 'string',
+        'default': 'hosted'
+    }
+    json_spec['components']['schemas'][s]['properties']['url'] = {
+        'type': 'string'
+    }
+    print(f'   Fixed `{s}`')
 
-# Fix Schema `MavenProxyApiRepository`
-json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['format'] = {
-    'type': 'string',
-    'default': 'maven2'
-}
-json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['type'] = {
-    'type': 'string',
-    'default': 'hosted'
-}
-json_spec['components']['schemas']['MavenProxyApiRepository']['properties']['url'] = {
-    'type': 'string'
-}
 
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {
