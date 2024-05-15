@@ -130,13 +130,19 @@ for s in repository_schemas_to_fix:
     }
     print(f'   Fixed `{s}`')
 
-
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {
     'description': 'Controls if deployments of and updates to assets are allowed',
     'enum': ['allow', 'allow_once', 'deny'],
     'example': 'allow_once',
     'type': 'string'
+}
+
+# Update schema `HttpClientConnectionAuthenticationAttributes` to also include `preemptive`
+json_spec['components']['schemas']['HttpClientConnectionAuthenticationAttributes']['properties']['preemptive'] = {
+    'description': 'Whether to use pre-emptive authentication. Use with caution. Defaults to false.',
+    'example': 'false',
+    'type': 'boolean'
 }
 
 # # Fix Response schema for GET /api/v2/applications
