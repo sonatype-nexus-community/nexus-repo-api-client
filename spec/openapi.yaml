@@ -1821,6 +1821,11 @@ components:
           type: string
         password:
           type: string
+        preemptive:
+          description: Whether to use pre-emptive authentication. Use with caution.
+            Defaults to false.
+          example: 'false'
+          type: boolean
         type:
           description: Authentication type
           enum:
