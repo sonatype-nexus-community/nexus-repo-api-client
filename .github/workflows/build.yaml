@@ -24,7 +24,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                language: ['go', 'typescript']
+                language: ['go', 'java-webclient', 'typescript']
         steps:
             - name: Checkout
               # see https://github.com/actions/checkout

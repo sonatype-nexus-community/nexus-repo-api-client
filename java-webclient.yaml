@@ -1,0 +1,9 @@
+'!include': 'common.yaml'
+outputDir: /local/out/java-webclient
+generatorName: java
+additionalProperties:
+  library: webclient
+  # prefixParameterInterfaces: true
+  # npmName: "@sonatype/nexus-repo-api-client"
+  # supportsES6: true
+  # withInterfaces: false
