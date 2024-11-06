@@ -3,16 +3,26 @@ outputDir: /local/out/java-webclient
 generatorName: java
 additionalProperties:
   library: webclient
+  artifactDescription: Nexus Repo API Webclient
   artifactId: nexus-repo-api-webclient
   artifactUrl: https://github.com/sonatype-nexus-community/nexus-repo-api-client
+  invokerPackage: org.sonatype.community.repo.webclient
+  apiPackage: org.sonatype.community.repo.webclient.api
+  modelPackage: org.sonatype.community.repo.webclient.model
   developerEmail: community@sonatype.com
   developerName: Sonatype Community
   developerOrganization: Sonatype Inc.
   developerOrganizationUrl: https://contribute.sonatype.com
-  groupId: org.sonatype
+  groupId: org.sonatype.community
   licenseName: Apache-2.0
   licenseUrl: https://github.com/sonatype-nexus-community/nexus-repo-api-client/blob/main/LICENSE
   scmConnection: scm:git:git@github.com:onatype-nexus-community/nexus-repo-api-client.git
   scmDeveloperConnection: scm:git:git@github.com:onatype-nexus-community/nexus-repo-api-client.git
   scmUrl: https://github.com/sonatype-nexus-community/nexus-repo-api-client
   useJakartaEe: true
+  asyncNative: true
+  generateBuilders: true
+  parentGroupId: org.sonatype.buildsupport
+  parentArtifactId: public-parent
+  parentVersion: 50
+
