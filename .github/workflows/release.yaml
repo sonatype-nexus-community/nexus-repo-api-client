@@ -26,6 +26,9 @@ jobs:
               # see https://github.com/actions/checkout
               uses: actions/checkout@v4
 
+            - name: Create Output Directory
+              run: mkdir out/${{ matrix.language }}
+
             - name: Run OpenAPI Generator
               uses: addnab/docker-run-action@v3
               with:
@@ -34,7 +37,7 @@ jobs:
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
 
             - name: Copy our scripts across too
-              run: cp *.sh out/${{ matrix.language }}
+              run: cp *.sh ./out/${{ matrix.language }}
             
             - name: Save to Cache
               uses: actions/cache/save@v4
@@ -52,6 +55,7 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version: 1.22
+
             - name: Checkout Go Library Repository
               uses: actions/checkout@v4
               with:
@@ -59,13 +63,16 @@ jobs:
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
                   path: out/go
+
             - name: Setup git config
               run: |
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
+
             - name: Unstage all existing files
               run: git rm -fr --ignore-unmatch *
               working-directory: out/go
+
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
@@ -74,14 +81,17 @@ jobs:
                   fail-on-cache-miss: true
             - name: Validate Checked Out Library
               run: ls -lR ${{ github.workspace }}
+              
             - name: Build Go API Client
               run: go build -v ./
               working-directory: out/go
+
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
               working-directory: out/go
+
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
               run: |

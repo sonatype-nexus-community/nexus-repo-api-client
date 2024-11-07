@@ -41,10 +41,7 @@ jobs:
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
 
             - name: Copy our scripts across too
-              run: |
-                ls -al ${{ github.workspace }}
-                ls -al ${{ github.workspace }}/out
-                cp *.sh ./out/${{ matrix.language }}
+              run: cp *.sh ./out/${{ matrix.language }}
 
             - name: Save to Cache
               uses: actions/cache/save@v4
@@ -62,15 +59,18 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version: 1.22
+
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
                   path: out/go
                   key: 'go-${{ github.run_id }}'
                   fail-on-cache-miss: true
+
             - name: Build Go API Client
               run: go build -v ./
               working-directory: out/go
+
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
@@ -100,6 +100,7 @@ jobs:
             - name: Build & Test Java Webclient API Client
               run: |
                 ./update-pom.sh pom.xml
+                mvn -v
                 mvn clean test
               working-directory: out/java-webclient
 
