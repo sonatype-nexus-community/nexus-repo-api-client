@@ -114,7 +114,7 @@ jobs:
             with:
               java-version: '17'
               distribution: 'temurin'
-              server-id: central
+              server-id: sonatype-public
               server-username: ${{ secrets.MAVEN_CENTRAL_USERAME }}
               server-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
               gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
