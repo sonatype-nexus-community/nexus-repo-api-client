@@ -11,7 +11,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    OPEN_API_GENERATOR_VERSION: 'v7.3.0'
+    OPEN_API_GENERATOR_VERSION: 'v7.9.0'
     THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
 
 jobs:
@@ -20,17 +20,25 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                language: ['go', 'typescript']
+                language: ['go', java-webclient', 'typescript']
         steps:
             - name: Checkout
               # see https://github.com/actions/checkout
               uses: actions/checkout@v4
+
+            - name: Create Output Directory
+              run: mkdir out/${{ matrix.language }}
+
             - name: Run OpenAPI Generator
               uses: addnab/docker-run-action@v3
               with:
                   image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
                   options: -v ${{ github.workspace }}:/local
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
+
+            - name: Copy our scripts across too
+              run: cp *.sh ./out/${{ matrix.language }}
+            
             - name: Save to Cache
               uses: actions/cache/save@v4
               with:
@@ -47,6 +55,7 @@ jobs:
               uses: actions/setup-go@v5
               with:
                   go-version: 1.22
+
             - name: Checkout Go Library Repository
               uses: actions/checkout@v4
               with:
@@ -54,13 +63,16 @@ jobs:
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
                   path: out/go
+
             - name: Setup git config
               run: |
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
+
             - name: Unstage all existing files
               run: git rm -fr --ignore-unmatch *
               working-directory: out/go
+
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
@@ -69,14 +81,17 @@ jobs:
                   fail-on-cache-miss: true
             - name: Validate Checked Out Library
               run: ls -lR ${{ github.workspace }}
+              
             - name: Build Go API Client
               run: go build -v ./
               working-directory: out/go
+
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
               working-directory: out/go
+
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
               run: |
@@ -87,6 +102,44 @@ jobs:
                   git push
                   git push --tags
               working-directory: out/go
+
+    release-java-webclient:
+        name: Release Java Webclient Library
+        runs-on: ubuntu-latest
+        needs: generate-library-code
+
+        steps:
+          - name: Set Java JDK 17 and Maven Central Repository
+            uses: actions/setup-java@v4
+            with:
+              java-version: '17'
+              distribution: 'temurin'
+              server-id: central
+              server-username: ${{ secrets.MAVEN_CENTRAL_USERAME }}
+              server-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+              gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+              gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+          - name: Set up Maven
+            uses: stCarolas/setup-maven@v5
+            with:
+              maven-version: 3.9.4
+
+          - name: Get generated code from cache
+            uses: actions/cache/restore@v4
+            with:
+              path: out/java-webclient
+              key: 'java-webclient-${{ github.run_id }}'
+              fail-on-cache-miss: true
+
+          - name: Publish package
+            run: |
+                ./update-pom.sh pom.xml
+                mvn -P release --batch-mode deploy -DskipTests
+            env:
+              MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERAME }}
+              MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+              MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
     release-typescript:
         name: Release Typescript Library
