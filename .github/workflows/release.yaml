@@ -11,7 +11,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    OPEN_API_GENERATOR_VERSION: 'v7.3.0'
+    OPEN_API_GENERATOR_VERSION: 'v7.9.0'
     THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
 
 jobs:
