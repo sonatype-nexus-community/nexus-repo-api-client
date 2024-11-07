@@ -129,7 +129,7 @@ jobs:
             uses: actions/cache/restore@v4
             with:
               path: out/java-webclient
-              key: 'java-webclient-${{ github.run_id }}'
+              key: 'java-webclient-${{ github.sha }}'
               fail-on-cache-miss: true
 
           - name: Publish package
