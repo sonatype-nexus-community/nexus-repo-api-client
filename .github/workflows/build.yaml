@@ -30,6 +30,9 @@ jobs:
               # see https://github.com/actions/checkout
               uses: actions/checkout@v4
 
+            - name: Create Output Directory
+              run: mkdir out/${{ matrix.language }}
+
             - name: Run OpenAPI Generator
               uses: addnab/docker-run-action@v3
               with:
