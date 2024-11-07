@@ -105,7 +105,6 @@ jobs:
             - name: Build & Test Java Webclient API Client
               run: |
                 ./update-pom.sh pom.xml
-                mvn -v
                 mvn clean test
               working-directory: out/java-webclient
 
