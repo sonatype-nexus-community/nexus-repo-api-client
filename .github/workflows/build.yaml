@@ -39,7 +39,7 @@ jobs:
 
             - name: Copy our scripts across too
               run: |
-                ls -al ${{ GITHUB_WORKSPACE }}
+                ls -al ${{ github.workspace }}
                 cp *.sh ./out/${{ matrix.language }}
 
             - name: Save to Cache
