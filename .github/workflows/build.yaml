@@ -87,7 +87,9 @@ jobs:
                   fail-on-cache-miss: true
 
             - name: Build & Test Java Webclient API Client
-              run: mvn clean test
+              run: |
+                ../../update-pom.sh pom.xml
+                mvn clean test
               working-directory: out/java-webclient
 
     validate-typescript:
