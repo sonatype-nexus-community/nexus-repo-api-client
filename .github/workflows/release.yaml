@@ -135,7 +135,7 @@ jobs:
           - name: Publish package
             run: |
                 ./update-pom.sh pom.xml
-                mvn --batch-mode -P publish-central -DskipTests
+                mvn deploy --batch-mode -Ppublish-central -DskipTests
             env:
               MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERAME }}
               MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
