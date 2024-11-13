@@ -30,10 +30,11 @@ This repository produces generated API Clients in various languages and framewor
 
 ## Supported Languages & Frameworks
 
-| Language / Framework | Sonatype IQ Version Added | Public Package Link                                                                                                                                                                                                                                                             |
+| Language / Framework | Sonatype Nexus Repository Version Added | Public Package Link                                                                                                                                                                                                                                                             |
 | -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Golang / Go          | 3.67.0                    | [![go.dev reference](https://img.shields.io/badge/dynamic/json?color=blue&label=tag&query=name&url=https://api.razonyang.com/v1/github/tag/sonatype-nexus-community/nexus-repo-api-client-go)](https://pkg.go.dev/github.com/sonatype-nexus-community/nexus-repo-api-client-go) |
-| Typescript (fetch)   | TBC                    | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-repo-api-client)](https://www.npmjs.com/package/@sonatype/nexus-repo-api-client)                                                                                                                                       |
+| Java (Webclient) | 3.68.1 | ![Maven Central Version](https://img.shields.io/maven-central/v/org.sonatype.community/nexus-repo-api-webclient) |
+| Typescript (fetch)   | 3.68.0                    | [![npm](https://img.shields.io/npm/v/%40sonatype%2Fnexus-repo-api-client)](https://www.npmjs.com/package/@sonatype/nexus-repo-api-client)                                                                                                                                       |
 
 ## Known Issues
 
