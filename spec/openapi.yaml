@@ -205,6 +205,8 @@ components:
             - ADD
             - DELETE
             - RUN
+            - START
+            - STOP
             - ASSOCIATE
             - DISASSOCIATE
             - ALL
@@ -237,6 +239,8 @@ components:
             - ADD
             - DELETE
             - RUN
+            - START
+            - STOP
             - ASSOCIATE
             - DISASSOCIATE
             - ALL
@@ -271,6 +275,8 @@ components:
             - ADD
             - DELETE
             - RUN
+            - START
+            - STOP
             - ASSOCIATE
             - DISASSOCIATE
             - ALL
@@ -309,6 +315,8 @@ components:
             - ADD
             - DELETE
             - RUN
+            - START
+            - STOP
             - ASSOCIATE
             - DISASSOCIATE
             - ALL
@@ -343,6 +351,8 @@ components:
             - ADD
             - DELETE
             - RUN
+            - START
+            - STOP
             - ASSOCIATE
             - DISASSOCIATE
             - ALL
@@ -587,6 +597,8 @@ components:
         blobCreated:
           format: date-time
           type: string
+        blobStoreName:
+          type: string
         checksum:
           additionalProperties:
             properties: {}
@@ -617,6 +629,30 @@ components:
           type: string
         uploaderIp:
           type: string
+      type: object
+    AuthSettingsXo:
+      properties:
+        enabled:
+          description: auth enabled
+          type: boolean
+        ntlmDomain:
+          description: Windows NTLM Domain
+          type: string
+        ntlmHost:
+          description: Windows NTLM Hostname
+          type: string
+        password:
+          description: user password
+          type: string
+        username:
+          description: user name
+          type: string
+      required:
+      - enabled
+      - ntlmDomain
+      - ntlmHost
+      - password
+      - username
       type: object
     AzureBlobStoreApiAuthentication:
       properties:
@@ -704,17 +740,7 @@ components:
         message:
           type: string
       type: object
-    BowerAttributes:
-      properties:
-        rewritePackageUrls:
-          description: Whether to force Bower to retrieve packages through this proxy
-            repository
-          example: true
-          type: boolean
-      required:
-      - rewritePackageUrls
-      type: object
-    BowerGroupRepositoryApiRequest:
+    CargoGroupRepositoryApiRequest:
       properties:
         group:
           $ref: '#/components/schemas/GroupAttributes'
@@ -735,7 +761,7 @@ components:
       - online
       - storage
       type: object
-    BowerHostedRepositoryApiRequest:
+    CargoHostedRepositoryApiRequest:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
@@ -757,45 +783,8 @@ components:
       - online
       - storage
       type: object
-    BowerProxyApiRepository:
+    CargoProxyRepositoryApiRequest:
       properties:
-        bower:
-          $ref: '#/components/schemas/BowerAttributes'
-        cleanup:
-          $ref: '#/components/schemas/CleanupPolicyAttributes'
-        httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
-        name:
-          description: A unique identifier for this repository
-          example: internal
-          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
-          type: string
-        negativeCache:
-          $ref: '#/components/schemas/NegativeCacheAttributes'
-        online:
-          description: Whether this repository accepts incoming requests
-          example: true
-          type: boolean
-        proxy:
-          $ref: '#/components/schemas/ProxyAttributes'
-        replication:
-          $ref: '#/components/schemas/ReplicationAttributes'
-        routingRuleName:
-          description: The name of the routing rule assigned to this repository
-          type: string
-        storage:
-          $ref: '#/components/schemas/StorageAttributes'
-      required:
-      - httpClient
-      - negativeCache
-      - online
-      - proxy
-      - storage
-      type: object
-    BowerProxyRepositoryApiRequest:
-      properties:
-        bower:
-          $ref: '#/components/schemas/BowerAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         httpClient:
@@ -834,6 +823,51 @@ components:
           items:
             type: string
           type: array
+      type: object
+    CleanupPolicyResourceXO:
+      properties:
+        criteriaAssetRegex:
+          description: asset name matcher (Remove components that have at least one
+            asset name matching the following regular expression pattern:)
+          type: string
+        criteriaLastBlobUpdated:
+          description: "component age (Components published over \u201Cx\u201D days\
+            \ ago (e.g 1-999))"
+          format: int64
+          type: integer
+        criteriaLastDownloaded:
+          description: "component usage (Components downloaded in \u201Cx\u201D amount\
+            \ of days (e.g 1-999))"
+          format: int64
+          type: integer
+        criteriaReleaseType:
+          description: release type (Remove components that are of the following release
+            type:)
+          enum:
+          - RELEASES
+          - PRERELEASES
+          - RELEASES_AND_PRERELEASES
+          type: string
+        format:
+          description: repository format
+          type: string
+        name:
+          description: policy name
+          maxLength: 255
+          minLength: 0
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        notes:
+          description: description
+          type: string
+        retain:
+          description: keep the latest "x" number of versions
+          format: int32
+          minimum: 1
+          type: integer
+      required:
+      - format
+      - name
       type: object
     CocoapodsProxyRepositoryApiRequest:
       properties:
@@ -894,10 +928,44 @@ components:
         version:
           type: string
       type: object
+    ConanHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
+      - storage
+      type: object
+    ConanProxyAttributes:
+      properties:
+        conanVersion:
+          description: Conan protocol version;
+          enum:
+          - V1
+          - V2
+          example: V1
+          type: string
+      type: object
     ConanProxyRepositoryApiRequest:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        conanProxy:
+          $ref: '#/components/schemas/ConanProxyAttributes'
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -1481,6 +1549,36 @@ components:
         softQuota:
           $ref: '#/components/schemas/BlobStoreApiSoftQuota'
       type: object
+    FrequencyXO:
+      properties:
+        cronExpression:
+          description: Cron expression for the task. Only applies for for "cron" schedule.
+          example: 0 1 2 * * ?
+          type: string
+        recurringDays:
+          description: Array with the number of the days the task must run. For "weekly"
+            schedule allowed values, 1 to 7. For "monthly" schedule allowed values,
+            1 to 31.
+          items:
+            format: int32
+            type: integer
+          type: array
+        schedule:
+          description: Type of schedule ("manual", "once", "hourly", "daily", "weekly",
+            "monthly", "cron")
+          type: string
+        startDate:
+          description: Start date of the task represented in unix timestamp. Does
+            not apply for "manual" schedule.
+          format: int64
+          type: integer
+        timeZoneOffset:
+          description: 'The offset time zone of the client. Example: '
+          example: -05:00
+          type: string
+      required:
+      - schedule
+      type: object
     GenericBlobStoreApiResponse:
       properties:
         availableSpaceInBytes:
@@ -1576,6 +1674,71 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    GoogleCloudBlobStoreApiBucket:
+      properties:
+        name:
+          description: The name of the GC Storage bucket
+          type: string
+        prefix:
+          description: The GC Storage blob store (i.e GC Storage object) key prefix
+          readOnly: true
+          type: string
+        projectId:
+          description: GCP Project ID
+          example: project_123
+          readOnly: true
+          type: string
+        region:
+          description: The GCP region to create a new GC Storage bucket in or an existing
+            GC Storage bucket's region
+          example: us-central1
+          type: string
+      required:
+      - name
+      - region
+      type: object
+    GoogleCloudBlobStoreApiBucketAuthentication:
+      properties:
+        accountKey:
+          description: The credentials JSON file.
+          type: string
+        authenticationMethod:
+          description: The type of Google Cloud authentication to use.
+          enum:
+          - applicationDefault
+          - accountKey
+          type: string
+      required:
+      - authenticationMethod
+      type: object
+    GoogleCloudBlobStoreApiBucketConfiguration:
+      properties:
+        bucket:
+          $ref: '#/components/schemas/GoogleCloudBlobStoreApiBucket'
+        bucketSecurity:
+          $ref: '#/components/schemas/GoogleCloudBlobStoreApiBucketAuthentication'
+      required:
+      - bucket
+      type: object
+    GoogleCloudBlobstoreApiModel:
+      properties:
+        bucketConfiguration:
+          $ref: '#/components/schemas/GoogleCloudBlobStoreApiBucketConfiguration'
+        name:
+          description: The name of the GC Storage blob store.
+          example: gc_storage
+          type: string
+        softQuota:
+          $ref: '#/components/schemas/BlobStoreApiSoftQuota'
+        type:
+          description: The blob store type.
+          example: Google Cloud Storage
+          readOnly: true
+          type: string
+      required:
+      - bucketConfiguration
+      - name
       type: object
     GroupAttributes:
       properties:
@@ -1857,7 +2020,55 @@ components:
         username:
           type: string
       type: object
+    HttpSettingsXo:
+      properties:
+        httpProxy:
+          $ref: '#/components/schemas/ProxySettingsXo'
+        httpsProxy:
+          $ref: '#/components/schemas/ProxySettingsXo'
+        nonProxyHosts:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        retries:
+          description: Connection/Socket Retry Attempts
+          format: int32
+          maximum: 10
+          minimum: 0
+          type: integer
+        timeout:
+          description: Connection/Socket Timeout
+          format: int32
+          maximum: 3600
+          minimum: 1
+          type: integer
+        userAgent:
+          description: User-Agent Customization
+          type: string
+      required:
+      - httpProxy
+      - httpsProxy
+      - retries
+      - timeout
+      - userAgent
+      type: object
     InputStream:
+      type: object
+    IqAuditXo:
+      properties:
+        enabled:
+          description: is audit enabled
+          type: boolean
+        enabledQuarantine:
+          description: is quarantine enabled
+          type: boolean
+        repositoryName:
+          description: repository name
+          type: string
+      required:
+      - enabledQuarantine
+      - repositoryName
       type: object
     IqConnectionVerificationXo:
       properties:
@@ -1911,6 +2122,14 @@ components:
           type: string
       required:
       - authenticationType
+      type: object
+    MaliciousRiskOnDiskCountResponse:
+      properties:
+        hdsExceptionThrown:
+          type: boolean
+        totalCount:
+          format: int64
+          type: integer
       type: object
     MavenAttributes:
       properties:
@@ -2111,6 +2330,11 @@ components:
       required:
       - enabled
       - timeToLive
+      type: object
+    NodeInformation:
+      properties:
+        nodeId:
+          type: string
       type: object
     NpmAttributes:
       properties:
@@ -2466,6 +2690,25 @@ components:
       - contentMaxAge
       - metadataMaxAge
       type: object
+    ProxySettingsXo:
+      properties:
+        authInfo:
+          $ref: '#/components/schemas/AuthSettingsXo'
+        enabled:
+          description: proxy enabled
+          type: boolean
+        host:
+          description: proxy host
+          type: string
+        port:
+          description: proxy port
+          type: string
+      required:
+      - authInfo
+      - enabled
+      - host
+      - port
+      type: object
     PyPiProxyAttributes:
       properties:
         removeQuarantined:
@@ -2720,6 +2963,15 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    ReEncryptionRequestApiXO:
+      properties:
+        notifyEmail:
+          description: Optional - Email to notify when task finishes
+          type: string
+        secretKeyId:
+          description: Key identifier that will be used to re-encrypt secrets
+          type: string
       type: object
     ReadLdapServerXo:
       properties:
@@ -3113,19 +3365,23 @@ components:
         endpoint:
           description: A custom endpoint URL for third party object stores using the
             S3 API.
+          readOnly: true
           type: string
         forcePathStyle:
           description: Setting this flag will result in path-style access being used
             for all requests.
+          readOnly: true
           type: boolean
         maxConnectionPoolSize:
           description: Setting this value will override the default connection pool
             size of Nexus of the s3 client for this blobstore.
           format: int32
+          readOnly: true
           type: integer
         signerType:
           description: An API signature version which may be required for third party
             object stores using the S3 API.
+          readOnly: true
           type: string
       type: object
     S3BlobStoreApiBucket:
@@ -3135,17 +3391,21 @@ components:
             the S3 bucket (-1 to disable)
           example: 3
           format: int32
+          readOnly: true
           type: integer
         name:
           description: The name of the S3 bucket
+          readOnly: true
           type: string
         prefix:
           description: The S3 blob store (i.e S3 object) key prefix
+          readOnly: true
           type: string
         region:
           description: The AWS region to create a new S3 bucket in or an existing
             S3 bucket's region
           example: DEFAULT
+          readOnly: true
           type: string
       required:
       - expiration
@@ -3154,6 +3414,11 @@ components:
       type: object
     S3BlobStoreApiBucketConfiguration:
       properties:
+        activeRegion:
+          description: The active region based on bucket configuration, failover buckets,
+            and EC2 region Nexus is running.
+          readOnly: true
+          type: string
         advancedBucketConnection:
           $ref: '#/components/schemas/S3BlobStoreApiAdvancedBucketConnection'
         bucket:
@@ -3162,6 +3427,12 @@ components:
           $ref: '#/components/schemas/S3BlobStoreApiBucketSecurity'
         encryption:
           $ref: '#/components/schemas/S3BlobStoreApiEncryption'
+        failoverBuckets:
+          description: A list of secondary buckets which have bidirectional replication
+            enabled and should be used when Nexus is running in the region
+          items:
+            $ref: '#/components/schemas/S3BlobStoreApiFailoverBucket'
+          type: array
       required:
       - bucket
       type: object
@@ -3169,9 +3440,11 @@ components:
       properties:
         accessKeyId:
           description: An IAM access key ID for granting access to the S3 bucket
+          readOnly: true
           type: string
         role:
           description: An IAM role to assume in order to access the S3 bucket
+          readOnly: true
           type: string
         secretAccessKey:
           description: The secret access key associated with the specified IAM access
@@ -3180,19 +3453,36 @@ components:
         sessionToken:
           description: An AWS STS session token associated with temporary security
             credentials which grant access to the S3 bucket
+          readOnly: true
           type: string
       type: object
     S3BlobStoreApiEncryption:
       properties:
         encryptionKey:
           description: The encryption key.
+          readOnly: true
           type: string
         encryptionType:
           description: The type of S3 server side encryption to use.
           enum:
           - s3ManagedEncryption
           - kmsManagedEncryption
+          readOnly: true
           type: string
+      type: object
+    S3BlobStoreApiFailoverBucket:
+      properties:
+        bucketName:
+          description: The name of the bucket in the region
+          readOnly: true
+          type: string
+        region:
+          description: The region containing the bucket
+          readOnly: true
+          type: string
+      required:
+      - bucketName
+      - region
       type: object
     S3BlobStoreApiModel:
       properties:
@@ -3201,6 +3491,7 @@ components:
         name:
           description: The name of the S3 blob store.
           example: s3
+          readOnly: true
           type: string
         softQuota:
           $ref: '#/components/schemas/BlobStoreApiSoftQuota'
@@ -3370,6 +3661,8 @@ components:
       type: object
     StackTraceElement:
       properties:
+        classLoaderName:
+          type: string
         className:
           type: string
         fileName:
@@ -3378,6 +3671,10 @@ components:
           format: int32
           type: integer
         methodName:
+          type: string
+        moduleName:
+          type: string
+        moduleVersion:
           type: string
         nativeMethod:
           type: boolean
@@ -3445,6 +3742,33 @@ components:
         truncated:
           type: boolean
       type: object
+    SystemCheckResultDTO:
+      properties:
+        healthy:
+          description: Whether the system check succeeded of failed
+          type: boolean
+        message:
+          description: A description of the success or failure
+          type: string
+      type: object
+    SystemCheckResultsApiDTO:
+      properties:
+        hostname:
+          description: The hostname of the originating node
+          example: nexus01
+          type: string
+        nodeId:
+          description: A unique identifier for the node, should not be considered
+            stable
+          type: string
+        results:
+          additionalProperties:
+            $ref: '#/components/schemas/SystemCheckResultDTO'
+          description: The system status check results
+          example: '{"Check": {"healthy": false, "message": "An explanation of the
+            check"}}'
+          type: object
+      type: object
     TagXO:
       properties:
         attributes:
@@ -3465,6 +3789,40 @@ components:
           type: string
       required:
       - name
+      type: object
+    TaskTemplateXO:
+      properties:
+        alertEmail:
+          description: e-mail for task notifications.
+          type: string
+        enabled:
+          description: Indicates if the task would be enabled.
+          type: boolean
+        frequency:
+          $ref: '#/components/schemas/FrequencyXO'
+        name:
+          description: The name of the task template.
+          type: string
+        notificationCondition:
+          description: Condition required to notify a task execution.
+          enum:
+          - FAILURE
+          - SUCCESS_FAILURE
+          type: string
+        properties:
+          additionalProperties:
+            type: string
+          description: Additional properties for the task
+          type: object
+        type:
+          description: The type of task to be created.
+          type: string
+      required:
+      - enabled
+      - frequency
+      - name
+      - notificationCondition
+      - type
       type: object
     TaskXO:
       properties:
@@ -3706,6 +4064,16 @@ components:
         enabled:
           description: Whether or not User Tokens feature is enabled
           type: boolean
+        expirationDays:
+          description: Set user token expiration days (E.g., 1-999)
+          example: 30
+          format: int32
+          maximum: 999
+          minimum: 1
+          type: integer
+        expirationEnabled:
+          description: Enable user tokens expiration
+          type: boolean
         protectContent:
           description: Additionally require user tokens for repository authentication
           type: boolean
@@ -3856,14 +4224,67 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.68.1-02.
+    as of version 3.74.0-05.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.68.1-02
+  version: 3.74.0-05
 openapi: 3.0.1
 paths:
+  /beta/status/check/cluster:
+    get:
+      operationId: getClusterSystemStatusChecks
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SystemCheckResultsApiDTO'
+                type: array
+          description: successful operation
+        '403':
+          content: {}
+          description: Insufficient permissions to retrieve system status checks
+      summary: Health check endpoint that returns the results of the system status
+        checks
+      tags:
+      - Status
+  /beta/status/check/{nodeId}:
+    get:
+      operationId: getNodeSystemStatusChecks
+      parameters:
+      - description: Node Id
+        in: path
+        name: nodeId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content: {}
+          description: The system status check results
+        '404':
+          content: {}
+          description: System status information not found
+      summary: Health check endpoint that returns the results of the system status
+        checks of specified Node
+      tags:
+      - Status
+  /beta/system/information:
+    get:
+      operationId: getSystemInformation
+      responses:
+        '200':
+          content: {}
+          description: System information for all running nodes grouped by nodeID
+        '403':
+          content: {}
+          description: Insufficient permissions to request this data
+      summary: Get information about all nodes
+      tags:
+      - 'System: Nodes'
   /v1/assets:
     get:
       operationId: getAssets
@@ -3895,7 +4316,7 @@ paths:
           description: Parameter 'repository' is required
       summary: List assets
       tags:
-      - Assets
+      - assets
   /v1/assets/{id}:
     delete:
       operationId: deleteAsset
@@ -3921,7 +4342,7 @@ paths:
           description: Malformed ID
       summary: Delete a single asset
       tags:
-      - Assets
+      - assets
     get:
       operationId: getAssetById
       parameters:
@@ -3949,7 +4370,7 @@ paths:
           description: Malformed ID
       summary: Get a single asset
       tags:
-      - Assets
+      - assets
   /v1/azureblobstore/test-connection:
     post:
       operationId: verifyConnection_2
@@ -4148,6 +4569,121 @@ paths:
           content: {}
           description: Blob store not found
       summary: Update a file blob store configuration by name
+      tags:
+      - Blob store
+      x-codegen-request-body-name: body
+  /v1/blobstores/google:
+    post:
+      operationId: createBlobStore_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleCloudBlobstoreApiModel'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Google Cloud blob store created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create a Google Cloud blob store
+      tags:
+      - Blob store
+      x-codegen-request-body-name: body
+  /v1/blobstores/google/regions/{projectId}:
+    get:
+      operationId: getRegionsByProjectId
+      parameters:
+      - description: projectId
+        in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: List of regions found
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Project not found
+      summary: Get the project regions by project's id
+      tags:
+      - Blob store
+  /v1/blobstores/google/{name}:
+    get:
+      operationId: getBlobStore_2
+      parameters:
+      - description: the name of the blob store
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoogleCloudBlobstoreApiModel'
+          description: Google Cloud blob store configuration
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Get the configuration for a Google Cloud blob store
+      tags:
+      - Blob store
+    put:
+      operationId: updateBlobStore_2
+      parameters:
+      - description: the name of the blobstore
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleCloudBlobstoreApiModel'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Google Cloud blob store updated
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update a Google Cloud blob store
       tags:
       - Blob store
       x-codegen-request-body-name: body
@@ -4378,6 +4914,101 @@ paths:
       summary: Get quota status for a given blob store
       tags:
       - Blob store
+  /v1/cleanup-policies:
+    get:
+      operationId: getAll
+      responses:
+        '200':
+          content: {}
+          description: The list of existing policies
+      summary: Get a list of existing policies
+      tags:
+      - Cleanup policies
+    post:
+      operationId: create_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanupPolicyResourceXO'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Policy was successfully created
+        '400':
+          content: {}
+          description: Given payload has invalid data
+        '409':
+          content: {}
+          description: Given policy name already exists
+      summary: Create a new policy
+      tags:
+      - Cleanup policies
+      x-codegen-request-body-name: body
+  /v1/cleanup-policies/{name}:
+    delete:
+      operationId: deletePolicyByName
+      parameters:
+      - in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Given policy successfully deleted
+        '404':
+          content: {}
+          description: The policy with the given name not found
+      summary: Delete cleanup policy
+      tags:
+      - Cleanup policies
+    get:
+      operationId: getCleanupPolicyByName
+      parameters:
+      - in: path
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content: {}
+          description: Policy if exists
+      summary: Get a policy by name
+      tags:
+      - Cleanup policies
+  /v1/cleanup-policies/{policyName}:
+    put:
+      operationId: update_2
+      parameters:
+      - in: path
+        name: policyName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanupPolicyResourceXO'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Policy was successfully updated
+        '400':
+          content: {}
+          description: Given payload has invalid data
+        '404':
+          content: {}
+          description: Given policy name does not exist
+      summary: Update existing policy
+      tags:
+      - Cleanup policies
+      x-codegen-request-body-name: body
   /v1/components:
     get:
       operationId: getComponents
@@ -4409,7 +5040,7 @@ paths:
           description: Parameter 'repository' is required
       summary: List components
       tags:
-      - Components
+      - components
     post:
       operationId: uploadComponent
       parameters:
@@ -4582,7 +5213,7 @@ paths:
           description: Parameter 'repository' is required
       summary: Upload a single component
       tags:
-      - Components
+      - components
   /v1/components/{id}:
     delete:
       operationId: deleteComponent
@@ -4608,7 +5239,7 @@ paths:
           description: Malformed ID
       summary: Delete a single component
       tags:
-      - Components
+      - components
     get:
       operationId: getComponentById
       parameters:
@@ -4636,7 +5267,7 @@ paths:
           description: Malformed ID
       summary: Get a single component
       tags:
-      - Components
+      - components
   /v1/email:
     delete:
       operationId: deleteEmailConfiguration
@@ -4743,6 +5374,44 @@ paths:
       summary: Get upload field requirements for the desired format
       tags:
       - Formats
+  /v1/http:
+    delete:
+      operationId: resetHttpSettings
+      responses:
+        '204':
+          content: {}
+          description: Configuration Reset Successful
+      summary: Reset HTTP System Settings
+      tags:
+      - Manage Sonatype HTTP System Settings
+    get:
+      operationId: getHttpSettings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HttpSettingsXo'
+          description: Successful Operation
+      summary: Get HTTP system settings
+      tags:
+      - Manage Sonatype HTTP System Settings
+    put:
+      operationId: updateHttpSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HttpSettingsXo'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Successful Operation
+      summary: Update HTTP system settings
+      tags:
+      - Manage Sonatype HTTP System Settings
+      x-codegen-request-body-name: body
   /v1/iq:
     get:
       operationId: getConfiguration
@@ -4769,6 +5438,62 @@ paths:
       tags:
       - Manage Sonatype Repository Firewall configuration
       x-codegen-request-body-name: body
+  /v1/iq/audit:
+    get:
+      operationId: getAllAuditStatus
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IqAuditXo'
+                type: array
+          description: Successful Operation
+      summary: List repositories audit statuses.
+      tags:
+      - Manage Sonatype Repository Firewall configuration
+    put:
+      operationId: manageAudit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IqAuditXo'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository audit is successfully updated
+        '400':
+          content: {}
+          description: Given repository is not a proxy
+        '404':
+          content: {}
+          description: Given repository not found
+      summary: Manage audit
+      tags:
+      - Manage Sonatype Repository Firewall configuration
+      x-codegen-request-body-name: body
+  /v1/iq/audit/{repositoryName}:
+    get:
+      operationId: getAuditStatus
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          content: {}
+          description: Given repository is not a proxy
+        '404':
+          content: {}
+          description: Given repository not found
+      summary: Get audit status for the repository
+      tags:
+      - Manage Sonatype Repository Firewall configuration
   /v1/iq/disable:
     post:
       operationId: disableIq
@@ -4854,6 +5579,38 @@ paths:
       tags:
       - Lifecycle
       x-codegen-request-body-name: body
+  /v1/malicious-risk/enabledRegistries:
+    get:
+      operationId: getEnabledRegistries
+      responses:
+        '200':
+          content: {}
+          description: RHC Enabled registries returned
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Get RHC Enabled registries for malicious risk scanning.
+      tags:
+      - Malicious Risk On Disk
+  /v1/malicious-risk/risk-on-disk:
+    get:
+      operationId: getMaliciousRiskOnDiskCount
+      responses:
+        '200':
+          content: {}
+          description: Malicious Risk On Disk Count returned
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Get Malicious Risk On Disk Count
+      tags:
+      - Malicious Risk On Disk
   /v1/read-only:
     get:
       operationId: get
@@ -5096,14 +5853,14 @@ paths:
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/group:
+  /v1/repositories/cargo/group:
     post:
-      operationId: createBowerGroupRepository
+      operationId: createCargoGroupRepository
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerGroupRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoGroupRepositoryApiRequest'
         required: false
       responses:
         '201':
@@ -5115,13 +5872,13 @@ paths:
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Create Bower group repository
+      summary: Create cargo group repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/group/{repositoryName}:
+  /v1/repositories/cargo/group/{repositoryName}:
     get:
-      operationId: getBowerGroupRepository
+      operationId: getCargoGroupRepository
       parameters:
       - in: path
         name: repositoryName
@@ -5139,7 +5896,7 @@ paths:
       tags:
       - Repository Management
     put:
-      operationId: updateBowerGroupRepository
+      operationId: updateCargoGroupRepository
       parameters:
       - description: Name of the repository to update
         in: path
@@ -5151,30 +5908,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerGroupRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoGroupRepositoryApiRequest'
         required: false
       responses:
         '204':
           content: {}
           description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
         '401':
           content: {}
           description: Authentication required
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Update Bower group repository
+      summary: Update cargo group repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/hosted:
+  /v1/repositories/cargo/hosted:
     post:
-      operationId: createBowerHostedRepository
+      operationId: createCargoHostedRepository
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerHostedRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoHostedRepositoryApiRequest'
         required: false
       responses:
         '201':
@@ -5186,13 +5946,13 @@ paths:
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Create Bower hosted repository
+      summary: Create cargo hosted repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/hosted/{repositoryName}:
+  /v1/repositories/cargo/hosted/{repositoryName}:
     get:
-      operationId: getBowerHostedRepository
+      operationId: getCargoHostedRepository
       parameters:
       - in: path
         name: repositoryName
@@ -5210,7 +5970,7 @@ paths:
       tags:
       - Repository Management
     put:
-      operationId: updateBowerHostedRepository
+      operationId: updateCargoHostedRepository
       parameters:
       - description: Name of the repository to update
         in: path
@@ -5222,30 +5982,33 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerHostedRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoHostedRepositoryApiRequest'
         required: false
       responses:
         '204':
           content: {}
           description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
         '401':
           content: {}
           description: Authentication required
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Update Bower hosted repository
+      summary: Update cargo hosted repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/proxy:
+  /v1/repositories/cargo/proxy:
     post:
-      operationId: createBowerProxyRepository
+      operationId: createCargoProxyRepository
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerProxyRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoProxyRepositoryApiRequest'
         required: false
       responses:
         '201':
@@ -5257,13 +6020,13 @@ paths:
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Create Bower proxy repository
+      summary: Create cargo proxy repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
-  /v1/repositories/bower/proxy/{repositoryName}:
+  /v1/repositories/cargo/proxy/{repositoryName}:
     get:
-      operationId: getBowerProxyRepository
+      operationId: getCargoProxyRepository
       parameters:
       - in: path
         name: repositoryName
@@ -5275,13 +6038,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BowerProxyApiRepository'
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
           description: successful operation
       summary: Get repository
       tags:
       - Repository Management
     put:
-      operationId: updateBowerProxyRepository
+      operationId: updateCargoProxyRepository
       parameters:
       - description: Name of the repository to update
         in: path
@@ -5293,19 +6056,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BowerProxyRepositoryApiRequest'
+              $ref: '#/components/schemas/CargoProxyRepositoryApiRequest'
         required: false
       responses:
         '204':
           content: {}
           description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
         '401':
           content: {}
           description: Authentication required
         '403':
           content: {}
           description: Insufficient permissions
-      summary: Update Bower proxy repository
+      summary: Update cargo proxy repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
@@ -5383,6 +6149,83 @@ paths:
           content: {}
           description: Insufficient permissions
       summary: Update Cocoapods proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/conan/hosted:
+    post:
+      operationId: createConanHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConanHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Conan hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/conan/hosted/{repositoryName}:
+    get:
+      operationId: getConanHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateConanHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConanHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update Conan hosted repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
@@ -8479,6 +9322,10 @@ paths:
       x-codegen-request-body-name: body
   /v1/search:
     get:
+      description: All searches require at least one criterion of at least three characters
+        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
+        your criteria in quotation marks to search an exact phrase; otherwise, search
+        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: search
       parameters:
       - allowEmptyValue: true
@@ -8596,6 +9443,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -8780,6 +9662,10 @@ paths:
       - Search
   /v1/search/assets:
     get:
+      description: All searches require at least one criterion of at least three characters
+        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
+        your criteria in quotation marks to search an exact phrase; otherwise, search
+        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: searchAssets
       parameters:
       - description: A token returned by a prior request. If present, the next page
@@ -8896,6 +9782,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -9195,6 +10116,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -9377,6 +10333,36 @@ paths:
       summary: Search and download asset
       tags:
       - Search
+  /v1/secrets/encryption/re-encrypt:
+    put:
+      description: Ensure all nodes have access to the key, and they use the same
+        key
+      operationId: reEncrypt
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReEncryptionRequestApiXO'
+        required: false
+      responses:
+        '202':
+          content: {}
+          description: Re-encrypt task successfully submitted
+        '400':
+          content: {}
+          description: 'Invalid request. See the response for more information. Possible
+            causes: The key is not available to all nodes, upgrade needed or empty
+            key id.'
+        '403':
+          content: {}
+          description: Insufficient permissions to re-encrypt secrets
+        '409':
+          content: {}
+          description: Re-encryption task in progress.
+      summary: Re-encrypt secrets using the specified key
+      tags:
+      - 'Security management: secrets encryption'
+      x-codegen-request-body-name: body
   /v1/security/anonymous:
     get:
       operationId: read
@@ -9608,6 +10594,20 @@ paths:
       tags:
       - Content selectors
       x-codegen-request-body-name: body
+  /v1/security/jwt:
+    put:
+      operationId: resetSecret
+      responses:
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Reset JWT secret (note that session will be expired for the all logged-in
+        users)
+      tags:
+      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: getLdapServers
@@ -9776,7 +10776,7 @@ paths:
       - 'Security management: privileges'
   /v1/security/privileges/application:
     post:
-      operationId: createPrivilege_1
+      operationId: createPrivilege
       requestBody:
         content:
           application/json:
@@ -9797,7 +10797,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/application/{privilegeName}:
     put:
-      operationId: updatePrivilege_1
+      operationId: updatePrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -10036,7 +11036,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard:
     post:
-      operationId: createPrivilege
+      operationId: createPrivilege_1
       requestBody:
         content:
           application/json:
@@ -10057,7 +11057,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard/{privilegeName}:
     put:
-      operationId: updatePrivilege
+      operationId: updatePrivilege_1
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -10605,8 +11605,7 @@ paths:
         '403':
           content: {}
           description: The user does not have permission to perform the operation.
-      summary: Retrieve a list of users. Note if the source is not 'default' the response
-        is limited to 100 users.
+      summary: Retrieve a list of users.
       tags:
       - 'Security management: users'
     post:
@@ -10643,6 +11642,11 @@ paths:
         in: path
         name: userId
         required: true
+        schema:
+          type: string
+      - description: The realm the request should apply to.
+        in: query
+        name: realm
         schema:
           type: string
       responses:
@@ -10839,6 +11843,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -11117,6 +12156,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -11430,6 +12504,32 @@ paths:
       tags:
       - Product licensing
       x-codegen-request-body-name: body
+  /v1/system/node:
+    delete:
+      operationId: clear
+      responses:
+        '403':
+          content: {}
+          description: Insufficient permissions to update settings
+      summary: Reset the ID for this node. Takes effect after restart and should only
+        be used when cloning an instance
+      tags:
+      - 'System: Nodes'
+    get:
+      operationId: getNodeId
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInformation'
+          description: successful operation
+        '403':
+          content: {}
+          description: Insufficient permissions to update settings
+      summary: Get information about this node
+      tags:
+      - 'System: Nodes'
   /v1/tags:
     get:
       operationId: getTags
@@ -11560,6 +12660,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -11837,6 +12972,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -12110,7 +13280,72 @@ paths:
       summary: List tasks
       tags:
       - Tasks
+    post:
+      operationId: createTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskTemplateXO'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Create task
+      tags:
+      - Tasks
+      x-codegen-request-body-name: body
+  /v1/tasks/templates:
+    get:
+      operationId: getTaskTemplates
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TaskTemplateXO'
+                type: array
+          description: successful operation
+      summary: List tasks of template tasks. This is the base to create new tasks
+      tags:
+      - Tasks
+  /v1/tasks/templates/{typeId}:
+    get:
+      operationId: getTaskTemplate
+      parameters:
+      - in: path
+        name: typeId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskTemplateXO'
+          description: successful operation
+      summary: Get task template by type. This is the base to create new tasks
+      tags:
+      - Tasks
   /v1/tasks/{id}:
+    delete:
+      operationId: deleteTaskById
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Delete task by id
+      tags:
+      - Tasks
     get:
       operationId: getTaskById
       parameters:
@@ -12179,6 +13414,29 @@ paths:
       summary: Stop task
       tags:
       - Tasks
+  /v1/tasks/{taskId}:
+    put:
+      operationId: updateTask
+      parameters:
+      - in: path
+        name: taskId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskTemplateXO'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Update an existing task
+      tags:
+      - Tasks
+      x-codegen-request-body-name: body
 security:
 - BasicAuth: []
 servers:
@@ -12187,32 +13445,38 @@ tags:
 - name: 'Security Management: Anonymous Access'
 - name: Security management
 - name: 'Security management: users'
+- name: 'Security management: JWT'
 - name: 'Security management: privileges'
 - name: 'Security management: realms'
 - name: 'Security management: roles'
 - name: Tasks
 - name: Blob store
 - name: Lifecycle
+- name: 'System: Nodes'
 - name: Read-only
+- name: 'Security management: secrets encryption'
 - name: 'Security: certificates'
-- name: Assets
-- name: Components
-- name: Repository Management
-- name: Content selectors
-- name: Routing rules
-- name: Search
-- name: Formats
 - name: Email
 - name: Status
 - name: Support
+- name: assets
+- name: components
+- name: Repository Management
+- name: Content selectors
+- name: Routing rules
+- name: Formats
+- name: Search
 - name: Script
 - name: 'Security management: LDAP'
 - name: Tags
 - name: Manage Sonatype Repository Firewall configuration
+- name: Malicious Risk On Disk
+- name: 'Security management: user tokens'
 - name: Product licensing
 - name: 'Security: Atlassian Crowd'
-- name: 'Security management: user tokens'
 - name: Staging
 - name: Azure blob store
 - name: 'Security management: SAML'
+- name: Cleanup policies
+- name: Manage Sonatype HTTP System Settings
 x-original-swagger-version: '2.0'
