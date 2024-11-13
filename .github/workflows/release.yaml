@@ -135,6 +135,7 @@ jobs:
           - name: Publish package
             run: |
                 ./update-pom.sh pom.xml
+                mvn versions:set -DnewVersion=${{ env.THIS_VERSION }}
                 mvn deploy --batch-mode -Ppublish-central -Prelease -DskipTests -DskipNexusStagingDeployMojo
             env:
               MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERAME }}
