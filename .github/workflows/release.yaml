@@ -115,10 +115,10 @@ jobs:
               java-version: '17'
               distribution: 'temurin'
               server-id: sonatype-public
-              server-username: ${{ secrets.MAVEN_CENTRAL_USERAME }}
-              server-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-              # gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
-              # gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+              server-username: MAVEN_USERNAME
+              server-password: MAVEN_PASSWORD
+              gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+              gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
           - name: Set up Maven
             uses: stCarolas/setup-maven@v5
@@ -136,6 +136,10 @@ jobs:
             run: |
                 ./update-pom.sh pom.xml
                 mvn deploy --batch-mode -Ppublish-central -DskipTests
+            env:
+              MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERAME }}
+              MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+              MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
             working-directory: out/java-webclient
 
     release-typescript:
