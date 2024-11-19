@@ -12,6 +12,8 @@ concurrency:
 
 env:
     OPEN_API_GENERATOR_VERSION: 'v7.9.0'
+    PYTHON_VERSION_DEFAULT: '3.12'
+    POETRY_VERSION: '1.8.1'
     THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
 
 jobs:
@@ -20,7 +22,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                language: ['go', 'java-webclient', 'typescript']
+                language: ['go', 'java-webclient', 'python', 'typescript']
         steps:
             - name: Checkout
               # see https://github.com/actions/checkout
@@ -102,6 +104,45 @@ jobs:
                   git push
                   git push --tags
               working-directory: out/go
+
+    release-python:
+      name: Release Python Library
+      runs-on: ubuntu-latest
+      needs: generate-library-code
+
+      steps:
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
+
+        - name: Install poetry
+          # see https://github.com/marketplace/actions/setup-poetry
+          uses: Gr1N/setup-poetry@v9
+          with:
+            poetry-version: ${{ env.POETRY_VERSION }}
+
+        - name: Get generated code from cache
+          uses: actions/cache/restore@v4
+          with:
+            path: out/python
+            key: 'python-${{ github.sha }}'
+            fail-on-cache-miss: true
+
+        - name: Set Version
+          run: |
+            poetry version ${{ env.THIS_VERSION }}
+          working-directory: out/python
+
+        - name: Build Python API Client
+          run: poetry build
+          working-directory: out/python
+
+        - name: Publish
+          run: |
+            poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+            poetry publish
+          working-directory: out/python
 
     release-java-webclient:
         name: Release Java Webclient Library
