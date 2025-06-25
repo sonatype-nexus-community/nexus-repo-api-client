@@ -58,9 +58,6 @@ jobs:
               with:
                   go-version: 1.22
 
-            - name: Set Go Mod Version
-              run: echo "GO_MOD_VERSION=$(echo ${{ github.ref_name }} | cut -d '.' -f1)" >> $GITHUB_ENV
-
             - name: Checkout Go Library Repository
               uses: actions/checkout@v4
               with:
@@ -74,13 +71,9 @@ jobs:
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
 
-            - name: Ensure Module Version folder exists
-              run: mkdir -p ${{ env.GO_MOD_VERSION }}
-              working-directory: out/go
-
             - name: Unstage all existing files
               run: git rm -fr --ignore-unmatch *
-              working-directory: out/go/${{ env.GO_MOD_VERSION }}
+              working-directory: out/go
 
             - name: Validate Checked Out Library
               run: ls -lR ${{ github.workspace }}
@@ -88,7 +81,7 @@ jobs:
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
-                  path: "out/go/${{ env.GO_MOD_VERSION }}"
+                  path: out/go
                   key: 'go-${{ github.sha }}'
                   fail-on-cache-miss: true
 
@@ -97,13 +90,13 @@ jobs:
               
             - name: Build Go API Client
               run: go build -v ./
-              working-directory: out/go/${{ env.GO_MOD_VERSION }}
+              working-directory: out/go
 
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
-              working-directory: out/go/${{ env.GO_MOD_VERSION }}
+              working-directory: out/go
 
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
@@ -114,7 +107,7 @@ jobs:
                   git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
                   git push
                   git push --tags
-              working-directory: out/go/${{ env.GO_MOD_VERSION }}
+              working-directory: out/go
 
     release-python:
       name: Release Python Library
