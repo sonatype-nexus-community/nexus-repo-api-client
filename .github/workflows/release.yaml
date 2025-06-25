@@ -11,6 +11,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
+    GO_MOD_VERSION: $(echo "${{ github.ref_name }}" | cut -d '.' -f1)
     OPEN_API_GENERATOR_VERSION: 'v7.13.0'
     PYTHON_VERSION_DEFAULT: '3.12'
     POETRY_VERSION: '1.8.1'
@@ -71,28 +72,33 @@ jobs:
                   git config --global user.name "GitHub Actions"
                   git config --global user.email "<>"
 
+            - name: Ensure Module Version folder exists
+              run: mkdir -p ${{ env.GO_MOD_VERSION }}
+              working-directory: out/go
+
             - name: Unstage all existing files
               run: git rm -fr --ignore-unmatch *
-              working-directory: out/go
+              working-directory: out/go/${{ env.GO_MOD_VERSION }}
 
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
-                  path: out/go
+                  path: out/go/${{ env.GO_MOD_VERSION }}
                   key: 'go-${{ github.sha }}'
                   fail-on-cache-miss: true
+
             - name: Validate Checked Out Library
               run: ls -lR ${{ github.workspace }}
               
             - name: Build Go API Client
               run: go build -v ./
-              working-directory: out/go
+              working-directory: out/go/${{ env.GO_MOD_VERSION }}
 
             - name: Install test dependencies & run generated tests
               run: |
                   go get github.com/stretchr/testify/assert
                   go test -v ./test/
-              working-directory: out/go
+              working-directory: out/go/${{ env.GO_MOD_VERSION }}
 
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
@@ -103,7 +109,7 @@ jobs:
                   git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
                   git push
                   git push --tags
-              working-directory: out/go
+              working-directory: out/go/${{ env.GO_MOD_VERSION }}
 
     release-python:
       name: Release Python Library
