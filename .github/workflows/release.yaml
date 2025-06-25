@@ -82,10 +82,13 @@ jobs:
               run: git rm -fr --ignore-unmatch *
               working-directory: out/go/${{ env.GO_MOD_VERSION }}
 
+            - name: Validate Checked Out Library
+              run: ls -lR ${{ github.workspace }}
+
             - name: Get generated code from cache
               uses: actions/cache/restore@v4
               with:
-                  path: out/go/${{ env.GO_MOD_VERSION }}
+                  path: "out/go/${{ env.GO_MOD_VERSION }}"
                   key: 'go-${{ github.sha }}'
                   fail-on-cache-miss: true
 
