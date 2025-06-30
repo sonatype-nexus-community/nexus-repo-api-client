@@ -159,7 +159,7 @@ for o in operations_to_fix:
     i = i + 1
 print(f'Overwrote {i} Operation IDs')
 
-# Add Response Schame for /system/ldap/* PATHS
+# Add Response Schema /system/ldap/* PATHS
 print('Fixing /security/ldap/* response schemas...')
 json_spec['paths']['/v1/security/ldap']['get']['responses']['200']['content'] = {
     'application/json': {
@@ -178,6 +178,12 @@ json_spec['paths']['/v1/security/ldap/{name}']['get']['responses']['200']['conte
         }
     }
 }
+print('Fixing Create/Update Schema required objects for /security/ldap/*')
+temp_required: list[str] = json_spec['components']['schemas']['CreateLdapServerXo']['required']
+temp_required.remove('groupType')
+json_spec['components']['schemas']['CreateLdapServerXo']['required'] = temp_required
+json_spec['components']['schemas']['ReadLdapServerXo']['required'] = temp_required
+json_spec['components']['schemas']['UpdateLdapServerXo']['required'] = temp_required
 print('Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:

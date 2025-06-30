@@ -1350,12 +1350,11 @@ components:
         userSubtree:
           description: Are users located in structures below the user base DN?
           type: boolean
-      required:
+      required: &id001
       - authPassword
       - authScheme
       - connectionRetryDelaySeconds
       - connectionTimeoutSeconds
-      - groupType
       - host
       - maxIncidentsCount
       - name
@@ -3310,17 +3309,7 @@ components:
         userSubtree:
           description: Are users located in structures below the user base DN?
           type: boolean
-      required:
-      - authScheme
-      - connectionRetryDelaySeconds
-      - connectionTimeoutSeconds
-      - groupType
-      - host
-      - maxIncidentsCount
-      - name
-      - port
-      - protocol
-      - searchBase
+      required: *id001
       type: object
     ReadOnlyState:
       properties:
@@ -4185,18 +4174,7 @@ components:
         userSubtree:
           description: Are users located in structures below the user base DN?
           type: boolean
-      required:
-      - authPassword
-      - authScheme
-      - connectionRetryDelaySeconds
-      - connectionTimeoutSeconds
-      - groupType
-      - host
-      - maxIncidentsCount
-      - name
-      - port
-      - protocol
-      - searchBase
+      required: *id001
       type: object
     UploadDefinitionXO:
       properties:
