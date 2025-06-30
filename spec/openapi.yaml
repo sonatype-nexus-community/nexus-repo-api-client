@@ -11064,7 +11064,12 @@ paths:
       operationId: getLdapServers
       responses:
         '200':
-          content: {}
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReadLdapServerXo'
+                type: array
           description: LDAP server list returned
         '401':
           content: {}
@@ -11160,7 +11165,10 @@ paths:
           type: string
       responses:
         '200':
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadLdapServerXo'
           description: LDAP server returned
         '401':
           content: {}
