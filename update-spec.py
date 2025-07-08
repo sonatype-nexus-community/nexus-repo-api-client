@@ -110,46 +110,40 @@ for path in json_spec['paths']:
 print(f'   Fixed {i} Repository Operations')
 
 # Fix Schemas relating to Repositories that are missing `format`, `type` and `url`
-repository_schemas_to_fix = [
-    'MavenHostedApiRepository',
-    'MavenProxyApiRepository',
-    'SimpleApiGroupRepository'
+repository_schemas_to_fix: list[dict[str, str]] = [
+    {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
+    {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
+    {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
+    {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
+    {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'}
 ]
 print('Fixing Repository Schemas...')
-for s in repository_schemas_to_fix:
-    json_spec['components']['schemas'][s]['properties']['format'] = {
+for v in repository_schemas_to_fix:
+    json_spec['components']['schemas'][v['s']]['properties']['format'] = {
         'type': 'string',
-        'default': 'maven2'
     }
-    json_spec['components']['schemas'][s]['properties']['type'] = {
+    if v['f'] is not None:
+        json_spec['components']['schemas'][v['s']]['properties']['format']['default'] = v['f']
+    json_spec['components']['schemas'][v['s']]['properties']['type'] = {
         'type': 'string',
-        'default': 'hosted'
+        'default': v['t']
     }
-    print(f'   Fixed `{s}`')
-
-repository_schemas_to_fix = [
-    'NpmProxyApiRepository',
-    'MavenHostedApiRepository',
-    'MavenProxyApiRepository',
-    'SimpleApiGroupRepository'
-]
-for s in repository_schemas_to_fix:
-    json_spec['components']['schemas'][s]['properties']['url'] = {
+    json_spec['components']['schemas'][v['s']]['properties']['url'] = {
         'type': 'string'
     }
-    print(f'   Fixed `{s}`')
+    print(f'   Fixed `{v['s']}`')
 
-simple_api_hosted_properties = json_spec['components']['schemas']['SimpleApiHostedRepository']['properties']
-simple_api_hosted_properties['format'] = {
-    'type': 'string'
-}
-simple_api_hosted_properties['type'] = {
-    'type': 'string',
-    'default': 'hosted'
-}
-simple_api_hosted_properties['url'] = {
-    'type': 'string'
-}
+# simple_api_hosted_properties = json_spec['components']['schemas']['SimpleApiHostedRepository']['properties']
+# simple_api_hosted_properties['format'] = {
+#     'type': 'string'
+# }
+# simple_api_hosted_properties['type'] = {
+#     'type': 'string',
+#     'default': 'hosted'
+# }
+# simple_api_hosted_properties['url'] = {
+#     'type': 'string'
+# }
 
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {

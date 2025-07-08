@@ -2445,7 +2445,7 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: hosted
+          default: proxy
           type: string
         url:
           type: string
@@ -2571,6 +2571,9 @@ components:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          default: npm
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -2595,6 +2598,9 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: proxy
+          type: string
         url:
           type: string
       required:
@@ -3734,7 +3740,6 @@ components:
     SimpleApiGroupRepository:
       properties:
         format:
-          default: maven2
           type: string
         group:
           $ref: '#/components/schemas/GroupAttributes'
@@ -3750,7 +3755,7 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: hosted
+          default: group
           type: string
         url:
           type: string
