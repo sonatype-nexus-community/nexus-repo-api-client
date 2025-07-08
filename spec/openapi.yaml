@@ -2595,6 +2595,8 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        url:
+          type: string
       required:
       - httpClient
       - negativeCache

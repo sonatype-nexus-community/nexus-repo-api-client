@@ -125,6 +125,15 @@ for s in repository_schemas_to_fix:
         'type': 'string',
         'default': 'hosted'
     }
+    print(f'   Fixed `{s}`')
+
+repository_schemas_to_fix = [
+    'NpmProxyApiRepository',
+    'MavenHostedApiRepository',
+    'MavenProxyApiRepository',
+    'SimpleApiGroupRepository'
+]
+for s in repository_schemas_to_fix:
     json_spec['components']['schemas'][s]['properties']['url'] = {
         'type': 'string'
     }
