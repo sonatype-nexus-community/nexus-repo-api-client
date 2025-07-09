@@ -115,7 +115,8 @@ repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
     {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
-    {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'}
+    {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'},
+    {'s': 'SimpleApiGroupDeployRepository', 't': 'group', 'f': None}
 ]
 print('Fixing Repository Schemas...')
 for v in repository_schemas_to_fix:

@@ -3717,6 +3717,8 @@ components:
       type: object
     SimpleApiGroupDeployRepository:
       properties:
+        format:
+          type: string
         group:
           $ref: '#/components/schemas/GroupDeployAttributes'
         name:
@@ -3732,6 +3734,11 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: group
+          type: string
+        url:
+          type: string
       required:
       - group
       - online
