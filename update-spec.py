@@ -198,6 +198,16 @@ json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
         }
     }
 }
+print('     Done')
+
+print('Adding missing 204 empty responses...')
+paths_missing_204: dict[str, list[str]] = {
+    '/v1/security/roles/{id}': ['delete']
+}
+for p, ms in paths_missing_204.items():
+    for m in ms:
+        json_spec['paths'][p][m]['responses'].update({'204': {'content': {}, 'description': 'Success'}})
+print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
