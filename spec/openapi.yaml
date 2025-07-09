@@ -5583,7 +5583,10 @@ paths:
       operationId: getConfiguration
       responses:
         '200':
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqConnectionXo'
           description: Sonatype Repository Firewall configuration returned
       summary: Get Sonatype Repository Firewall configuration
       tags:

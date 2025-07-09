@@ -134,18 +134,6 @@ for v in repository_schemas_to_fix:
     }
     print(f'   Fixed `{v['s']}`')
 
-# simple_api_hosted_properties = json_spec['components']['schemas']['SimpleApiHostedRepository']['properties']
-# simple_api_hosted_properties['format'] = {
-#     'type': 'string'
-# }
-# simple_api_hosted_properties['type'] = {
-#     'type': 'string',
-#     'default': 'hosted'
-# }
-# simple_api_hosted_properties['url'] = {
-#     'type': 'string'
-# }
-
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {
     'description': 'Controls if deployments of and updates to assets are allowed',
@@ -201,6 +189,15 @@ json_spec['components']['schemas']['CreateLdapServerXo']['required'] = temp_requ
 json_spec['components']['schemas']['ReadLdapServerXo']['required'] = temp_required
 json_spec['components']['schemas']['UpdateLdapServerXo']['required'] = temp_required
 print('Done')
+
+print('Fixing response schema for IQ Connection...')
+json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            '$ref': '#/components/schemas/IqConnectionXo'
+        }
+    }
+}
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
