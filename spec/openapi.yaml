@@ -11219,14 +11219,21 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges:
     get:
-      operationId: getPrivileges_1
+      operationId: getAllPrivileges
       responses:
         '200':
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/ApiPrivilege'
+                items: &id002
+                  oneOf:
+                  - $ref: '#/components/schemas/ApiPrivilegeApplicationRequest'
+                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryAdminRequest'
+                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryContentSelectorRequest'
+                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryViewRequest'
+                  - $ref: '#/components/schemas/ApiPrivilegeScriptRequest'
+                  - $ref: '#/components/schemas/ApiPrivilegeWildcardRequest'
+                  - $ref: '#/components/schemas/ApiPrivilege'
                 type: array
           description: successful operation
         '403':
@@ -11619,8 +11626,7 @@ paths:
         '200':
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ApiPrivilege'
+              schema: *id002
           description: successful operation
         '403':
           content: {}
