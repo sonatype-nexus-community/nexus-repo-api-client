@@ -343,6 +343,88 @@ components:
             to (or * for all).
           type: string
       type: object
+    ApiPrivilegeRequest:
+      properties:
+        actions:
+          description: 'A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as ''run'' for
+            script privileges.
+
+
+            Only applicable for Privilege Types: repository-admin, repository-content-selector,
+            repository-view, script'
+          items:
+            type: string
+          type: array
+        contentSelector:
+          description: 'The name of a content selector that will be used to grant
+            access to content via this privilege.
+
+
+            Only applicable for Privilege Types: repository-content-selector'
+          type: string
+        description:
+          type: string
+        domain:
+          description: 'The domain (i.e. ''blobstores'', ''capabilities'' or even
+            ''*'' for all) that this privilege is granting access to. Note that creating
+            new privileges with a domain is only necessary when using plugins that
+            define their own domain(s).
+
+
+            Only applicable for Privilege Types: application'
+          type: string
+        format:
+          description: 'The repository format (i.e ''nuget'', ''npm'') this privilege
+            will grant access to (or * for all).
+
+
+            Only applicable for Privilege Types: repository-admin, repository-content-selector,
+            repository-view'
+          type: string
+        name:
+          description: The name of the privilege. This value cannot be changed.
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        pattern:
+          description: 'A colon separated list of parts that create a permission string.
+
+
+            Only applicable for Privilege Types: wildcard'
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        repository:
+          description: 'The name of the repository this privilege will grant access
+            to (or * for all). The repository MUST exist.
+
+
+            Only applicable for Privilege Types: repository-admin, repository-content-selector,
+            repository-view'
+          type: string
+        scriptName:
+          description: 'The name of a script to give access to.
+
+
+            Only applicable for Privilege Types: script'
+          type: string
+        type:
+          description: The type of privilege, each type covers different portion of
+            the system. External values supplied to this will be ignored by the system.
+          enum:
+          - application
+          - repository-admin
+          - repository-content-selector
+          - repository-view
+          - script
+          - wildcard
+          type: string
+      required:
+      - name
+      - type
+      type: object
     ApiPrivilegeScriptRequest:
       properties:
         actions:
@@ -11225,16 +11307,7 @@ paths:
           content:
             application/json:
               schema:
-                items: &id002
-                  oneOf:
-                  - $ref: '#/components/schemas/ApiPrivilegeApplicationRequest'
-                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryAdminRequest'
-                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryContentSelectorRequest'
-                  - $ref: '#/components/schemas/ApiPrivilegeRepositoryViewRequest'
-                  - $ref: '#/components/schemas/ApiPrivilegeScriptRequest'
-                  - $ref: '#/components/schemas/ApiPrivilegeWildcardRequest'
-                  - $ref: '#/components/schemas/ApiPrivilege'
-                type: array
+                $ref: '#/components/schemas/ApiPrivilegeRequest'
           description: successful operation
         '403':
           content: {}
@@ -11626,7 +11699,8 @@ paths:
         '200':
           content:
             application/json:
-              schema: *id002
+              schema:
+                $ref: '#/components/schemas/ApiPrivilegeRequest'
           description: successful operation
         '403':
           content: {}

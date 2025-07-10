@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import json
+import os.path
 
 import requests
 import sys
@@ -127,29 +129,22 @@ for path in json_spec['paths']:
 print(f'   Fixed {i} Privilege Operations')
 
 print('Correcting Response Schema for GET Privileges Operations...')
-privilege_one_of_response_schema = {
-    'oneOf': [
-        {'$ref': '#/components/schemas/ApiPrivilegeApplicationRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilegeRepositoryAdminRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilegeRepositoryContentSelectorRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilegeRepositoryViewRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilegeScriptRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilegeWildcardRequest'},
-        {'$ref': '#/components/schemas/ApiPrivilege'}
-    ]
-}
+with open(os.path.join(os.path.dirname(__file__), "snippets", "ApiPrivilegeRequest.json"), 'r') as o:
+    json_spec['components']['schemas']['ApiPrivilegeRequest'] = json.load(o)
+
 json_spec['paths']['/v1/security/privileges']['get']['operationId'] = 'getAllPrivileges'
 json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
-            'type': 'array',
-            'items': privilege_one_of_response_schema
+            '$ref': '#/components/schemas/ApiPrivilegeRequest'
         }
     }
 }
 json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses']['200']['content'] = {
     'application/json': {
-        'schema': privilege_one_of_response_schema
+        'schema': {
+            '$ref': '#/components/schemas/ApiPrivilegeRequest'
+        }
     }
 }
 

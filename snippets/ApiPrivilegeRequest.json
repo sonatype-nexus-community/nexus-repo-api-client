@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "required": [
+    "name", "type"
+  ],
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the privilege. This value cannot be changed.",
+      "pattern": "^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$"
+    },
+    "actions": {
+      "type": "array",
+      "description": "A collection of actions to associate with the privilege, using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script privileges.\n\nOnly applicable for Privilege Types: repository-admin, repository-content-selector, repository-view, script",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contentSelector": {
+      "type": "string",
+      "description": "The name of a content selector that will be used to grant access to content via this privilege.\n\nOnly applicable for Privilege Types: repository-content-selector"
+    },
+    "domain": {
+      "type": "string",
+      "description": "The domain (i.e. 'blobstores', 'capabilities' or even '*' for all) that this privilege is granting access to. Note that creating new privileges with a domain is only necessary when using plugins that define their own domain(s).\n\nOnly applicable for Privilege Types: application"
+    },
+    "format": {
+      "type": "string",
+      "description": "The repository format (i.e 'nuget', 'npm') this privilege will grant access to (or * for all).\n\nOnly applicable for Privilege Types: repository-admin, repository-content-selector, repository-view"
+    },
+    "pattern": {
+      "type": "string",
+      "description": "A colon separated list of parts that create a permission string.\n\nOnly applicable for Privilege Types: wildcard"
+    },
+    "readOnly": {
+      "type": "boolean",
+      "description": "Indicates whether the privilege can be changed. External values supplied to this will be ignored by the system."
+    },
+    "repository": {
+      "type": "string",
+      "description": "The name of the repository this privilege will grant access to (or * for all). The repository MUST exist.\n\nOnly applicable for Privilege Types: repository-admin, repository-content-selector, repository-view"
+    },
+    "scriptName": {
+      "type": "string",
+      "description": "The name of a script to give access to.\n\nOnly applicable for Privilege Types: script"
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of privilege, each type covers different portion of the system. External values supplied to this will be ignored by the system.",
+      "enum": [
+        "application",
+        "repository-admin",
+        "repository-content-selector",
+        "repository-view",
+        "script",
+        "wildcard"
+      ]
+    }
+  }
+}
