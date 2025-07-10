@@ -109,6 +109,23 @@ for path in json_spec['paths']:
                     i = i + 1
 print(f'   Fixed {i} Repository Operations')
 
+# Pin/Fix OperationIDs for all /v1/security/privileges/[TYPE]
+print('Fixing and pinning OperationIDs for /v1/security/privileges/* paths...')
+i = 0
+for path in json_spec['paths']:
+    if str(path).startswith('/v1/security/privileges/'):
+        path_parts = str(path).split('/')
+        if len(path_parts) > 4:
+            t = path_parts[4]
+            for method in json_spec['paths'][path]:
+                if str(method).lower() == 'post':
+                    json_spec['paths'][path]['post']['operationId'] = f'create{t.capitalize()}Privilege'
+                    i = i+1
+                if str(method).lower() == 'put':
+                    json_spec['paths'][path]['put']['operationId'] = f'update{t.capitalize()}Privilege'
+                    i = i+1
+print(f'   Fixed {i} Repository Operations')
+
 # Fix Schemas relating to Repositories that are missing `format`, `type` and `url`
 repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
@@ -200,8 +217,28 @@ json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
 }
 print('     Done')
 
+print('Adding missing 201 empty responses...')
+paths_missing_201: dict[str, list[str]] = {
+    '/v1/security/privileges/application': ['post'],
+    '/v1/security/privileges/repository-admin': ['post'],
+    '/v1/security/privileges/repository-content-selector': ['post'],
+    '/v1/security/privileges/repository-view': ['post'],
+    '/v1/security/privileges/script': ['post'],
+    '/v1/security/privileges/wildcard': ['post'],
+}
+for p, ms in paths_missing_201.items():
+    for m in ms:
+        json_spec['paths'][p][m]['responses'].update({'201': {'content': {}, 'description': 'Success'}})
+print('     Done')
+
 print('Adding missing 204 empty responses...')
 paths_missing_204: dict[str, list[str]] = {
+    '/v1/security/privileges/application/{privilegeName}': ['put'],
+    '/v1/security/privileges/repository-admin/{privilegeName}': ['put'],
+    '/v1/security/privileges/repository-content-selector/{privilegeName}': ['put'],
+    '/v1/security/privileges/repository-view/{privilegeName}': ['put'],
+    '/v1/security/privileges/script/{privilegeName}': ['put'],
+    '/v1/security/privileges/wildcard/{privilegeName}': ['put'],
     '/v1/security/roles/{id}': ['delete'],
     '/v1/security/users/{userId}': ['put'],
     '/v1/security/users/{userId}/change-password': ['put']
