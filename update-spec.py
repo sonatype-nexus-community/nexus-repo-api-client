@@ -136,7 +136,10 @@ json_spec['paths']['/v1/security/privileges']['get']['operationId'] = 'getAllPri
 json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
-            '$ref': '#/components/schemas/ApiPrivilegeRequest'
+            'type': 'array',
+            'items': {
+                '$ref': '#/components/schemas/ApiPrivilegeRequest'
+            }
         }
     }
 }
