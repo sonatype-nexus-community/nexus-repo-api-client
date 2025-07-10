@@ -12144,6 +12144,9 @@ paths:
         description: A representation of the user to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Password was not supplied in the body of the request
