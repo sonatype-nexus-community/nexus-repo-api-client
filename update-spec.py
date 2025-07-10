@@ -203,7 +203,8 @@ print('     Done')
 print('Adding missing 204 empty responses...')
 paths_missing_204: dict[str, list[str]] = {
     '/v1/security/roles/{id}': ['delete'],
-    '/v1/security/users/{userId}': ['put']
+    '/v1/security/users/{userId}': ['put'],
+    '/v1/security/users/{userId}/change-password': ['put']
 }
 for p, ms in paths_missing_204.items():
     for m in ms:
