@@ -11237,7 +11237,7 @@ paths:
       - 'Security management: privileges'
   /v1/security/privileges/application:
     post:
-      operationId: createPrivilege_4
+      operationId: createApplicationPrivilege
       requestBody:
         content:
           application/json:
@@ -11246,6 +11246,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11258,7 +11261,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/application/{privilegeName}:
     put:
-      operationId: updatePrivilege_4
+      operationId: updateApplicationPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11274,6 +11277,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11289,7 +11295,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-admin:
     post:
-      operationId: createPrivilege_2
+      operationId: createRepository-adminPrivilege
       requestBody:
         content:
           application/json:
@@ -11298,6 +11304,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11310,7 +11319,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-admin/{privilegeName}:
     put:
-      operationId: updatePrivilege_2
+      operationId: updateRepository-adminPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11326,6 +11335,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11341,7 +11353,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-content-selector:
     post:
-      operationId: createPrivilege_1
+      operationId: createRepository-content-selectorPrivilege
       requestBody:
         content:
           application/json:
@@ -11350,6 +11362,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11362,7 +11377,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-content-selector/{privilegeName}:
     put:
-      operationId: updatePrivilege_1
+      operationId: updateRepository-content-selectorPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11378,6 +11393,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11393,7 +11411,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-view:
     post:
-      operationId: createPrivilege
+      operationId: createRepository-viewPrivilege
       requestBody:
         content:
           application/json:
@@ -11402,6 +11420,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11414,7 +11435,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/repository-view/{privilegeName}:
     put:
-      operationId: updatePrivilege
+      operationId: updateRepository-viewPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11430,6 +11451,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11445,7 +11469,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/script:
     post:
-      operationId: createPrivilege_5
+      operationId: createScriptPrivilege
       requestBody:
         content:
           application/json:
@@ -11454,6 +11478,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11466,7 +11493,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/script/{privilegeName}:
     put:
-      operationId: updatePrivilege_5
+      operationId: updateScriptPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11482,6 +11509,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11497,7 +11527,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard:
     post:
-      operationId: createPrivilege_3
+      operationId: createWildcardPrivilege
       requestBody:
         content:
           application/json:
@@ -11506,6 +11536,9 @@ paths:
         description: The privilege to create.
         required: false
       responses:
+        '201':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -11518,7 +11551,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/privileges/wildcard/{privilegeName}:
     put:
-      operationId: updatePrivilege_3
+      operationId: updateWildcardPrivilege
       parameters:
       - description: The name of the privilege to update.
         in: path
@@ -11534,6 +11567,9 @@ paths:
         description: The privilege to update.
         required: false
       responses:
+        '204':
+          content: {}
+          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
