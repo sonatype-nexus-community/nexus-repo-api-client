@@ -275,5 +275,12 @@ for p, ms in paths_missing_204.items():
         json_spec['paths'][p][m]['responses'].update({'204': {'content': {}, 'description': 'Success'}})
 print('     Done')
 
+print('Correcting schema InputStream...')
+json_spec['components']['schemas']['InputStream'] = {
+    'type': 'string',
+    'format': 'binary'
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
