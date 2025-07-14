@@ -1517,6 +1517,9 @@ components:
       properties:
         docker:
           $ref: '#/components/schemas/DockerAttributes'
+        format:
+          default: docker
+          type: string
         group:
           $ref: '#/components/schemas/GroupDeployAttributes'
         name:
@@ -1530,6 +1533,11 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: group
+          type: string
+        url:
+          type: string
       required:
       - docker
       - group

@@ -157,6 +157,7 @@ print('     Done')
 repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
     {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
+    {'s': 'DockerGroupApiRepository', 't': 'group', 'f': 'docker'},
     {'s': 'DockerHostedApiRepository', 't': 'hosted', 'f': 'docker'},
     {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
