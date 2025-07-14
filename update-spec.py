@@ -155,6 +155,8 @@ print('     Done')
 
 # Fix Schemas relating to Repositories that are missing `format`, `type` and `url`
 repository_schemas_to_fix: list[dict[str, str]] = [
+    {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
+    {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
     {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},

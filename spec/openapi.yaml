@@ -533,6 +533,9 @@ components:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         component:
           $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          default: apt
+          type: string
         name:
           description: A unique identifier for this repository
           example: internal
@@ -544,6 +547,11 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          default: hosted
+          type: string
+        url:
+          type: string
       required:
       - apt
       - aptSigning
@@ -591,6 +599,9 @@ components:
           $ref: '#/components/schemas/AptProxyRepositoriesAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          default: apt
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -613,6 +624,11 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: proxy
+          type: string
+        url:
+          type: string
       required:
       - apt
       - httpClient
