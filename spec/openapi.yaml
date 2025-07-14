@@ -1568,6 +1568,9 @@ components:
           $ref: '#/components/schemas/ComponentAttributes'
         docker:
           $ref: '#/components/schemas/DockerAttributes'
+        format:
+          default: docker
+          type: string
         name:
           description: A unique identifier for this repository
           example: internal
@@ -1578,7 +1581,12 @@ components:
           example: true
           type: boolean
         storage:
-          $ref: '#/components/schemas/HostedStorageAttributes'
+          $ref: '#/components/schemas/DockerHostedStorageAttributes'
+        type:
+          default: hosted
+          type: string
+        url:
+          type: string
       required:
       - docker
       - online
@@ -1646,6 +1654,9 @@ components:
           $ref: '#/components/schemas/DockerAttributes'
         dockerProxy:
           $ref: '#/components/schemas/DockerProxyAttributes'
+        format:
+          default: docker
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -1668,6 +1679,11 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: proxy
+          type: string
+        url:
+          type: string
       required:
       - docker
       - dockerProxy

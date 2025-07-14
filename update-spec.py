@@ -157,6 +157,8 @@ print('     Done')
 repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
     {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
+    {'s': 'DockerHostedApiRepository', 't': 'hosted', 'f': 'docker'},
+    {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
     {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
@@ -281,6 +283,12 @@ print('Correcting schema InputStream...')
 json_spec['components']['schemas']['InputStream'] = {
     'type': 'string',
     'format': 'binary'
+}
+print('     Done')
+
+print('Correcting response schema for GET /v1/repositories/docker/hosted/{name}...')
+json_spec['components']['schemas']['DockerHostedApiRepository']['properties']['storage'] = {
+    '$ref': '#/components/schemas/DockerHostedStorageAttributes'
 }
 print('     Done')
 
