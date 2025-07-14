@@ -165,7 +165,8 @@ repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
     {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
     {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'},
-    {'s': 'SimpleApiGroupDeployRepository', 't': 'group', 'f': None}
+    {'s': 'SimpleApiGroupDeployRepository', 't': 'group', 'f': None},
+    {'s': 'SimpleApiProxyRepository', 't': 'proxy', 'f': None}
 ]
 print('Fixing Repository Schemas...')
 for v in repository_schemas_to_fix:

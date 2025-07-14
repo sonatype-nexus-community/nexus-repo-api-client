@@ -3926,6 +3926,8 @@ components:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -3948,6 +3950,11 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: proxy
+          type: string
+        url:
+          type: string
       required:
       - httpClient
       - negativeCache
