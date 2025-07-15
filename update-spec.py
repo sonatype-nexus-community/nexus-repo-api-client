@@ -294,5 +294,11 @@ json_spec['components']['schemas']['DockerHostedApiRepository']['properties']['s
 }
 print('     Done')
 
+print('Correcting response schema for GET /v1/repositories/pypi/proxy/{name}...')
+json_spec['paths']['/v1/repositories/pypi/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
+                                                                                                          '/json')][
+    'schema']['$ref'] = '#/components/schemas/PypiProxyRepositoryApiRequest'
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
