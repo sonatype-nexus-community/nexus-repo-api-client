@@ -100,7 +100,7 @@ for path in json_spec['paths']:
                 if str(method).lower() == 'get':
                     json_spec['paths'][path]['get'][
                         'operationId'] = f'get{format.capitalize()}{type.capitalize()}Repository'
-                    i = i+1
+                    i = i + 1
                 if str(method).lower() == 'post':
                     json_spec['paths'][path]['post'][
                         'operationId'] = f'create{format.capitalize()}{type.capitalize()}Repository'
@@ -122,10 +122,10 @@ for path in json_spec['paths']:
             for method in json_spec['paths'][path]:
                 if str(method).lower() == 'post':
                     json_spec['paths'][path]['post']['operationId'] = f'create{t.capitalize()}Privilege'
-                    i = i+1
+                    i = i + 1
                 if str(method).lower() == 'put':
                     json_spec['paths'][path]['put']['operationId'] = f'update{t.capitalize()}Privilege'
-                    i = i+1
+                    i = i + 1
 print(f'   Fixed {i} Privilege Operations')
 
 print('Correcting Response Schema for GET Privileges Operations...')
@@ -317,7 +317,7 @@ json_spec['components']['schemas'].update({
             'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
             'routingRuleName': {'type': 'string'},
             'storage': {'$ref': '#/components/schemas/StorageAttributes'},
-            'type': {'type': 'string', 'default': 'pypi'},
+            'type': {'type': 'string', 'default': 'proxy'},
             'url': {'type': 'string'},
         },
         'required': [
@@ -341,7 +341,96 @@ for p in paths_to_fix_writable_member:
 json_spec['components']['schemas']['PypiGroupRepositoryApiRequest']['properties']['group'] = {
     '$ref': '#/components/schemas/GroupDeployAttributes'
 }
+print('     Done')
 
+print('Correcting response schema for GET /v1/repositories/raw/*/{name}...')
+json_spec['components']['schemas'].update({
+    'RawGroupApiRepository': {
+        'properties': {
+            'format': {'type': 'string', 'default': 'raw'},
+            'group': {'$ref': '#/components/schemas/GroupAttributes'},
+            'name': {
+                'description': 'A unique identifier for this repository',
+                'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$',
+                'type': 'string',
+            },
+            'online': {
+                'description': 'Whether this repository accepts incoming requests',
+                'type': 'boolean',
+            },
+            'raw': {'$ref': '#/components/schemas/RawAttributes'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string', 'default': 'group'},
+            'url': {'type': 'string'},
+        },
+        'required': [
+            'format', 'group', 'name', 'online', 'raw', 'storage', 'type', 'url'
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/raw/group/{repositoryName}']['get']['responses']['200']['content'][('application'
+                                                                                                         '/json')][
+    'schema']['$ref'] = '#/components/schemas/RawGroupApiRepository'
+json_spec['components']['schemas'].update({
+    'RawHostedApiRepository': {
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'component': {'$ref': '#/components/schemas/ComponentAttributes'},
+            'format': {'type': 'string', 'default': 'raw'},
+            'name': {
+                'description': 'A unique identifier for this repository',
+                'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$',
+                'type': 'string',
+            },
+            'online': {
+                'description': 'Whether this repository accepts incoming requests',
+                'type': 'boolean',
+            },
+            'raw': {'$ref': '#/components/schemas/RawAttributes'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string', 'default': 'hosted'},
+            'url': {'type': 'string'},
+        },
+        'required': [
+            'format', 'name', 'online', 'raw', 'storage', 'type', 'url'
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses']['200']['content'][('application'
+                                                                                                         '/json')][
+    'schema']['$ref'] = '#/components/schemas/RawHostedApiRepository'
+json_spec['components']['schemas'].update({
+    'RawProxyApiRepository': {
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'format': {'type': 'string', 'default': 'pypi'},
+            'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
+            'name': {
+                'description': 'A unique identifier for this repository',
+                'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$',
+                'type': 'string',
+            },
+            'negativeCache': {'$ref': '#/components/schemas/NegativeCacheAttributes'},
+            'online': {
+                'description': 'Whether this repository accepts incoming requests',
+                'type': 'boolean',
+            },
+            'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
+            'raw': {'$ref': '#/components/schemas/RawAttributes'},
+            'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
+            'routingRuleName': {'type': 'string'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string', 'default': 'raw'},
+            'url': {'type': 'string'},
+        },
+        'required': [
+            'format', 'httpClient', 'name', 'negativeCache', 'online', 'proxy', 'raw', 'storage', 'type', 'url'
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
+                                                                                                         '/json')][
+    'schema']['$ref'] = '#/components/schemas/RawProxyApiRepository'
 print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
