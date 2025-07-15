@@ -3043,7 +3043,7 @@ components:
           $ref: '#/components/schemas/PyPiProxyAttributes'
         replication:
           $ref: '#/components/schemas/ReplicationAttributes'
-        routingRule:
+        routingRuleName:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'

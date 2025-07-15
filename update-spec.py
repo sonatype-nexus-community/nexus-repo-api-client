@@ -314,7 +314,7 @@ json_spec['components']['schemas'].update({
             'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
             'pypi': {'$ref': '#/components/schemas/PyPiProxyAttributes'},
             'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
-            'routingRule': {'type': 'string'},
+            'routingRuleName': {'type': 'string'},
             'storage': {'$ref': '#/components/schemas/StorageAttributes'},
             'type': {'type': 'string', 'default': 'pypi'},
             'url': {'type': 'string'},
