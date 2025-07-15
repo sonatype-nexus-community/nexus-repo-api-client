@@ -387,7 +387,7 @@ json_spec['components']['schemas'].update({
                 'type': 'boolean',
             },
             'raw': {'$ref': '#/components/schemas/RawAttributes'},
-            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'storage': {'$ref': '#/components/schemas/HostedStorageAttributes'},
             'type': {'type': 'string', 'default': 'hosted'},
             'url': {'type': 'string'},
         },

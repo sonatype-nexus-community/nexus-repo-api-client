@@ -3318,7 +3318,7 @@ components:
         raw:
           $ref: '#/components/schemas/RawAttributes'
         storage:
-          $ref: '#/components/schemas/StorageAttributes'
+          $ref: '#/components/schemas/HostedStorageAttributes'
         type:
           default: hosted
           type: string
