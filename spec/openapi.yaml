@@ -3075,7 +3075,7 @@ components:
     PypiGroupRepositoryApiRequest:
       properties:
         group:
-          $ref: '#/components/schemas/GroupAttributes'
+          $ref: '#/components/schemas/GroupDeployAttributes'
         name:
           description: A unique identifier for this repository
           example: internal

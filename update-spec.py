@@ -337,6 +337,10 @@ for p in paths_to_fix_writable_member:
     json_spec['paths'][p]['get']['responses']['200']['content']['application/json']['schema'] = {
         '$ref': '#/components/schemas/SimpleApiGroupDeployRepository'
     }
+json_spec['components']['schemas']['PypiGroupRepositoryApiRequest']['properties']['group'] = {
+    '$ref': '#/components/schemas/GroupDeployAttributes'
+}
+
 print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
