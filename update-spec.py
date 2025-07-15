@@ -295,9 +295,38 @@ json_spec['components']['schemas']['DockerHostedApiRepository']['properties']['s
 print('     Done')
 
 print('Correcting response schema for GET /v1/repositories/pypi/proxy/{name}...')
+json_spec['components']['schemas'].update({
+    'PyPiProxyApiRepository': {
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'format': {'type': 'string', 'default': 'pypi'},
+            'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
+            'name': {
+                'description': 'A unique identifier for this repository',
+                'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$',
+                'type': 'string',
+            },
+            'negativeCache': {'$ref': '#/components/schemas/NegativeCacheAttributes'},
+            'online': {
+                'description': 'Whether this repository accepts incoming requests',
+                'type': 'boolean',
+            },
+            'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
+            'pypi': {'$ref': '#/components/schemas/PyPiProxyAttributes'},
+            'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
+            'routingRule': {'type': 'string'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string', 'default': 'pypi'},
+            'url': {'type': 'string'},
+        },
+        'required': [
+            'format', 'httpClient', 'name', 'negativeCache', 'online', 'proxy', 'pypi', 'storage', 'type', 'url'
+        ]
+    }
+})
 json_spec['paths']['/v1/repositories/pypi/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                           '/json')][
-    'schema']['$ref'] = '#/components/schemas/PypiProxyRepositoryApiRequest'
+    'schema']['$ref'] = '#/components/schemas/PyPiProxyApiRepository'
 print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:

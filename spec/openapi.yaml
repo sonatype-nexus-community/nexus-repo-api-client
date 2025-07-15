@@ -3019,6 +3019,50 @@ components:
       - host
       - port
       type: object
+    PyPiProxyApiRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          default: pypi
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        pypi:
+          $ref: '#/components/schemas/PyPiProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: pypi
+          type: string
+        url:
+          type: string
+      required:
+      - format
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - pypi
+      - storage
+      - type
+      - url
     PyPiProxyAttributes:
       properties:
         removeQuarantined:
@@ -8471,7 +8515,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PypiProxyRepositoryApiRequest'
+                $ref: '#/components/schemas/PyPiProxyApiRepository'
           description: successful operation
       summary: Get repository
       tags:
