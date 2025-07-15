@@ -162,6 +162,7 @@ repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
     {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
+    {'s': 'NugetProxyApiRepository', 't': 'proxy', 'f': 'nuget'},
     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
     {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
     {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'},
