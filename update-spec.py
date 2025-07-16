@@ -157,6 +157,8 @@ print('     Done')
 repository_schemas_to_fix: list[dict[str, str]] = [
     {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
     {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
+    {'s': 'CargoGroupApiRepository', 't': 'group', 'f': 'cargo'},
+    {'s': 'CargoProxyApiRepository', 't': 'proxy', 'f': 'cargo'},
     {'s': 'DockerGroupApiRepository', 't': 'group', 'f': 'docker'},
     {'s': 'DockerHostedApiRepository', 't': 'hosted', 'f': 'docker'},
     {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
@@ -431,6 +433,12 @@ json_spec['components']['schemas'].update({
 json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawProxyApiRepository'
+print('     Done')
+
+print('Correcting Schema CargoGroupApiRepository...')
+json_spec['components']['schemas']['CargoGroupApiRepository']['properties']['group'] = {
+    '$ref': '#/components/schemas/GroupAttributes'
+}
 print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:

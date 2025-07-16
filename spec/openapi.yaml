@@ -853,8 +853,11 @@ components:
       properties:
         cargo:
           $ref: '#/components/schemas/CargoAttributes'
+        format:
+          default: cargo
+          type: string
         group:
-          $ref: '#/components/schemas/GroupDeployAttributes'
+          $ref: '#/components/schemas/GroupAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -866,6 +869,11 @@ components:
           type: boolean
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: group
+          type: string
+        url:
+          type: string
       required:
       - group
       - online
@@ -922,6 +930,9 @@ components:
           $ref: '#/components/schemas/CargoAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          default: cargo
+          type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
@@ -944,6 +955,11 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        type:
+          default: proxy
+          type: string
+        url:
+          type: string
       required:
       - httpClient
       - negativeCache
