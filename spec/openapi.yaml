@@ -6756,7 +6756,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiGroupRepository'
+                $ref: '#/components/schemas/SimpleApiGroupDeployRepository'
           description: successful operation
       summary: Get repository
       tags:

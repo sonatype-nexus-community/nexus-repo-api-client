@@ -399,7 +399,7 @@ json_spec['components']['schemas'].update({
     }
 })
 json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses']['200']['content'][('application'
-                                                                                                         '/json')][
+                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawHostedApiRepository'
 json_spec['components']['schemas'].update({
     'RawProxyApiRepository': {
@@ -439,6 +439,12 @@ print('Correcting Schema CargoGroupApiRepository...')
 json_spec['components']['schemas']['CargoGroupApiRepository']['properties']['group'] = {
     '$ref': '#/components/schemas/GroupAttributes'
 }
+print('     Done')
+
+print('Correcting response schema for GET /v1/repositories/conan/group/{repositoryName}...')
+json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['responses']['200']['content'][('application'
+                                                                                                           '/json')][
+    'schema']['$ref'] = '#/components/schemas/SimpleApiGroupDeployRepository'
 print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
