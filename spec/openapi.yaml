@@ -841,6 +841,21 @@ components:
         message:
           type: string
       type: object
+    CapabilityDTO:
+      properties:
+        enabled:
+          type: boolean
+        id:
+          type: string
+        notes:
+          type: string
+        properties:
+          additionalProperties:
+            type: string
+          type: object
+        type:
+          type: string
+      type: object
     CargoAttributes:
       properties:
         requireAuthentication:
@@ -4705,12 +4720,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.81.1-01.
+    as of version 3.82.0-08.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.81.1-01
+  version: 3.82.0-08
 openapi: 3.0.1
 paths:
   /beta/status/check/cluster:
@@ -4895,7 +4910,7 @@ paths:
       - Blob store
   /v1/blobstores/azure:
     post:
-      operationId: createBlobStore_1
+      operationId: createBlobStore
       requestBody:
         content:
           application/json:
@@ -4918,7 +4933,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/blobstores/azure/{name}:
     get:
-      operationId: getBlobStore_1
+      operationId: getBlobStore
       parameters:
       - description: Name of the blob store configuration to fetch
         in: path
@@ -4946,7 +4961,7 @@ paths:
       tags:
       - Blob store
     put:
-      operationId: updateBlobStore_1
+      operationId: updateBlobStore
       parameters:
       - description: Name of the blob store to update
         in: path
@@ -5055,7 +5070,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/blobstores/google:
     post:
-      operationId: createBlobStore_2
+      operationId: createBlobStore_1
       requestBody:
         content:
           application/json:
@@ -5109,7 +5124,7 @@ paths:
       - Blob store
   /v1/blobstores/google/{name}:
     get:
-      operationId: getBlobStore_2
+      operationId: getBlobStore_1
       parameters:
       - description: the name of the blob store
         in: path
@@ -5137,7 +5152,7 @@ paths:
       tags:
       - Blob store
     put:
-      operationId: updateBlobStore_2
+      operationId: updateBlobStore_1
       parameters:
       - description: the name of the blobstore
         in: path
@@ -5395,6 +5410,81 @@ paths:
       summary: Get quota status for a given blob store
       tags:
       - Blob store
+  /v1/capabilities:
+    get:
+      operationId: list
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CapabilityDTO'
+                type: array
+          description: successful operation
+      summary: List the active capabilities
+      tags:
+      - Capabilities
+    post:
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityDTO'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityDTO'
+          description: successful operation
+      summary: Create a capability
+      tags:
+      - Capabilities
+      x-codegen-request-body-name: body
+  /v1/capabilities/{capabilityId}:
+    delete:
+      operationId: delete_4
+      parameters:
+      - description: capabilityId
+        in: path
+        name: capabilityId
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Delete a capability
+      tags:
+      - Capabilities
+    put:
+      operationId: update_2
+      parameters:
+      - description: capabilityId
+        in: path
+        name: capabilityId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityDTO'
+        description: capability
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      summary: Update a capability
+      tags:
+      - Capabilities
+      x-codegen-request-body-name: body
   /v1/cleanup-policies:
     get:
       operationId: getAll
@@ -10045,10 +10135,6 @@ paths:
       x-codegen-request-body-name: body
   /v1/search:
     get:
-      description: All searches require at least one criterion of at least three characters
-        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
-        your criteria in quotation marks to search an exact phrase; otherwise, search
-        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: search
       parameters:
       - allowEmptyValue: true
@@ -10183,41 +10269,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -10333,6 +10384,11 @@ paths:
         name: nuget.summary
         schema:
           type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
+        schema:
+          type: string
       - description: p2 plugin name
         in: query
         name: p2.pluginName
@@ -10400,10 +10456,6 @@ paths:
       - Search
   /v1/search/assets:
     get:
-      description: All searches require at least one criterion of at least three characters
-        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
-        your criteria in quotation marks to search an exact phrase; otherwise, search
-        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: searchAssets
       parameters:
       - description: A token returned by a prior request. If present, the next page
@@ -10537,41 +10589,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -10685,6 +10702,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -10884,41 +10906,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -11032,6 +11019,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -11148,7 +11140,7 @@ paths:
       tags:
       - 'Security Management: Anonymous Access'
     put:
-      operationId: update_2
+      operationId: update_3
       requestBody:
         content:
           application/json:
@@ -11362,20 +11354,6 @@ paths:
       tags:
       - Content selectors
       x-codegen-request-body-name: body
-  /v1/security/jwt:
-    put:
-      operationId: resetSecret
-      responses:
-        '401':
-          content: {}
-          description: Authentication required
-        '403':
-          content: {}
-          description: Insufficient permissions
-      summary: Reset JWT secret (note that session will be expired for the all logged-in
-        users)
-      tags:
-      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: getLdapServers
@@ -12681,41 +12659,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -12829,6 +12772,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -13009,41 +12957,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -13157,6 +13070,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -13574,41 +13492,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -13722,6 +13605,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -13899,41 +13787,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -14047,6 +13900,11 @@ paths:
       - description: NuGet summary
         in: query
         name: nuget.summary
+        schema:
+          type: string
+      - description: NuGet prerelease
+        in: query
+        name: nuget.is_prerelease
         schema:
           type: string
       - description: p2 plugin name
@@ -14369,8 +14227,6 @@ security:
 servers:
 - url: /service/rest/
 tags:
-- name: 'System: Nodes'
-- name: Status
 - name: assets
 - name: components
 - name: Repository Management
@@ -14388,24 +14244,26 @@ tags:
 - name: 'Security: Atlassian Crowd'
 - name: 'Security management: LDAP'
 - name: Product licensing
-- name: Monthly Metrics
 - name: 'Security management: SAML'
 - name: Staging
 - name: Tags
 - name: 'Security management: user tokens'
 - name: Blob store
+- name: Azure blob store
+- name: Status
+- name: Capabilities
+- name: Monthly Metrics
+- name: Malicious Risk On Disk
 - name: Email
 - name: Formats
 - name: Read-only
 - name: Lifecycle
+- name: 'System: Nodes'
 - name: 'Security Management: Anonymous Access'
 - name: Community Edition Eula
-- name: 'Security management: JWT'
 - name: 'Security management: realms'
 - name: 'Security management: secrets encryption'
 - name: Support
-- name: Azure blob store
 - name: Manage Sonatype HTTP System Settings
-- name: Malicious Risk On Disk
 - name: 'Security: certificates'
 x-original-swagger-version: '2.0'
