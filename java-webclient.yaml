@@ -16,8 +16,8 @@ additionalProperties:
   groupId: org.sonatype.community
   licenseName: Apache-2.0
   licenseUrl: https://github.com/sonatype-nexus-community/nexus-repo-api-client/blob/main/LICENSE
-  scmConnection: scm:git:git@github.com:onatype-nexus-community/nexus-repo-api-client.git
-  scmDeveloperConnection: scm:git:git@github.com:onatype-nexus-community/nexus-repo-api-client.git
+  scmConnection: scm:git:git@github.com:sonatype-nexus-community/nexus-repo-api-client.git
+  scmDeveloperConnection: scm:git:git@github.com:sonatype-nexus-community/nexus-repo-api-client.git
   scmUrl: https://github.com/sonatype-nexus-community/nexus-repo-api-client
   useJakartaEe: true
   asyncNative: true
