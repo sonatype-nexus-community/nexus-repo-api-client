@@ -4722,7 +4722,7 @@ info:
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
     as of version 3.82.0-08.
   license:
-    name: Apache 2.0
+    name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
   version: 3.82.0-08
