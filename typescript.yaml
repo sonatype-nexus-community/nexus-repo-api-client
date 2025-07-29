@@ -2,6 +2,7 @@
 outputDir: /local/out/typescript
 generatorName: typescript-fetch
 additionalProperties:
+  licenseName: "Apache-2.0"
   prefixParameterInterfaces: true
   npmName: "@sonatype/nexus-repo-api-client"
   supportsES6: true
