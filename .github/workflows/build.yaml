@@ -16,7 +16,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    OPEN_API_GENERATOR_VERSION: 'v7.13.0'
+    OPEN_API_GENERATOR_VERSION: 'v7.16.0'
     PYTHON_VERSION_DEFAULT: '3.12'
     POETRY_VERSION: '1.8.1'
 
