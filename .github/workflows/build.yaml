@@ -42,8 +42,8 @@ jobs:
                   options: -v ${{ github.workspace }}:/local
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
 
-            - name: Copy our scripts across too
-              run: cp *.sh ./out/${{ matrix.language }}
+            - name: Copy LICENSE and our scripts across too
+              run: cp LICENSE *.sh ./out/${{ matrix.language }}
 
             - name: Save to Cache
               uses: actions/cache/save@v4
