@@ -16,9 +16,9 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    OPEN_API_GENERATOR_VERSION: 'v7.13.0'
+    OPEN_API_GENERATOR_VERSION: 'v7.16.0'
     PYTHON_VERSION_DEFAULT: '3.12'
-    POETRY_VERSION: '1.8.1'
+    POETRY_VERSION: '2.2.1'
 
 jobs:
     generate-library-code:
@@ -42,8 +42,8 @@ jobs:
                   options: -v ${{ github.workspace }}:/local
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
 
-            - name: Copy our scripts across too
-              run: cp *.sh ./out/${{ matrix.language }}
+            - name: Copy LICENSE and our scripts across too
+              run: cp LICENSE *.sh ./out/${{ matrix.language }}
 
             - name: Save to Cache
               uses: actions/cache/save@v4
