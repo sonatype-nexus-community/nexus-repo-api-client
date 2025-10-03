@@ -13,7 +13,7 @@ concurrency:
 env:
     OPEN_API_GENERATOR_VERSION: 'v7.16.0'
     PYTHON_VERSION_DEFAULT: '3.12'
-    POETRY_VERSION: '1.8.1'
+    POETRY_VERSION: '2.2.1'
     THIS_VERSION: $(echo "${{ github.ref_name }}" | cut -d 'v' -f2)
 
 jobs:
