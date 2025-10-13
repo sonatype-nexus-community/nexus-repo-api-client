@@ -448,5 +448,46 @@ json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['resp
     'schema']['$ref'] = '#/components/schemas/SimpleApiGroupDeployRepository'
 print('     Done')
 
+print('Injecting requestBody schema for PUT /v1/tasks/{taskId}...')
+json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content'][('application''/json')]['schema'] = {
+    'properties': {
+        'alertEmail': {
+            'description': 'e-mail for task notifications.',
+            'type': 'string'
+        },
+        'enabled': {
+            'description': 'Indicates if the task would be enabled.',
+            'type': 'boolean'
+        },
+        'frequency': {
+            '$ref': '#/components/schemas/FrequencyXO'
+        },
+        'name': {
+            'description': 'The name of the task template.',
+            'type': 'string'
+        },
+        'notificationCondition': {
+            'description': 'Condition required to notify a task execution.',
+            'enum': ['FAILURE', 'SUCCESS_FAILURE'],
+            'type': 'string'
+        },
+        'properties': {
+            'additionalProperties': {
+                'type': 'string'
+            },
+            'description': 'Additional properties for the task',
+            'type': 'object'
+        },
+        'type': {
+            'description': 'The type of task to be created.',
+            'type': 'string'
+        }
+    },
+    'required': [
+        'enabled', 'frequency', 'name', 'notificationCondition'
+    ]
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
