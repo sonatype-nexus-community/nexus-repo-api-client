@@ -532,6 +532,19 @@ components:
         name:
           type: string
       type: object
+    ApplyStatusXO:
+      properties:
+        entity:
+          type: string
+        message:
+          type: string
+        status:
+          enum:
+          - APPLIED
+          - NOT_APPLIED
+          - FAILED
+          type: string
+      type: object
     AptHostedApiRepository:
       properties:
         apt:
@@ -1293,6 +1306,26 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    ConfigurationApplyResponseXO:
+      properties:
+        appliedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+        failedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+        notAppliedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+      type: object
+    ConfigurationXO:
+      properties:
+        configurationTypeId:
+          type: string
       type: object
     ContentSelectorApiCreateRequest:
       properties:
@@ -2461,6 +2494,13 @@ components:
     InputStream:
       format: binary
       type: string
+    InstanceConfigurationXO:
+      properties:
+        configurationXOs:
+          items:
+            $ref: '#/components/schemas/ConfigurationXO'
+          type: array
+      type: object
     IqAuditXo:
       properties:
         enabled:
@@ -4884,12 +4924,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.84.0-03.
+    as of version 3.85.0-03.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.84.0-03
+  version: 3.85.0-03
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -4984,7 +5024,7 @@ paths:
     put:
       description: Ensure all nodes have access to the key, and they use the same
         key
-      operationId: reEncrypt_1
+      operationId: reEncrypt
       requestBody:
         content:
           application/json:
@@ -6068,6 +6108,68 @@ paths:
       summary: Get a single component
       tags:
       - components
+  /v1/configuration:
+    get:
+      operationId: exportConfiguration
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceConfigurationXO'
+          description: Successful Operation
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+      summary: Export instance configuration
+      tags:
+      - Instance configuration
+    put:
+      operationId: applyConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceConfigurationXO'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationApplyResponseXO'
+          description: Successful Operation
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Invalid request
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+      summary: Apply instance configuration
+      tags:
+      - Instance configuration
+      x-codegen-request-body-name: body
   /v1/email:
     delete:
       operationId: deleteEmailConfiguration
@@ -6141,7 +6243,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/formats/upload-specs:
     get:
-      operationId: get_2
+      operationId: get_1
       responses:
         '200':
           content:
@@ -6156,7 +6258,7 @@ paths:
       - Formats
   /v1/formats/{format}/upload-specs:
     get:
-      operationId: get_1
+      operationId: get
       parameters:
       - description: The desired repository format
         in: path
@@ -6677,7 +6779,7 @@ paths:
       - Reconcile Plan
   /v1/read-only:
     get:
-      operationId: get
+      operationId: get_2
       responses:
         '200':
           content:
@@ -10682,6 +10784,16 @@ paths:
         name: prerelease
         schema:
           type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
+        schema:
+          type: string
       - description: Specific MD5 hash of component's asset
         in: query
         name: md5
@@ -11002,6 +11114,16 @@ paths:
         name: prerelease
         schema:
           type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
+        schema:
+          type: string
       - description: Specific MD5 hash of component's asset
         in: query
         name: md5
@@ -11319,6 +11441,16 @@ paths:
         name: prerelease
         schema:
           type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
+        schema:
+          type: string
       - description: Specific MD5 hash of component's asset
         in: query
         name: md5
@@ -11570,7 +11702,7 @@ paths:
     put:
       description: Ensure all nodes have access to the key, and they use the same
         key
-      operationId: reEncrypt
+      operationId: reEncrypt_1
       requestBody:
         content:
           application/json:
@@ -13079,6 +13211,16 @@ paths:
         name: prerelease
         schema:
           type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
+        schema:
+          type: string
       - description: Specific MD5 hash of component's asset
         in: query
         name: md5
@@ -13375,6 +13517,16 @@ paths:
       - description: Prerelease version flag
         in: query
         name: prerelease
+        schema:
+          type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
         schema:
           type: string
       - description: Specific MD5 hash of component's asset
@@ -13912,6 +14064,16 @@ paths:
         name: prerelease
         schema:
           type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
+        schema:
+          type: string
       - description: Specific MD5 hash of component's asset
         in: query
         name: md5
@@ -14205,6 +14367,16 @@ paths:
       - description: Prerelease version flag
         in: query
         name: prerelease
+        schema:
+          type: string
+      - description: Asset last modified time
+        in: query
+        name: last_updated
+        schema:
+          type: string
+      - description: Asset last modified time (UI)
+        in: query
+        name: lastBlobUpdated
         schema:
           type: string
       - description: Specific MD5 hash of component's asset
@@ -14745,26 +14917,27 @@ tags:
 - name: Search
 - name: 'Security management: privileges'
 - name: Tasks
-- name: 'Security management: roles'
 - name: 'Security management: users'
+- name: 'Security management: roles'
 - name: Script
 - name: 'Security management: LDAP'
 - name: Status
-- name: Read-only
-- name: Formats
-- name: 'System: Nodes'
+- name: Blob store
 - name: Email
+- name: Formats
+- name: Read-only
 - name: Lifecycle
+- name: 'System: Nodes'
+- name: 'Security Management: Anonymous Access'
+- name: 'Security management: api keys principals encryption'
 - name: Community Edition Eula
 - name: 'Security management: realms'
-- name: 'Security Management: Anonymous Access'
-- name: Security management
 - name: 'Security management: secrets encryption'
-- name: 'Security management: api keys principals encryption'
-- name: Blob store
+- name: Security management
 - name: Support
-- name: Manage Sonatype Repository Firewall configuration
+- name: Instance configuration
 - name: Cleanup policies
+- name: Manage Sonatype Repository Firewall configuration
 - name: Reconcile Plan
 - name: 'Security: Atlassian Crowd'
 - name: Product licensing
@@ -14774,9 +14947,9 @@ tags:
 - name: Tags
 - name: 'Security management: user tokens'
 - name: Azure blob store
-- name: Malicious Risk On Disk
 - name: Capabilities
-- name: 'Security: certificates'
+- name: Malicious Risk On Disk
 - name: Manage Sonatype HTTP System Settings
 - name: Monthly Metrics
+- name: 'Security: certificates'
 x-original-swagger-version: '2.0'
