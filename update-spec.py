@@ -244,15 +244,16 @@ json_spec['components']['schemas']['ReadLdapServerXo']['required'] = temp_requir
 json_spec['components']['schemas']['UpdateLdapServerXo']['required'] = temp_required
 print('Done')
 
-print('Fixing response schema for IQ Connection...')
-json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
-    'application/json': {
-        'schema': {
-            '$ref': '#/components/schemas/IqConnectionXo'
-        }
-    }
-}
-print('     Done')
+# Not required from NXRM 3.85.0 onwards
+# print('Fixing response schema for IQ Connection...')
+# json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
+#     'application/json': {
+#         'schema': {
+#             '$ref': '#/components/schemas/IqConnectionXo'
+#         }
+#     }
+# }
+# print('     Done')
 
 print('Adding missing 201 empty responses...')
 paths_missing_201: dict[str, list[str]] = {
@@ -449,7 +450,7 @@ json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['resp
 print('     Done')
 
 print('Injecting requestBody schema for PUT /v1/tasks/{taskId}...')
-json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content'][('application''/json')]['schema'] = {
+json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content']['application/json']['schema'] = {
     'properties': {
         'alertEmail': {
             'description': 'e-mail for task notifications.',
@@ -486,6 +487,28 @@ json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content'][('appl
     'required': [
         'enabled', 'frequency', 'name', 'notificationCondition'
     ]
+}
+print('     Done')
+
+print('Injecting Response Schema for POST /v1/tasks...')
+json_spec['paths']['/v1/tasks']['post']['responses'] = {
+    '201': {
+        'content': {
+            'application/json': {
+                'schema': {
+                    'properties': {
+                        'id': {
+                            'description': 'Task ID',
+                            'format': 'uuid',
+                            'type': 'string'
+                        }
+                    },
+                    'required': ['id']
+                }
+            }
+        },
+        'description': 'Task created successfully'
+    }
 }
 print('     Done')
 
