@@ -14726,9 +14726,18 @@ paths:
               $ref: '#/components/schemas/TaskTemplateXO'
         required: false
       responses:
-        default:
-          content: {}
-          description: successful operation
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    description: Task ID
+                    format: uuid
+                    type: string
+                required:
+                - id
+          description: Task created successfully
       summary: Create task
       tags:
       - Tasks
