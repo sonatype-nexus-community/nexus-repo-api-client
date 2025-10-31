@@ -1150,6 +1150,10 @@ components:
           type: string
         repository:
           type: string
+        tags:
+          items:
+            type: string
+          type: array
         version:
           type: string
       type: object

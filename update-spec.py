@@ -512,5 +512,14 @@ json_spec['paths']['/v1/tasks']['post']['responses'] = {
 }
 print('     Done')
 
+print('Adding missing `tags` field for schema `ComponentXO`...')
+json_spec['components']['schemas']['ComponentXO']['properties']['tags'] = {
+    'items': {
+        'type': 'string'
+    },
+    'type': 'array'
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
