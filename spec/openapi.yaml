@@ -4479,9 +4479,7 @@ components:
     TagXO:
       properties:
         attributes:
-          additionalProperties:
-            properties: {}
-            type: object
+          additionalProperties: {}
           type: object
         firstCreated:
           format: date-time

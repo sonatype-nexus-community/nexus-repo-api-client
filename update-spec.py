@@ -521,5 +521,12 @@ json_spec['components']['schemas']['ComponentXO']['properties']['tags'] = {
 }
 print('     Done')
 
+print('Correct `attributes` field for schema `TagXO`...')
+json_spec['components']['schemas']['TagXO']['properties']['attributes'] = {
+    'additionalProperties': {},
+    'type': 'object'
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
