@@ -1240,6 +1240,9 @@ components:
           format:
             default: conan
             type: string
+          routingRuleName:
+            description: The name of the routing rule assigned to this repository
+            type: string
           type:
             default: proxy
             type: string

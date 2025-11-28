@@ -542,6 +542,10 @@ json_spec['components']['schemas'].update({
                     'format': {'type': 'string', 'default': 'conan'},
                     'type': {'type': 'string', 'default': 'proxy'},
                     'url': {'type': 'string'},
+                    'routingRuleName': {
+                        'description': 'The name of the routing rule assigned to this repository',
+                        'type': 'string'
+                    }
                 }
             }
         ]
