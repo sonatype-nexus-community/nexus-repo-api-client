@@ -7585,7 +7585,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiProxyRepository'
+                $ref: '#/components/schemas/ConanProxyRepositoryApiRequest'
           description: successful operation
       summary: Get repository
       tags:

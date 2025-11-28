@@ -528,5 +528,12 @@ json_spec['components']['schemas']['TagXO']['properties']['attributes'] = {
 }
 print('     Done')
 
+print('Correct response schema for `GET /v1/repositories/conan/proxy/{repositoryName}`...')
+json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/ConanProxyRepositoryApiRequest'
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
