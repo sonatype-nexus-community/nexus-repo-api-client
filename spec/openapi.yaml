@@ -1233,6 +1233,23 @@ components:
       - online
       - storage
       type: object
+    ConanProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/ConanProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: conan
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     ConanProxyAttributes:
       properties:
         conanVersion:
@@ -7585,7 +7602,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConanProxyRepositoryApiRequest'
+                $ref: '#/components/schemas/ConanProxyApiRepository'
           description: successful operation
       summary: Get repository
       tags:

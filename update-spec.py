@@ -529,9 +529,27 @@ json_spec['components']['schemas']['TagXO']['properties']['attributes'] = {
 print('     Done')
 
 print('Correct response schema for `GET /v1/repositories/conan/proxy/{repositoryName}`...')
+json_spec['components']['schemas'].update({
+    'ConanProxyApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/ConanProxyRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'conan'},
+                    'type': {'type': 'string', 'default': 'proxy'},
+                    'url': {'type': 'string'},
+                }
+            }
+        ]
+    }
+})
 json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
-    '$ref': '#/components/schemas/ConanProxyRepositoryApiRequest'
+    '$ref': '#/components/schemas/ConanProxyApiRepository'
 }
 print('     Done')
 
