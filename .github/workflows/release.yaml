@@ -34,6 +34,8 @@ jobs:
             - name: Run OpenAPI Generator
               uses: addnab/docker-run-action@v3
               with:
+                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                  password: ${{ secrets.DOCKER_HUB_PAT }}
                   image: openapitools/openapi-generator-cli:${{ env.OPEN_API_GENERATOR_VERSION }}
                   options: -v ${{ github.workspace }}:/local
                   run: /usr/local/bin/docker-entrypoint.sh batch --clean /local/${{ matrix.language }}.yaml
