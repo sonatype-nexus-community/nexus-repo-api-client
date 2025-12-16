@@ -557,5 +557,12 @@ json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['resp
 }
 print('     Done')
 
+print('Patching schema `HttpSettingsXo`...')
+json_spec['components']['schemas']['HttpSettingsXo']['properties']['nonProxyHosts'].update({'nullable': 'true'})
+json_spec['components']['schemas']['HttpSettingsXo']['properties']['userAgent'].update({'nullable': 'true'})
+json_spec['components']['schemas']['ProxySettingsXo'].update({'nullable': 'true'})
+print('     Done')
+
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
