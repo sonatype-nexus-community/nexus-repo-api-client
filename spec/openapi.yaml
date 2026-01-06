@@ -533,6 +533,19 @@ components:
         name:
           type: string
       type: object
+    ApplyStatusXO:
+      properties:
+        entity:
+          type: string
+        message:
+          type: string
+        status:
+          enum:
+          - APPLIED
+          - NOT_APPLIED
+          - FAILED
+          type: string
+      type: object
     AptHostedApiRepository:
       properties:
         apt:
@@ -705,6 +718,33 @@ components:
         passphrase:
           description: Passphrase to access PGP signing key
           type: string
+      type: object
+    AssetImportResponseXO:
+      properties:
+        assetId:
+          type: string
+        componentId:
+          type: string
+        errorMessage:
+          type: string
+        importTimestamp:
+          format: date-time
+          type: string
+        path:
+          type: string
+        repository:
+          type: string
+        status:
+          enum:
+          - SUCCESS
+          - SUCCESS_WITH_WARNINGS
+          - SKIPPED_ALREADY_EXISTS
+          - FAILED
+          type: string
+        warnings:
+          items:
+            type: string
+          type: array
       type: object
     AssetXO:
       properties:
@@ -1319,6 +1359,26 @@ components:
       - proxy
       - storage
       type: object
+    ConfigurationApplyResponseXO:
+      properties:
+        appliedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+        failedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+        notAppliedConfigurations:
+          items:
+            $ref: '#/components/schemas/ApplyStatusXO'
+          type: array
+      type: object
+    ConfigurationXO:
+      properties:
+        configurationTypeId:
+          type: string
+      type: object
     ContentSelectorApiCreateRequest:
       properties:
         description:
@@ -1774,10 +1834,10 @@ components:
         writePolicy:
           description: Controls if deployments of and updates to assets are allowed
           enum:
-          - allow
-          - allow_once
-          - deny
-          example: allow_once
+          - ALLOW
+          - ALLOW_ONCE
+          - DENY
+          example: ALLOW_ONCE
           type: string
       required:
       - blobStoreName
@@ -2284,10 +2344,10 @@ components:
         writePolicy:
           description: Controls if deployments of and updates to assets are allowed
           enum:
-          - allow
-          - allow_once
-          - deny
-          example: allow_once
+          - ALLOW
+          - ALLOW_ONCE
+          - DENY
+          example: ALLOW_ONCE
           type: string
       required:
       - blobStoreName
@@ -2488,6 +2548,13 @@ components:
     InputStream:
       format: binary
       type: string
+    InstanceConfigurationXO:
+      properties:
+        configurationXOs:
+          items:
+            $ref: '#/components/schemas/ConfigurationXO'
+          type: array
+      type: object
     IqAuditXo:
       properties:
         enabled:
@@ -4558,6 +4625,8 @@ components:
         nextRun:
           format: date-time
           type: string
+        schedule:
+          type: string
         type:
           type: string
       type: object
@@ -4937,12 +5006,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.86.2-01.
+    as of version 3.87.1-01.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.86.2-01
+  version: 3.87.1-01
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -6121,6 +6190,198 @@ paths:
       summary: Get a single component
       tags:
       - components
+  /v1/configuration:
+    get:
+      operationId: exportConfiguration
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceConfigurationXO'
+          description: Successful Operation
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Missing or invalid protocol version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+      summary: Export instance configuration
+      tags:
+      - Instance configuration
+    put:
+      operationId: applyConfiguration
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstanceConfigurationXO'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigurationApplyResponseXO'
+          description: Successful Operation
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Invalid request or missing/invalid protocol version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+      summary: Apply instance configuration
+      tags:
+      - Instance configuration
+      x-codegen-request-body-name: body
+  /v1/configuration/assets:
+    get:
+      operationId: getAssets_1
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      - description: A token returned by a prior request. If present, the next page
+          of results are returned
+        in: query
+        name: continuationToken
+        schema:
+          type: string
+      - description: Repository from which you would like to retrieve assets.
+        in: query
+        name: repository
+        required: true
+        schema:
+          type: string
+      - description: Unix timestamp (milliseconds since epoch). Return assets last
+          updated after this timestamp
+        in: query
+        name: newerThan
+        schema:
+          format: int64
+          type: integer
+      - description: Unix timestamp (milliseconds since epoch). Return assets last
+          updated before this timestamp
+        in: query
+        name: olderThan
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: Successful Operation
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Missing or invalid protocol version
+        '403':
+          content: {}
+          description: Insufficient permissions to list assets
+        '422':
+          content: {}
+          description: Parameter 'repository' is required
+      summary: List assets
+      tags:
+      - Instance configuration
+  /v1/configuration/assets/{repositoryName}/import:
+    post:
+      operationId: importAsset
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      - description: Repository name to import assets to
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AssetImportResponseXO'
+                type: array
+          description: Assets imported successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Repository not found or missing/invalid protocol version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+        '500':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Asset import failed
+      summary: Import assets to repository
+      tags:
+      - Instance configuration
   /v1/email:
     delete:
       operationId: deleteEmailConfiguration
@@ -10970,6 +11231,36 @@ paths:
         name: tag
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
+        schema:
+          type: string
       - description: Yum architecture
         in: query
         name: yum.architecture
@@ -11300,6 +11591,36 @@ paths:
         name: tag
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
+        schema:
+          type: string
       - description: Yum architecture
         in: query
         name: yum.architecture
@@ -11625,6 +11946,36 @@ paths:
       - description: Component tag
         in: query
         name: tag
+        schema:
+          type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -13527,6 +13878,36 @@ paths:
         name: tag
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
+        schema:
+          type: string
       - description: Yum architecture
         in: query
         name: yum.architecture
@@ -13833,6 +14214,36 @@ paths:
       - description: Component tag
         in: query
         name: tag
+        schema:
+          type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -14380,6 +14791,36 @@ paths:
         name: tag
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
+        schema:
+          type: string
       - description: Yum architecture
         in: query
         name: yum.architecture
@@ -14683,6 +15124,36 @@ paths:
       - description: Component tag
         in: query
         name: tag
+        schema:
+          type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
+      - description: terraform provider
+        in: query
+        name: terraform.provider
+        schema:
+          type: string
+      - description: terraform name
+        in: query
+        name: terraform.name
+        schema:
+          type: string
+      - description: terraform system
+        in: query
+        name: terraform.system
+        schema:
+          type: string
+      - description: terraform architecture
+        in: query
+        name: terraform.architecture
+        schema:
+          type: string
+      - description: terraform asset kind
+        in: query
+        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -15025,6 +15496,7 @@ tags:
 - name: 'Security management: secrets encryption'
 - name: Security management
 - name: Support
+- name: Instance configuration
 - name: Cleanup policies
 - name: Manage Sonatype Repository Firewall configuration
 - name: Reconcile Plan
