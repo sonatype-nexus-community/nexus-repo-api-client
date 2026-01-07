@@ -153,40 +153,41 @@ json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses'
 
 print('     Done')
 
+# Resolved in NXRM 3.86
 # Fix Schemas relating to Repositories that are missing `format`, `type` and `url`
-repository_schemas_to_fix: list[dict[str, str]] = [
-    {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
-    {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
-    {'s': 'CargoGroupApiRepository', 't': 'group', 'f': 'cargo'},
-    {'s': 'CargoProxyApiRepository', 't': 'proxy', 'f': 'cargo'},
-    {'s': 'DockerGroupApiRepository', 't': 'group', 'f': 'docker'},
-    {'s': 'DockerHostedApiRepository', 't': 'hosted', 'f': 'docker'},
-    {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
-    {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
-    {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
-    {'s': 'NugetProxyApiRepository', 't': 'proxy', 'f': 'nuget'},
-    {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
-    {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
-    {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'},
-    {'s': 'SimpleApiGroupDeployRepository', 't': 'group', 'f': None},
-    {'s': 'SimpleApiProxyRepository', 't': 'proxy', 'f': None},
-    {'s': 'YumHostedApiRepository', 't': 'hosted', 'f': 'yum'}
-]
-print('Fixing Repository Schemas...')
-for v in repository_schemas_to_fix:
-    json_spec['components']['schemas'][v['s']]['properties']['format'] = {
-        'type': 'string',
-    }
-    if v['f'] is not None:
-        json_spec['components']['schemas'][v['s']]['properties']['format']['default'] = v['f']
-    json_spec['components']['schemas'][v['s']]['properties']['type'] = {
-        'type': 'string',
-        'default': v['t']
-    }
-    json_spec['components']['schemas'][v['s']]['properties']['url'] = {
-        'type': 'string'
-    }
-    print(f'   Fixed `{v['s']}`')
+# repository_schemas_to_fix: list[dict[str, str]] = [
+#     {'s': 'AptHostedApiRepository', 't': 'hosted', 'f': 'apt'},
+#     {'s': 'AptProxyApiRepository', 't': 'proxy', 'f': 'apt'},
+#     {'s': 'CargoGroupApiRepository', 't': 'group', 'f': 'cargo'},
+#     {'s': 'CargoProxyApiRepository', 't': 'proxy', 'f': 'cargo'},
+#     {'s': 'DockerGroupApiRepository', 't': 'group', 'f': 'docker'},
+#     {'s': 'DockerHostedApiRepository', 't': 'hosted', 'f': 'docker'},
+#     {'s': 'DockerProxyApiRepository', 't': 'proxy', 'f': 'docker'},
+#     {'s': 'MavenHostedApiRepository', 't': 'hosted', 'f': 'maven2'},
+#     {'s': 'MavenProxyApiRepository', 't': 'proxy', 'f': 'maven2'},
+#     {'s': 'NugetProxyApiRepository', 't': 'proxy', 'f': 'nuget'},
+#     {'s': 'SimpleApiGroupRepository', 't': 'group', 'f': None},
+#     {'s': 'SimpleApiHostedRepository', 't': 'hosted', 'f': None},
+#     {'s': 'NpmProxyApiRepository', 't': 'proxy', 'f': 'npm'},
+#     {'s': 'SimpleApiGroupDeployRepository', 't': 'group', 'f': None},
+#     {'s': 'SimpleApiProxyRepository', 't': 'proxy', 'f': None},
+#     {'s': 'YumHostedApiRepository', 't': 'hosted', 'f': 'yum'}
+# ]
+# print('Fixing Repository Schemas...')
+# for v in repository_schemas_to_fix:
+#     json_spec['components']['schemas'][v['s']]['properties']['format'] = {
+#         'type': 'string',
+#     }
+#     if v['f'] is not None:
+#         json_spec['components']['schemas'][v['s']]['properties']['format']['default'] = v['f']
+#     json_spec['components']['schemas'][v['s']]['properties']['type'] = {
+#         'type': 'string',
+#         'default': v['t']
+#     }
+#     json_spec['components']['schemas'][v['s']]['properties']['url'] = {
+#         'type': 'string'
+#     }
+#     print(f'   Fixed `{v['s']}`')
 
 # Fix Schema `StorageAttributes` - missing Write Policy
 json_spec['components']['schemas']['StorageAttributes']['properties']['writePolicy'] = {

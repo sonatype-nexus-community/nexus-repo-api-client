@@ -557,7 +557,8 @@ components:
         component:
           $ref: '#/components/schemas/ComponentAttributes'
         format:
-          default: apt
+          description: Component format held in this repository
+          example: apt
           type: string
         name:
           description: A unique identifier for this repository
@@ -571,9 +572,16 @@ components:
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
         type:
-          default: hosted
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/apt-example
           type: string
       required:
       - apt
@@ -623,7 +631,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
-          default: apt
+          description: Component format held in this repository
+          example: apt
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -648,9 +657,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/apt-example
           type: string
       required:
       - apt
@@ -921,7 +937,8 @@ components:
         cargo:
           $ref: '#/components/schemas/CargoAttributes'
         format:
-          default: cargo
+          description: Component format held in this repository
+          example: cargo
           type: string
         group:
           $ref: '#/components/schemas/GroupAttributes'
@@ -937,9 +954,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: group
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: group
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/cargo-example
           type: string
       required:
       - group
@@ -998,7 +1022,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
-          default: cargo
+          description: Component format held in this repository
+          example: cargo
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -1023,9 +1048,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/cargo-example
           type: string
       required:
       - httpClient
@@ -1708,7 +1740,8 @@ components:
         docker:
           $ref: '#/components/schemas/DockerAttributes'
         format:
-          default: docker
+          description: Component format held in this repository
+          example: docker
           type: string
         group:
           $ref: '#/components/schemas/GroupDeployAttributes'
@@ -1724,9 +1757,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: group
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: group
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/docker-example
           type: string
       required:
       - docker
@@ -1767,7 +1807,8 @@ components:
         docker:
           $ref: '#/components/schemas/DockerAttributes'
         format:
-          default: docker
+          description: Component format held in this repository
+          example: docker
           type: string
         name:
           description: A unique identifier for this repository
@@ -1781,9 +1822,16 @@ components:
         storage:
           $ref: '#/components/schemas/DockerHostedStorageAttributes'
         type:
-          default: hosted
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/docker-example
           type: string
       required:
       - docker
@@ -1853,7 +1901,8 @@ components:
         dockerProxy:
           $ref: '#/components/schemas/DockerProxyAttributes'
         format:
-          default: docker
+          description: Component format held in this repository
+          example: docker
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -1878,9 +1927,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/docker-example
           type: string
       required:
       - docker
@@ -2687,7 +2743,8 @@ components:
         component:
           $ref: '#/components/schemas/ComponentAttributes'
         format:
-          default: maven2
+          description: Component format held in this repository
+          example: maven2
           type: string
         maven:
           $ref: '#/components/schemas/MavenAttributes'
@@ -2703,9 +2760,16 @@ components:
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
         type:
-          default: hosted
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/maven2-example
           type: string
       required:
       - maven
@@ -2742,7 +2806,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
-          default: maven2
+          description: Component format held in this repository
+          example: maven2
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -2769,9 +2834,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/maven2-example
           type: string
       required:
       - httpClient
@@ -2896,7 +2968,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
-          default: npm
+          description: Component format held in this repository
+          example: npm
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -2923,9 +2996,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/npm-example
           type: string
       required:
       - httpClient
@@ -3033,7 +3113,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
-          default: nuget
+          description: Component format held in this repository
+          example: nuget
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -3060,9 +3141,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/nuget-example
           type: string
       required:
       - httpClient
@@ -4319,6 +4407,9 @@ components:
     SimpleApiGroupDeployRepository:
       properties:
         format:
+          description: Component format held in this repository
+          example: simpleapigroupdeployrepository
+          readOnly: true
           type: string
         group:
           $ref: '#/components/schemas/GroupDeployAttributes'
@@ -4336,9 +4427,17 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: group
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: group
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapigroupdeployrepository-example
+          readOnly: true
           type: string
       required:
       - group
@@ -4348,6 +4447,8 @@ components:
     SimpleApiGroupRepository:
       properties:
         format:
+          description: Component format held in this repository
+          example: simpleapigrouprepository
           type: string
         group:
           $ref: '#/components/schemas/GroupAttributes'
@@ -4363,9 +4464,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: group
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: group
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapigrouprepository-example
           type: string
       required:
       - group
@@ -4379,6 +4487,8 @@ components:
         component:
           $ref: '#/components/schemas/ComponentAttributes'
         format:
+          description: Component format held in this repository
+          example: simpleapihostedrepository
           type: string
         name:
           description: A unique identifier for this repository
@@ -4392,9 +4502,16 @@ components:
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
         type:
-          default: hosted
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapihostedrepository-example
           type: string
       required:
       - online
@@ -4405,6 +4522,8 @@ components:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
+          description: Component format held in this repository
+          example: simpleapiproxyrepository
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
@@ -4429,9 +4548,16 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
         type:
-          default: proxy
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapiproxyrepository-example
           type: string
       required:
       - httpClient
@@ -4902,7 +5028,8 @@ components:
         component:
           $ref: '#/components/schemas/ComponentAttributes'
         format:
-          default: yum
+          description: Component format held in this repository
+          example: yum
           type: string
         name:
           description: A unique identifier for this repository
@@ -4916,9 +5043,16 @@ components:
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
         type:
-          default: hosted
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
           type: string
         url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/yum-example
           type: string
         yum:
           $ref: '#/components/schemas/YumAttributes'
