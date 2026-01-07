@@ -342,9 +342,10 @@ for p in paths_to_fix_writable_member:
     json_spec['paths'][p]['get']['responses']['200']['content']['application/json']['schema'] = {
         '$ref': '#/components/schemas/SimpleApiGroupDeployRepository'
     }
-json_spec['components']['schemas']['PypiGroupRepositoryApiRequest']['properties']['group'] = {
-    '$ref': '#/components/schemas/GroupDeployAttributes'
-}
+# Resolved in NXRM 3.85
+# json_spec['components']['schemas']['PypiGroupRepositoryApiRequest']['properties']['group'] = {
+#     '$ref': '#/components/schemas/GroupDeployAttributes'
+# }
 print('     Done')
 
 print('Correcting response schema for GET /v1/repositories/raw/*/{name}...')
