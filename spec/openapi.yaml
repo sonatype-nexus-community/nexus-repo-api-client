@@ -6968,10 +6968,13 @@ paths:
       - Manage Sonatype Repository Firewall configuration
   /v1/iq/verify-connection:
     post:
-      operationId: verifyConnection_2
+      operationId: verifyIqConnection
       responses:
         '200':
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqConnectionVerificationXo'
           description: Connection verification complete, check response body for result
       summary: Verify Sonatype Repository Firewall connection
       tags:

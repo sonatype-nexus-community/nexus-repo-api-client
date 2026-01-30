@@ -565,6 +565,16 @@ json_spec['components']['schemas']['HttpSettingsXo']['properties']['userAgent'].
 json_spec['components']['schemas']['ProxySettingsXo'].update({'nullable': 'true'})
 print('     Done')
 
+print('Inject response schema for POST /v1/iq/verify-connection and set OperationId')
+json_spec['paths']['/v1/iq/verify-connection']['post']['operationId'] = 'verifyIqConnection'
+json_spec['paths']['/v1/iq/verify-connection']['post']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            '$ref': '#/components/schemas/IqConnectionVerificationXo'
+        }
+    }
+}
+print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
