@@ -156,6 +156,10 @@ components:
         algorithmForDecryption:
           description: Optional - The algorithm to be used to decrypt the principals
           type: string
+        iterationsForDecryption:
+          description: Optional - The iterations to be used to decrypt the principals
+          format: int32
+          type: integer
         notifyEmail:
           description: Optional - Email to notify when task finishes
           type: string
@@ -924,6 +928,23 @@ components:
         type:
           type: string
       type: object
+    CapabilityType:
+      properties:
+        about:
+          description: Description of the capability type
+          type: string
+        formFields:
+          description: Form fields configuration for this capability type
+          items:
+            $ref: '#/components/schemas/FormField'
+          type: array
+        id:
+          description: Capability type identifier
+          type: string
+        name:
+          description: Display name of the capability type
+          type: string
+      type: object
     CargoAttributes:
       properties:
         requireAuthentication:
@@ -1499,28 +1520,20 @@ components:
           description: This field specifies the attribute of the Object class that
             defines the Group ID. Required if groupType is static
           example: cn
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberAttribute:
           description: LDAP attribute containing the usernames for the group. Required
             if groupType is static
           example: memberUid
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberFormat:
           description: The format of user ID stored in the group member attribute.
             Required if groupType is static
           example: uid=${username},ou=people,dc=example,dc=com
-          maxLength: 0
-          minLength: 0
           type: string
         groupObjectClass:
           description: LDAP class for group objects. Required if groupType is static
           example: posixGroup
-          maxLength: 0
-          minLength: 0
           type: string
         groupSubtree:
           description: Are groups located in structures below the group base DN
@@ -1589,8 +1602,6 @@ components:
           description: Set this to the attribute used to store the attribute which
             holds groups DN in the user object. Required if groupType is dynamic
           example: memberOf
-          maxLength: 0
-          minLength: 0
           type: string
         userObjectClass:
           description: LDAP class for user objects
@@ -2042,6 +2053,65 @@ components:
           type: string
         softQuota:
           $ref: '#/components/schemas/BlobStoreApiSoftQuota'
+      type: object
+    FormField:
+      properties:
+        allowAutocomplete:
+          description: Whether autocomplete is enabled for this field
+          type: boolean
+        attributes:
+          additionalProperties:
+            properties: {}
+            type: object
+          description: Additional attributes for the field
+          type: object
+        disabled:
+          description: Whether the field is disabled
+          type: boolean
+        helpText:
+          description: Help text shown to users
+          type: string
+        id:
+          description: Field identifier
+          type: string
+        idMapping:
+          description: Property path for the ID field in store API response
+          type: string
+        initialValue:
+          description: Initial value for the field
+          type: string
+        label:
+          description: Display label for the field
+          type: string
+        maximumValue:
+          description: Maximum value (for number fields)
+          type: string
+        minimumValue:
+          description: Minimum value (for number fields)
+          type: string
+        nameMapping:
+          description: Property path for the name/display field in store API response
+          type: string
+        readOnly:
+          description: Whether the field is read-only
+          type: boolean
+        regexValidation:
+          description: Regular expression for field validation
+          type: string
+        required:
+          description: Whether the field is required
+          type: boolean
+        storeApi:
+          description: API endpoint for fetching selectable options
+          type: string
+        storeFilters:
+          additionalProperties:
+            type: string
+          description: Filters to apply when fetching options from the store API
+          type: object
+        type:
+          description: Field type (e.g., string, password, number, checkbox, combobox)
+          type: string
       type: object
     FrequencyXO:
       properties:
@@ -2719,6 +2789,8 @@ components:
       properties:
         group:
           $ref: '#/components/schemas/GroupAttributes'
+        maven:
+          $ref: '#/components/schemas/MavenAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -2732,6 +2804,7 @@ components:
           $ref: '#/components/schemas/StorageAttributes'
       required:
       - group
+      - maven
       - name
       - online
       - storage
@@ -3793,28 +3866,20 @@ components:
           description: This field specifies the attribute of the Object class that
             defines the Group ID. Required if groupType is static
           example: cn
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberAttribute:
           description: LDAP attribute containing the usernames for the group. Required
             if groupType is static
           example: memberUid
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberFormat:
           description: The format of user ID stored in the group member attribute.
             Required if groupType is static
           example: uid=${username},ou=people,dc=example,dc=com
-          maxLength: 0
-          minLength: 0
           type: string
         groupObjectClass:
           description: LDAP class for group objects. Required if groupType is static
           example: posixGroup
-          maxLength: 0
-          minLength: 0
           type: string
         groupSubtree:
           description: Are groups located in structures below the group base DN
@@ -3891,8 +3956,6 @@ components:
           description: Set this to the attribute used to store the attribute which
             holds groups DN in the user object. Required if groupType is dynamic
           example: memberOf
-          maxLength: 0
-          minLength: 0
           type: string
         userObjectClass:
           description: LDAP class for user objects
@@ -4756,6 +4819,98 @@ components:
         type:
           type: string
       type: object
+    TerraformAttributes:
+      properties:
+        requireAuthentication:
+          description: Indicates if this repository requires authentication overriding
+            anonymous access.
+          example: false
+          type: boolean
+      type: object
+    TerraformProxyApiRepository:
+      description: Terraform proxy repository configuration
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: terraform
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        terraform:
+          $ref: '#/components/schemas/TerraformAttributes'
+        type:
+          description: Repository type
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/terraform-example
+          type: string
+      required:
+      - httpClient
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
+    TerraformProxyRepositoryApiRequest:
+      description: Request body for creating or updating a Terraform proxy repository
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        terraform:
+          $ref: '#/components/schemas/TerraformAttributes'
+      required:
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
     Throwable:
       properties:
         cause:
@@ -4818,28 +4973,20 @@ components:
           description: This field specifies the attribute of the Object class that
             defines the Group ID. Required if groupType is static
           example: cn
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberAttribute:
           description: LDAP attribute containing the usernames for the group. Required
             if groupType is static
           example: memberUid
-          maxLength: 0
-          minLength: 0
           type: string
         groupMemberFormat:
           description: The format of user ID stored in the group member attribute.
             Required if groupType is static
           example: uid=${username},ou=people,dc=example,dc=com
-          maxLength: 0
-          minLength: 0
           type: string
         groupObjectClass:
           description: LDAP class for group objects. Required if groupType is static
           example: posixGroup
-          maxLength: 0
-          minLength: 0
           type: string
         groupSubtree:
           description: Are groups located in structures below the group base DN
@@ -4911,8 +5058,6 @@ components:
           description: Set this to the attribute used to store the attribute which
             holds groups DN in the user object. Required if groupType is dynamic
           example: memberOf
-          maxLength: 0
-          minLength: 0
           type: string
         userObjectClass:
           description: LDAP class for user objects
@@ -4930,6 +5075,37 @@ components:
           description: Are users located in structures below the user base DN?
           type: boolean
       required: *id001
+      type: object
+    UpdateTaskTemplateXO:
+      description: Task template for updating existing tasks (type field is immutable)
+      properties:
+        alertEmail:
+          description: e-mail for task notifications.
+          type: string
+        enabled:
+          description: Indicates if the task would be enabled.
+          type: boolean
+        frequency:
+          $ref: '#/components/schemas/FrequencyXO'
+        name:
+          description: The name of the task template.
+          type: string
+        notificationCondition:
+          description: Condition required to notify a task execution.
+          enum:
+          - FAILURE
+          - SUCCESS_FAILURE
+          type: string
+        properties:
+          additionalProperties:
+            type: string
+          description: Additional properties for the task
+          type: object
+      required:
+      - enabled
+      - frequency
+      - name
+      - notificationCondition
       type: object
     UploadDefinitionXO:
       properties:
@@ -4956,6 +5132,10 @@ components:
           type: string
         optional:
           type: boolean
+        options:
+          additionalProperties:
+            type: string
+          type: object
         type:
           type: string
       type: object
@@ -5140,12 +5320,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.87.1-01.
+    as of version 3.88.0-08.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.87.1-01
+  version: 3.88.0-08
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -5929,6 +6109,21 @@ paths:
       tags:
       - Capabilities
       x-codegen-request-body-name: body
+  /v1/capabilities/types:
+    get:
+      operationId: getTypes
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CapabilityType'
+                type: array
+          description: successful operation
+      summary: List all capability types available and exposed in the system
+      tags:
+      - Capabilities
   /v1/capabilities/{capabilityId}:
     delete:
       operationId: delete_4
@@ -10382,6 +10577,99 @@ paths:
       tags:
       - Repository Management
       x-codegen-request-body-name: body
+  /v1/repositories/terraform/proxy:
+    post:
+      description: Creates a new Terraform proxy repository that proxies requests
+        to an upstream Terraform Registry
+      operationId: createTerraformProxyRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerraformProxyRepositoryApiRequest'
+        description: Configuration for the new Terraform proxy repository
+        required: true
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create terraform proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/terraform/proxy/{repositoryName}:
+    get:
+      description: Retrieves configuration details for a Terraform proxy repository
+      operationId: getTerraformProxyRepository
+      parameters:
+      - description: Name of the repository to retrieve
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content: {}
+          description: Repository configuration retrieved successfully
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      description: Updates the configuration of an existing Terraform proxy repository
+      operationId: updateTerraformProxyRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerraformProxyRepositoryApiRequest'
+        description: Updated configuration for the Terraform proxy repository
+        required: true
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update terraform proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
   /v1/repositories/yum/group:
     post:
       operationId: createYumGroupRepository
@@ -11056,6 +11344,10 @@ paths:
       x-codegen-request-body-name: body
   /v1/search:
     get:
+      description: All searches require at least one criterion of at least three characters
+        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
+        your criteria in quotation marks to search an exact phrase; otherwise, search
+        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: search
       parameters:
       - allowEmptyValue: true
@@ -11365,34 +11657,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -11417,6 +11694,10 @@ paths:
       - Search
   /v1/search/assets:
     get:
+      description: All searches require at least one criterion of at least three characters
+        before a trailing wildcard (\*) and cannot start with a wildcard (\*). Enclose
+        your criteria in quotation marks to search an exact phrase; otherwise, search
+        criteria will be split by any commas, spaces, dashes, or forward slashes.
       operationId: searchAssets
       parameters:
       - description: A token returned by a prior request. If present, the next page
@@ -11725,34 +12006,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -12082,34 +12348,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -13249,6 +13500,10 @@ paths:
         in: query
         name: type
         schema:
+          default: signing
+          enum:
+          - decryption
+          - signing
           type: string
       responses:
         '200':
@@ -14012,34 +14267,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -14350,34 +14590,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -14925,34 +15150,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -15260,34 +15470,19 @@ paths:
         name: tag
         schema:
           type: string
-      - description: terraform namespace
-        in: query
-        name: terraform.namespace
-        schema:
-          type: string
       - description: terraform provider
         in: query
         name: terraform.provider
         schema:
           type: string
+      - description: terraform namespace
+        in: query
+        name: terraform.namespace
+        schema:
+          type: string
       - description: terraform name
         in: query
         name: terraform.name
-        schema:
-          type: string
-      - description: terraform system
-        in: query
-        name: terraform.system
-        schema:
-          type: string
-      - description: terraform architecture
-        in: query
-        name: terraform.architecture
-        schema:
-          type: string
-      - description: terraform asset kind
-        in: query
-        name: terraform.asset_kind
         schema:
           type: string
       - description: Yum architecture
@@ -15643,8 +15838,8 @@ tags:
 - name: Tags
 - name: 'Security management: user tokens'
 - name: Azure blob store
-- name: Capabilities
 - name: Malicious Risk On Disk
+- name: Capabilities
 - name: Manage Sonatype HTTP System Settings
 - name: Monthly Metrics
 - name: 'Security: certificates'
