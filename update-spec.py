@@ -576,5 +576,15 @@ json_spec['paths']['/v1/iq/verify-connection']['post']['responses']['200']['cont
 }
 print('     Done')
 
+print('Inject response schema for GET /v1/repositories/terraform/proxy/{repositoryName}')
+json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            '$ref': '#/components/schemas/TerraformProxyApiRepository'
+        }
+    }
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
