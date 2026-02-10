@@ -627,5 +627,14 @@ json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get'][
 }
 print('     Done')
 
+print('Correct response schema for GET /v1/repositories/swift/proxy/{repositoryName}')
+json_spec['paths']['/v1/repositories/swift/proxy/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json'] = {
+    'schema': {
+        '$ref': '#/components/schemas/SwiftProxyApiRepository'
+    }
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))

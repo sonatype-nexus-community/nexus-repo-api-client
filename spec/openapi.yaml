@@ -10793,7 +10793,10 @@ paths:
           type: string
       responses:
         '200':
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwiftProxyApiRepository'
           description: Repository configuration retrieved successfully
         '401':
           content: {}
