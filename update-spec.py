@@ -602,5 +602,30 @@ json_spec['paths']['/v1/tasks']['post']['responses']['201']['content']['applicat
 }
 print('     Done')
 
+print('Fix `TerraformHostedRepositoryApiRequest` schema (missing fields)')
+json_spec['components']['schemas']['TerraformHostedRepositoryApiRequest']['properties'].update({
+    'format': {
+        'type': 'string',
+        'default': 'terraform'
+    },
+    'type': {
+        'type': 'string',
+        'default': 'hosted'
+    },
+    'url': {
+        'type': 'string'
+    }
+})
+print('     Done')
+
+print('Correct response schema for GET /v1/tasks')
+json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json'] = {
+    'schema': {
+        '$ref': '#/components/schemas/TerraformHostedRepositoryApiRequest'
+    }
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
