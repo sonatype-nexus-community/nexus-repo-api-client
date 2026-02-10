@@ -512,8 +512,10 @@ components:
           type: array
           uniqueItems: true
         source:
-          description: The user source which is the origin of this user. This value
-            cannot be changed.
+          description: The source of the user. When creating user, if the source is
+            "default", the local Nexus Security User will be created. If the source
+            is anything but "default" (i.e., LDAP or SAML), a local LdapUser (or SamlUser)
+            will be created and have the listed roles assigned to that user.
           type: string
         status:
           description: The user's status, e.g. active or disabled.
@@ -1221,6 +1223,11 @@ components:
           items:
             $ref: '#/components/schemas/AssetXO'
           type: array
+        extraJsonAttributes:
+          additionalProperties:
+            properties: {}
+            type: object
+          type: object
         format:
           type: string
         group:
@@ -1792,7 +1799,8 @@ components:
         group:
           $ref: '#/components/schemas/GroupDeployAttributes'
         name:
-          description: A unique identifier for this repository
+          description: A unique identifier for this repository (must be lowercase
+            for Docker repositories)
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
           type: string
@@ -1858,7 +1866,8 @@ components:
         docker:
           $ref: '#/components/schemas/DockerAttributes'
         name:
-          description: A unique identifier for this repository
+          description: A unique identifier for this repository (must be lowercase
+            for Docker repositories)
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
           type: string
@@ -1993,7 +2002,8 @@ components:
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
         name:
-          description: A unique identifier for this repository
+          description: A unique identifier for this repository (must be lowercase
+            for Docker repositories)
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
           type: string
@@ -2717,6 +2727,7 @@ components:
         failOpenModeEnabled:
           description: Allow by default when quarantine is enabled and the IQ connection
             fails
+          example: false
           type: boolean
         password:
           description: Credentials for the Sonatype Repository Firewall User
@@ -2789,8 +2800,6 @@ components:
       properties:
         group:
           $ref: '#/components/schemas/GroupAttributes'
-        maven:
-          $ref: '#/components/schemas/MavenAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -2804,7 +2813,6 @@ components:
           $ref: '#/components/schemas/StorageAttributes'
       required:
       - group
-      - maven
       - name
       - online
       - storage
@@ -4716,6 +4724,100 @@ components:
         truncated:
           type: boolean
       type: object
+    SwiftAttributes:
+      properties:
+        requireAuthentication:
+          description: Indicates if this repository requires authentication overriding
+            anonymous access.
+          example: false
+          type: boolean
+      type: object
+    SwiftProxyApiRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: swift
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        swift:
+          $ref: '#/components/schemas/SwiftAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/swift-example
+          type: string
+      required:
+      - httpClient
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
+    SwiftProxyRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        swift:
+          $ref: '#/components/schemas/SwiftAttributes'
+      required:
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
     SystemCheckResultDTO:
       properties:
         healthy:
@@ -4827,6 +4929,31 @@ components:
           example: false
           type: boolean
       type: object
+    TerraformHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        terraformSigning:
+          $ref: '#/components/schemas/TerraformSigningAttributes'
+      required:
+      - name
+      - online
+      - storage
+      - terraformSigning
+      type: object
     TerraformProxyApiRepository:
       description: Terraform proxy repository configuration
       properties:
@@ -4910,6 +5037,23 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    TerraformSigningAttributes:
+      properties:
+        keypair:
+          description: PGP signing key pair (armored private key e.g. gpg --export-secret-key
+            --armor). Required.
+          example: '-----BEGIN PGP PRIVATE KEY BLOCK-----
+
+            ...
+
+            -----END PGP PRIVATE KEY BLOCK-----'
+          type: string
+        passphrase:
+          description: Passphrase to access PGP signing key (optional)
+          type: string
+      required:
+      - keypair
       type: object
     Throwable:
       properties:
@@ -5320,12 +5464,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.88.0-08.
+    as of version 3.89.0-09.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.88.0-08
+  version: 3.89.0-09
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -6314,13 +6458,6 @@ paths:
                 apt.tag:
                   description: apt Tag
                   type: string
-                docker.asset:
-                  description: 'docker Asset '
-                  format: binary
-                  type: string
-                docker.tag:
-                  description: docker Tag
-                  type: string
                 helm.asset:
                   description: 'helm Asset '
                   format: binary
@@ -6440,6 +6577,40 @@ paths:
                   type: string
                 rubygems.tag:
                   description: rubygems Tag
+                  type: string
+                terraform.architecture:
+                  description: terraform Architecture
+                  type: string
+                terraform.asset:
+                  description: 'terraform Asset '
+                  format: binary
+                  type: string
+                terraform.name:
+                  description: terraform Name
+                  type: string
+                terraform.namespace:
+                  description: terraform Namespace
+                  type: string
+                terraform.os:
+                  description: terraform Operating System
+                  type: string
+                terraform.provider:
+                  description: terraform Provider
+                  type: string
+                terraform.tag:
+                  description: terraform Tag
+                  type: string
+                terraform.type:
+                  description: terraform Type
+                  type: string
+                terraform.uploadType:
+                  description: terraform Upload Type
+                  enum:
+                  - module
+                  - provider
+                  type: string
+                terraform.version:
+                  description: terraform Version
                   type: string
                 yum.asset:
                   description: 'yum Asset '
@@ -10580,6 +10751,160 @@ paths:
       tags:
       - Repository Management
       x-codegen-request-body-name: body
+  /v1/repositories/swift/proxy:
+    post:
+      operationId: createSwiftProxyRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwiftProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create swift proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/swift/proxy/{repositoryName}:
+    get:
+      operationId: getSwiftProxyRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content: {}
+          description: Repository configuration retrieved successfully
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateSwiftProxyRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwiftProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update swift proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/terraform/hosted:
+    post:
+      operationId: createTerraformHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerraformHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create terraform hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/terraform/hosted/{repositoryName}:
+    get:
+      operationId: getTerraformHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateTerraformHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerraformHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update terraform hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
   /v1/repositories/terraform/proxy:
     post:
       description: Creates a new Terraform proxy repository that proxies requests
@@ -11658,6 +11983,16 @@ paths:
         name: rubygems.summary
         schema:
           type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
+        schema:
+          type: string
       - description: Component tag
         in: query
         name: tag
@@ -12007,6 +12342,16 @@ paths:
         name: rubygems.summary
         schema:
           type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
+        schema:
+          type: string
       - description: Component tag
         in: query
         name: tag
@@ -12347,6 +12692,16 @@ paths:
       - description: RubyGems summary
         in: query
         name: rubygems.summary
+        schema:
+          type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
         schema:
           type: string
       - description: Component tag
@@ -14268,6 +14623,16 @@ paths:
         name: rubygems.summary
         schema:
           type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
+        schema:
+          type: string
       - description: Component tag
         in: query
         name: tag
@@ -14589,6 +14954,16 @@ paths:
       - description: RubyGems summary
         in: query
         name: rubygems.summary
+        schema:
+          type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
         schema:
           type: string
       - description: Component tag
@@ -15151,6 +15526,16 @@ paths:
         name: rubygems.summary
         schema:
           type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
+        schema:
+          type: string
       - description: Component tag
         in: query
         name: tag
@@ -15471,6 +15856,16 @@ paths:
         name: rubygems.summary
         schema:
           type: string
+      - description: swift scope
+        in: query
+        name: swift.scope
+        schema:
+          type: string
+      - description: swift asset kind
+        in: query
+        name: swift.asset_kind
+        schema:
+          type: string
       - description: Component tag
         in: query
         name: tag
@@ -15617,13 +16012,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id:
-                    description: Task ID
-                    format: uuid
-                    type: string
-                required:
-                - id
+                $ref: '#/components/schemas/TaskXO'
           description: Task created successfully
       summary: Create task
       tags:
