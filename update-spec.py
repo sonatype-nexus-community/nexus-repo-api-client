@@ -586,5 +586,13 @@ json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['
 }
 print('     Done')
 
+print('Complete type for `terraform.uploadType` for POST /v1/components')
+json_spec['paths']['/v1/components']['post']['requestBody']['content']['multipart/form-data']['schema']['properties']['terraform.uploadType'] = {
+    'description': 'terraform Upload Type',
+    'enum': ['module', 'provider'],
+    'type': 'string'
+}
+print('     Done')
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))

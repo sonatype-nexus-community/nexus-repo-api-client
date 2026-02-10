@@ -6605,6 +6605,10 @@ paths:
                   type: string
                 terraform.uploadType:
                   description: terraform Upload Type
+                  enum:
+                  - module
+                  - provider
+                  type: string
                 terraform.version:
                   description: terraform Version
                   type: string
