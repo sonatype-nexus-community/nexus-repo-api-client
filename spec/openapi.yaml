@@ -4935,6 +4935,9 @@ components:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         component:
           $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          default: terraform
+          type: string
         name:
           description: A unique identifier for this repository
           example: internal
@@ -4948,6 +4951,11 @@ components:
           $ref: '#/components/schemas/HostedStorageAttributes'
         terraformSigning:
           $ref: '#/components/schemas/TerraformSigningAttributes'
+        type:
+          default: hosted
+          type: string
+        url:
+          type: string
       required:
       - name
       - online
@@ -10868,7 +10876,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiHostedRepository'
+                $ref: '#/components/schemas/TerraformHostedRepositoryApiRequest'
           description: successful operation
       summary: Get repository
       tags:
