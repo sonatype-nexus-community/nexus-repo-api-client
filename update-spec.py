@@ -15,10 +15,9 @@
 #
 import json
 import os.path
-
-import requests
 import sys
 
+import requests
 from yaml import dump as yaml_dump
 
 try:
@@ -587,10 +586,19 @@ json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['
 print('     Done')
 
 print('Complete type for `terraform.uploadType` for POST /v1/components')
-json_spec['paths']['/v1/components']['post']['requestBody']['content']['multipart/form-data']['schema']['properties']['terraform.uploadType'] = {
+json_spec['paths']['/v1/components']['post']['requestBody']['content']['multipart/form-data']['schema']['properties'][
+    'terraform.uploadType'] = {
     'description': 'terraform Upload Type',
     'enum': ['module', 'provider'],
     'type': 'string'
+}
+print('     Done')
+
+print('Correct response schema for POST /v1/tasks')
+json_spec['paths']['/v1/tasks']['post']['responses']['201']['content']['application/json'] = {
+    'schema': {
+        '$ref': '#/components/schemas/TaskXO'
+    }
 }
 print('     Done')
 

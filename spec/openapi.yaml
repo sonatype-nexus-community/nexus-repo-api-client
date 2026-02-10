@@ -16012,13 +16012,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  id:
-                    description: Task ID
-                    format: uuid
-                    type: string
-                required:
-                - id
+                $ref: '#/components/schemas/TaskXO'
           description: Task created successfully
       summary: Create task
       tags:
