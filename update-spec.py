@@ -614,6 +614,9 @@ json_spec['components']['schemas']['TerraformHostedRepositoryApiRequest']['prope
     },
     'url': {
         'type': 'string'
+    },
+    'component': {
+        '$ref': '#/components/schemas/ComponentAttributes'
     }
 })
 print('     Done')
