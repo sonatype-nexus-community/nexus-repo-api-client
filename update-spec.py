@@ -238,7 +238,7 @@ json_spec['paths']['/v1/security/ldap/{name}']['get']['responses']['200']['conte
 }
 print('Fixing Create/Update Schema required objects for /security/ldap/*')
 temp_required: list[str] = json_spec['components']['schemas']['CreateLdapServerXo']['required']
-temp_required.remove('groupType')
+# temp_required.remove('groupType') Removed for 3.90.1
 json_spec['components']['schemas']['CreateLdapServerXo']['required'] = temp_required
 json_spec['components']['schemas']['ReadLdapServerXo']['required'] = temp_required
 json_spec['components']['schemas']['UpdateLdapServerXo']['required'] = temp_required
