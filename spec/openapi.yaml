@@ -11237,7 +11237,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TerraformHostedRepositoryApiRequest'
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
           description: successful operation
       summary: Get repository
       tags:
