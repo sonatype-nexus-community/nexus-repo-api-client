@@ -618,15 +618,14 @@ json_spec['components']['schemas']['TerraformHostedRepositoryApiRequest']['prope
 })
 print('     Done')
 
-# Removed for NXRM 3.90.1
-# print('Correct response schema for GET /v1/tasks')
-# json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get']['responses']['200']['content'][
-#     'application/json'] = {
-#     'schema': {
-#         '$ref': '#/components/schemas/TerraformHostedRepositoryApiRequest'
-#     }
-# }
-# print('     Done')
+print('Correct response schema for GET /v1/repositories/terraform/hosted/{repositoryName')
+json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json'] = {
+    'schema': {
+        '$ref': '#/components/schemas/TerraformHostedRepositoryApiRequest'
+    }
+}
+print('     Done')
 
 print('Correct response schema for GET /v1/repositories/swift/proxy/{repositoryName}')
 json_spec['paths']['/v1/repositories/swift/proxy/{repositoryName}']['get']['responses']['200']['content'][
