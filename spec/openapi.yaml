@@ -71,6 +71,22 @@ components:
         subjectOrganizationalUnit:
           type: string
       type: object
+    ApiClusterDatabaseMigrationResultDTO:
+      properties:
+        message:
+          description: Provides a message indicating the current state of the migration
+          type: string
+        state:
+          description: Provides the current migration state.
+          enum:
+          - MIGRATION_NOT_REQUIRED
+          - MIGRATION_REQUIRED
+          - MIGRATION_IN_PROGRESS
+          - MIGRATION_FAILED
+          - MIGRATION_FAILED_RETRYABLE
+          - MIGRATION_SUCCEED
+          type: string
+      type: object
     ApiCreateUser:
       properties:
         emailAddress:
@@ -638,6 +654,8 @@ components:
       properties:
         apt:
           $ref: '#/components/schemas/AptProxyRepositoriesAttributes'
+        aptSigning:
+          $ref: '#/components/schemas/AptSigningRepositoriesAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         format:
@@ -713,6 +731,8 @@ components:
       properties:
         apt:
           $ref: '#/components/schemas/AptProxyRepositoriesAttributes'
+        aptSigning:
+          $ref: '#/components/schemas/AptSigningRepositoriesAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         httpClient:
@@ -787,7 +807,12 @@ components:
         blobCreated:
           format: date-time
           type: string
+        blobRef:
+          type: string
         blobStoreName:
+          type: string
+        blobUpdated:
+          format: date-time
           type: string
         checksum:
           additionalProperties:
@@ -808,6 +833,9 @@ components:
           format: date-time
           type: string
         lastModified:
+          format: date-time
+          type: string
+        lastVerified:
           format: date-time
           type: string
         path:
@@ -1989,8 +2017,6 @@ components:
             layers
           type: boolean
         foreignLayerUrlWhitelist:
-          description: Regular expressions used to identify URLs that are allowed
-            for foreign layer requests
           items:
             type: string
           type: array
@@ -2523,9 +2549,6 @@ components:
           type: boolean
         connection:
           $ref: '#/components/schemas/HttpClientConnectionAttributes'
-      required:
-      - autoBlock
-      - blocked
       type: object
     HttpClientAttributesWithPreemptiveAuth:
       properties:
@@ -2542,9 +2565,6 @@ components:
           type: boolean
         connection:
           $ref: '#/components/schemas/HttpClientConnectionAttributes'
-      required:
-      - autoBlock
-      - blocked
       type: object
     HttpClientConnectionAttributes:
       properties:
@@ -3492,6 +3512,10 @@ components:
       - url
     PyPiProxyAttributes:
       properties:
+        indexPath:
+          description: Remote Index Path
+          example: /simple
+          type: string
         removeQuarantined:
           description: Remove Quarantined Versions
           example: true
@@ -4012,15 +4036,6 @@ components:
           type: boolean
       required: *id001
       type: object
-    ReadOnlyState:
-      properties:
-        frozen:
-          type: boolean
-        summaryReason:
-          type: string
-        systemInitiated:
-          type: boolean
-      type: object
     RealmApiXO:
       properties:
         id:
@@ -4121,6 +4136,10 @@ components:
           type: string
         name:
           type: string
+        size:
+          description: Size of the repository in bytes
+          format: int64
+          type: integer
         type:
           type: string
         url:
@@ -4763,6 +4782,63 @@ components:
           example: false
           type: boolean
       type: object
+    SwiftGroupApiRepository:
+      properties:
+        format:
+          description: Component format held in this repository
+          example: swift
+          type: string
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: group
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/swift-example
+          type: string
+      required:
+      - group
+      - online
+      - storage
+      type: object
+    SwiftGroupRepositoryApiRequest:
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
     SwiftHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4967,8 +5043,6 @@ components:
         nextRun:
           format: date-time
           type: string
-        schedule:
-          type: string
         type:
           type: string
       type: object
@@ -5041,6 +5115,43 @@ components:
       - name
       - online
       - storage
+      type: object
+    TerraformHostedApiRepository:
+      description: Terraform hosted repository configuration
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          description: Component format held in this repository
+          example: terraform
+          type: string
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        terraformSigning:
+          $ref: '#/components/schemas/TerraformSigningAttributes'
+        type:
+          description: Repository type
+          example: hosted
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/terraform-example
+          type: string
+      required:
+      - online
+      - storage
+      - terraformSigning
       type: object
     TerraformHostedRepositoryApiRequest:
       properties:
@@ -5192,6 +5303,27 @@ components:
           items:
             $ref: '#/components/schemas/Throwable'
           type: array
+      type: object
+    TransferCompleteXO:
+      properties:
+        failedAssetTransferCount:
+          format: int64
+          type: integer
+        message:
+          type: string
+        repositoryName:
+          type: string
+        skippedAssetTransferCount:
+          format: int64
+          type: integer
+        successful:
+          type: boolean
+        successfulAssetTransferCount:
+          format: int64
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
       type: object
     UpdateLdapServerXo:
       properties:
@@ -5392,6 +5524,8 @@ components:
         description:
           type: string
         group:
+          type: string
+        groupHelpText:
           type: string
         name:
           type: string
@@ -5624,12 +5758,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.90.1-01.
+    as of version 3.91.0-07.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.90.1-01
+  version: 3.91.0-07
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -6564,6 +6698,48 @@ paths:
       tags:
       - Cleanup policies
       x-codegen-request-body-name: body
+  /v1/clustered/upgrade-database-schema:
+    delete:
+      operationId: clearResult
+      responses:
+        '204':
+          content: {}
+          description: An error was successfully cleared or no errors were stored.
+        '400':
+          content: {}
+          description: An error exists which cannot be cleared. Contact support for
+            assistance.
+      summary: Clears a stored database schema upgrade success or a recoverable error
+      tags:
+      - Database Upgrade
+    get:
+      operationId: getProgress
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiClusterDatabaseMigrationResultDTO'
+          description: See the response body for database schema upgrade details.
+      summary: Check the progress of a database schema upgrade
+      tags:
+      - Database Upgrade
+    post:
+      operationId: migrate
+      responses:
+        '204':
+          content: {}
+          description: The responding node was able to start database schema upgrade
+        '400':
+          content: {}
+          description: The cluster is not able to start the database schema upgrade;
+            see the response for details
+        '500':
+          content: {}
+          description: An internal error occurred
+      summary: Begins a database schema upgrade
+      tags:
+      - Database Upgrade
   /v1/components:
     get:
       operationId: getComponents
@@ -6762,7 +6938,7 @@ paths:
                   format: binary
                   type: string
                 terraform.name:
-                  description: terraform Name
+                  description: terraform Module Name
                   type: string
                 terraform.namespace:
                   description: terraform Namespace
@@ -6777,7 +6953,7 @@ paths:
                   description: terraform Tag
                   type: string
                 terraform.type:
-                  description: terraform Type
+                  description: terraform Provider Type
                   type: string
                 terraform.uploadType:
                   description: terraform Upload Type
@@ -7058,6 +7234,154 @@ paths:
       summary: Import assets to repository
       tags:
       - Instance configuration
+  /v1/configuration/cipher:
+    delete:
+      operationId: clearCipherPassword
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Cipher password cleared successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Missing or invalid protocol version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+        '500':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Failed to clear cipher password
+      summary: Clear migration cipher password
+      tags:
+      - Instance configuration
+    post:
+      operationId: setCipherPassword
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+        description: Cipher password as plain text
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Cipher password set successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Missing password or invalid protocol version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+        '500':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Failed to set cipher password
+      summary: Set migration cipher password for decrypting imported secrets
+      tags:
+      - Instance configuration
+      x-codegen-request-body-name: body
+  /v1/configuration/transfer-complete:
+    post:
+      operationId: transferComplete
+      parameters:
+      - description: Migration protocol version (must be '1')
+        in: header
+        name: X-Nexus-Migration-Protocol-Version
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferCompleteXO'
+        description: Transfer completion notification data
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Transfer complete notification received
+        '400':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Missing notification data, repository name, or invalid protocol
+            version
+        '401':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Authentication required
+        '403':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Insufficient permissions
+        '500':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: Failed to process notification
+      summary: Receive transfer complete notification from migrator
+      tags:
+      - Instance configuration
+      x-codegen-request-body-name: body
   /v1/email:
     delete:
       operationId: deleteEmailConfiguration
@@ -7677,73 +8001,6 @@ paths:
       summary: Execute a reconciliation plan based on its Id
       tags:
       - Reconcile Plan
-  /v1/read-only:
-    get:
-      operationId: get_2
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ReadOnlyState'
-          description: successful operation
-      summary: Get read-only state
-      tags:
-      - Read-only
-  /v1/read-only/force-release:
-    post:
-      description: 'Forcibly release read-only status, including if caused by system
-        tasks. Warning: may result in data loss.'
-      operationId: forceRelease
-      responses:
-        '204':
-          content: {}
-          description: Database is no longer read-only
-        '403':
-          content: {}
-          description: Authentication required
-        '404':
-          content: {}
-          description: No change to read-only state
-      summary: Forcibly release read-only and allow changes to the database
-      tags:
-      - Read-only
-  /v1/read-only/freeze:
-    post:
-      description: For low-level system maintenance purposes only; do not use if you
-        want users to still be able to download components.
-      operationId: freeze
-      responses:
-        '204':
-          content: {}
-          description: Database is now read-only
-        '403':
-          content: {}
-          description: Authentication required
-        '404':
-          content: {}
-          description: No change to read-only state
-      summary: Prevent changes to the database
-      tags:
-      - Read-only
-  /v1/read-only/release:
-    post:
-      description: Releases administrator-initiated read-only status. Will not release
-        read-only status caused by system tasks.
-      operationId: release
-      responses:
-        '204':
-          content: {}
-          description: Database is no longer read-only
-        '403':
-          content: {}
-          description: Authentication required
-        '404':
-          content: {}
-          description: No change to read-only state
-      summary: Release read-only and allow changes to the database
-      tags:
-      - Read-only
   /v1/recovery-mode:
     delete:
       operationId: disableRecoveryMode
@@ -10971,6 +11228,80 @@ paths:
       tags:
       - Repository Management
       x-codegen-request-body-name: body
+  /v1/repositories/swift/group:
+    post:
+      operationId: createSwiftGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwiftGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Swift group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/swift/group/{repositoryName}:
+    get:
+      operationId: getSwiftGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwiftGroupApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateSwiftGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwiftGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Swift group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
   /v1/repositories/swift/hosted:
     post:
       operationId: createSwiftHostedRepository
@@ -11083,16 +11414,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwiftProxyApiRepository'
-          description: Repository configuration retrieved successfully
-        '401':
-          content: {}
-          description: Authentication required
-        '403':
-          content: {}
-          description: Insufficient permissions
-        '404':
-          content: {}
-          description: Repository not found
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11307,11 +11629,9 @@ paths:
       x-codegen-request-body-name: body
   /v1/repositories/terraform/proxy/{repositoryName}:
     get:
-      description: Retrieves configuration details for a Terraform proxy repository
       operationId: getTerraformProxyRepository
       parameters:
-      - description: Name of the repository to retrieve
-        in: path
+      - in: path
         name: repositoryName
         required: true
         schema:
@@ -11322,16 +11642,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TerraformProxyApiRepository'
-          description: Repository configuration retrieved successfully
-        '401':
-          content: {}
-          description: Authentication required
-        '403':
-          content: {}
-          description: Insufficient permissions
-        '404':
-          content: {}
-          description: Repository not found
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12194,6 +12505,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -12553,6 +12899,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -12903,6 +13284,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -13378,6 +13794,20 @@ paths:
       tags:
       - Content selectors
       x-codegen-request-body-name: body
+  /v1/security/jwt:
+    put:
+      operationId: resetSecret
+      responses:
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Reset JWT secret (note that session will be expired for the all logged-in
+        users)
+      tags:
+      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: getLdapServers
@@ -13566,9 +13996,6 @@ paths:
         '201':
           content: {}
           description: Success
-        '204':
-          content: {}
-          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -13627,9 +14054,6 @@ paths:
         '201':
           content: {}
           description: Success
-        '204':
-          content: {}
-          description: Success
         '400':
           content: {}
           description: Privilege object not configured properly.
@@ -13686,9 +14110,6 @@ paths:
         required: false
       responses:
         '201':
-          content: {}
-          description: Success
-        '204':
           content: {}
           description: Success
         '400':
@@ -14784,7 +15205,7 @@ paths:
     get:
       description: Retrieves metadata for an existing user token. Both userId and
         realm are required parameters. The passCode is never returned in this response.
-      operationId: get_4
+      operationId: get_3
       parameters:
       - description: The userId of the user to get the token for
         in: path
@@ -15014,6 +15435,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -15347,6 +15803,41 @@ paths:
       - description: Conan package revision
         in: query
         name: conan.packageRevision
+        schema:
+          type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
         schema:
           type: string
       - description: Docker image name
@@ -15919,6 +16410,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -16249,6 +16775,41 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
+      - description: Conan base version strict
+        in: query
+        name: conan.baseVersion.strict
+        schema:
+          type: string
+      - description: Return latest revision
+        in: query
+        name: conan.revision.latest
+        schema:
+          type: string
+      - description: Conan arch
+        in: query
+        name: conan.settings.arch
+        schema:
+          type: string
+      - description: Conan os
+        in: query
+        name: conan.settings.os
+        schema:
+          type: string
+      - description: Conan compiler
+        in: query
+        name: conan.settings.compiler
+        schema:
+          type: string
+      - description: Conan compiler version
+        in: query
+        name: conan.settings.compiler.version
+        schema:
+          type: string
+      - description: Conan compiler runtime
+        in: query
+        name: conan.settings.compiler.runtime
+        schema:
+          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -16480,7 +17041,7 @@ paths:
       tags:
       - Tags
     get:
-      operationId: get_3
+      operationId: get_2
       parameters:
       - description: Name of the tag to retrieve
         in: path
@@ -16763,12 +17324,12 @@ tags:
 - name: Blob store
 - name: Email
 - name: Formats
-- name: Read-only
 - name: Lifecycle
 - name: 'System: Nodes'
 - name: 'Security Management: Anonymous Access'
 - name: 'Security management: api keys principals encryption'
 - name: Community Edition Eula
+- name: 'Security management: JWT'
 - name: 'Security management: realms'
 - name: 'Security management: secrets encryption'
 - name: Security management
@@ -16779,6 +17340,7 @@ tags:
 - name: Reconcile Plan
 - name: Recovery Mode
 - name: 'Security: Atlassian Crowd'
+- name: Database Upgrade
 - name: Product licensing
 - name: Data Store
 - name: 'Security management: SAML'
