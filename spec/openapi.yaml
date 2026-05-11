@@ -30,6 +30,11 @@ components:
       required:
       - online
       type: object
+    AcknowledgeRequestXO:
+      properties:
+        reason:
+          type: string
+      type: object
     AnonymousAccessSettingsXO:
       properties:
         enabled:
@@ -41,6 +46,59 @@ components:
         userId:
           description: The username of the anonymous account
           type: string
+      type: object
+    ApiAccessCheckXo:
+      properties:
+        endpoint:
+          description: The API endpoint to check access for.
+          example: /service/rest/v1/repositories
+          type: string
+        method:
+          description: The HTTP method for the endpoint.
+          enum:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          example: GET
+          type: string
+        roleId:
+          description: The role ID to check access for. Mutually exclusive with userId.
+          example: nx-admin
+          pattern: ^[a-zA-Z0-9._-]{1,200}$
+          type: string
+        userId:
+          description: The user ID to check access for. If omitted, checks access
+            for the current user.
+          example: john.doe
+          pattern: ^[a-zA-Z0-9._-]{1,200}$
+          type: string
+      required:
+      - endpoint
+      - method
+      type: object
+    ApiAccessResultXo:
+      properties:
+        chains:
+          description: The permission chains showing how access is granted (user ->
+            role -> privilege -> permission)
+          items:
+            $ref: '#/components/schemas/PermissionChainXo'
+          type: array
+        hasAccess:
+          description: Whether the user/role has access to the endpoint
+          type: boolean
+        relatedEndpoints:
+          description: Related API endpoints that use similar permissions
+          items:
+            $ref: '#/components/schemas/RelatedEndpointXo'
+          type: array
+        requiredPermission:
+          description: The permission required to access the endpoint
+          type: string
+      required:
+      - hasAccess
       type: object
     ApiCertificate:
       properties:
@@ -69,22 +127,6 @@ components:
         subjectOrganization:
           type: string
         subjectOrganizationalUnit:
-          type: string
-      type: object
-    ApiClusterDatabaseMigrationResultDTO:
-      properties:
-        message:
-          description: Provides a message indicating the current state of the migration
-          type: string
-        state:
-          description: Provides the current migration state.
-          enum:
-          - MIGRATION_NOT_REQUIRED
-          - MIGRATION_REQUIRED
-          - MIGRATION_IN_PROGRESS
-          - MIGRATION_FAILED
-          - MIGRATION_FAILED_RETRYABLE
-          - MIGRATION_SUCCEED
           type: string
       type: object
     ApiCreateUser:
@@ -167,6 +209,35 @@ components:
         success:
           type: boolean
       type: object
+    ApiEndpointPermission:
+      properties:
+        authenticated:
+          description: Whether the endpoint requires an authenticated subject
+          type: boolean
+        description:
+          description: Short description from Swagger annotations, if any
+          type: string
+        httpMethod:
+          description: HTTP method
+          example: DELETE
+          type: string
+        pathPattern:
+          description: Path pattern with JAX-RS template segments
+          type: string
+        permissions:
+          description: Required permissions and combination logic
+          items:
+            $ref: '#/components/schemas/ApiPermissionRequirement'
+          type: array
+        tag:
+          description: Swagger tag / API grouping
+          type: string
+      required:
+      - authenticated
+      - httpMethod
+      - pathPattern
+      - permissions
+      type: object
     ApiKeysReEncryptionRequestApiXO:
       properties:
         algorithmForDecryption:
@@ -208,6 +279,45 @@ components:
         maxRepoRequests:
           format: int64
           type: integer
+      type: object
+    ApiPermissionRequirement:
+      properties:
+        logical:
+          description: How this permission combines with siblings (AND or OR)
+          type: string
+        permission:
+          description: Permission string as declared on the resource
+          type: string
+      required:
+      - logical
+      - permission
+      type: object
+    ApiPermissionsResponse:
+      properties:
+        endpoints:
+          description: Mapped endpoints
+          items:
+            $ref: '#/components/schemas/ApiEndpointPermission'
+          type: array
+        error:
+          description: Present when the registry could not serve data
+          type: string
+        generatedAt:
+          description: ISO-8601 timestamp when the registry was built
+          type: string
+        totalEndpoints:
+          description: Total endpoints returned before client-side filtering
+          format: int32
+          type: integer
+        unmappedEndpoints:
+          description: Count of Swagger operations that had no permission mapping
+            at registry build time
+          format: int32
+          type: integer
+      required:
+      - endpoints
+      - generatedAt
+      - totalEndpoints
       type: object
     ApiPrivilege:
       properties:
@@ -586,10 +696,12 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
+          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -604,6 +716,7 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
+          readOnly: true
           type: string
       required:
       - apt
@@ -958,9 +1071,32 @@ components:
         message:
           type: string
       type: object
+    BrowseNodeXO:
+      properties:
+        assetId:
+          type: string
+        componentId:
+          type: string
+        id:
+          type: string
+        leaf:
+          type: boolean
+        packageUrl:
+          type: string
+        text:
+          type: string
+        type:
+          type: string
+      type: object
     CapabilityDTO:
       properties:
+        active:
+          type: boolean
+        description:
+          type: string
         enabled:
+          type: boolean
+        error:
           type: boolean
         id:
           type: string
@@ -970,7 +1106,17 @@ components:
           additionalProperties:
             type: string
           type: object
+        state:
+          type: string
+        stateDescription:
+          type: string
+        tags:
+          additionalProperties:
+            type: string
+          type: object
         type:
+          type: string
+        typeName:
           type: string
       type: object
     CapabilityType:
@@ -1427,6 +1573,49 @@ components:
       - negativeCache
       - online
       - proxy
+      - storage
+      type: object
+    CondaGroupRepositoryApiRequest:
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
+    CondaHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
       - storage
       type: object
     CondaProxyRepositoryApiRequest:
@@ -2017,6 +2206,8 @@ components:
             layers
           type: boolean
         foreignLayerUrlWhitelist:
+          description: Regular expressions used to identify URLs that are allowed
+            for foreign layer requests
           items:
             type: string
           type: array
@@ -2071,6 +2262,17 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    EntityRefXo:
+      properties:
+        id:
+          description: The entity ID
+          type: string
+        name:
+          description: The entity display name
+          type: string
+      required:
+      - id
       type: object
     EulaStatus:
       properties:
@@ -2455,6 +2657,27 @@ components:
             in NXRM Pro.'
           type: string
       type: object
+    HelmGroupRepositoryApiRequest:
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
     HelmHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -2744,8 +2967,29 @@ components:
       - enabledQuarantine
       - repositoryName
       type: object
+    IqCapabilitiesXo:
+      properties:
+        connected:
+          description: Whether the IQ instance is currently connected
+          type: boolean
+        deploymentId:
+          description: The deployment ID for constructing deep links
+          type: string
+        hasFirewall:
+          description: Whether the IQ instance has access to Repository Firewall
+          type: boolean
+        hasLifecycle:
+          description: Whether the IQ instance has access to Sonatype Lifecycle
+          type: boolean
+        url:
+          description: The IQ Server URL
+          type: string
+      type: object
     IqConnectionVerificationXo:
       properties:
+        applicationCount:
+          format: int32
+          type: integer
         reason:
           type: string
         success:
@@ -2767,6 +3011,14 @@ components:
             fails
           example: false
           type: boolean
+        hasFirewall:
+          description: Whether the connected IQ Server has Firewall enabled
+          type: boolean
+        licensedSolutions:
+          description: List of licensed solutions available in the connected IQ Server
+          items:
+            $ref: '#/components/schemas/Licensed Solution'
+          type: array
         password:
           description: Credentials for the Sonatype Repository Firewall User
           type: string
@@ -2798,8 +3050,169 @@ components:
       required:
       - authenticationType
       type: object
+    LdapSchemaTemplateXo:
+      properties:
+        groupBaseDn:
+          description: The relative DN where groups are found
+          type: string
+        groupIdAttribute:
+          description: LDAP attribute containing the group ID
+          type: string
+        groupMemberAttribute:
+          description: LDAP attribute containing group member references
+          type: string
+        groupMemberFormat:
+          description: Format of group member attribute values
+          type: string
+        groupObjectClass:
+          description: LDAP object class for groups
+          type: string
+        groupSubtree:
+          description: Whether to include subtrees when searching for groups
+          type: boolean
+        groupType:
+          description: 'Group type: ''static'' or ''dynamic'''
+          type: string
+        ldapGroupsAsRoles:
+          description: Whether LDAP groups should be mapped as roles
+          type: boolean
+        name:
+          description: Template name
+          type: string
+        userBaseDn:
+          description: The relative DN where users are found
+          type: string
+        userEmailAddressAttribute:
+          description: LDAP attribute containing the user's email address
+          type: string
+        userIdAttribute:
+          description: LDAP attribute containing the user ID
+          type: string
+        userLdapFilter:
+          description: Optional LDAP filter to limit user search
+          type: string
+        userMemberOfAttribute:
+          description: LDAP attribute on user containing group membership (for dynamic
+            groups)
+          type: string
+        userObjectClass:
+          description: LDAP object class for users
+          type: string
+        userPasswordAttribute:
+          description: LDAP attribute containing the user's password
+          type: string
+        userRealNameAttribute:
+          description: LDAP attribute containing the user's real name
+          type: string
+        userSubtree:
+          description: Whether to include subtrees when searching for users
+          type: boolean
+      type: object
+    LdapTestUserMappingXo:
+      properties:
+        email:
+          description: User's email address from LDAP
+          type: string
+        membership:
+          description: Group memberships from LDAP
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        realName:
+          description: User's real name from LDAP
+          type: string
+        username:
+          description: Username from LDAP
+          type: string
+      type: object
+    LdapVerifyLoginXo:
+      properties:
+        base64Password:
+          description: Base64-encoded password to test
+          type: string
+        base64Username:
+          description: Base64-encoded username to test
+          type: string
+        ldapServer:
+          $ref: '#/components/schemas/CreateLdapServerXo'
+      required:
+      - base64Password
+      - base64Username
+      - ldapServer
+      type: object
+    Licensed Solution:
+      properties:
+        id:
+          description: Solution identifier (lifecycle, firewall, sbom, developer)
+          example: lifecycle
+          type: string
+        url:
+          description: Dashboard URL for this solution
+          example: http://iq-server/ui/links/lifecycle
+          type: string
+      required:
+      - id
+      - url
+      type: object
+    MaliciousRiskComponentXO:
+      properties:
+        acknowledgedAt:
+          type: string
+        acknowledgedBy:
+          type: string
+        acknowledgedReason:
+          type: string
+        assetId:
+          type: string
+        componentFormat:
+          type: string
+        componentName:
+          type: string
+        componentVersion:
+          type: string
+        createdBy:
+          type: string
+        createdByIp:
+          type: string
+        deletedBy:
+          type: string
+        deletedTime:
+          type: string
+        deletionMethod:
+          type: string
+        firstDetectedAt:
+          type: string
+        format:
+          type: string
+        hash:
+          type: string
+        id:
+          format: int32
+          type: integer
+        path:
+          type: string
+        policyName:
+          type: string
+        recordedTime:
+          type: string
+        repositoryName:
+          type: string
+        threatLevel:
+          format: int32
+          type: integer
+        threatReference:
+          type: string
+        threatSummary:
+          type: string
+      type: object
     MaliciousRiskOnDiskCountResponse:
       properties:
+        countsByRepository:
+          additionalProperties:
+            format: int64
+            type: integer
+          type: object
         hdsExceptionThrown:
           type: boolean
         totalCount:
@@ -3412,6 +3825,18 @@ components:
             $ref: '#/components/schemas/TaskXO'
           type: array
       type: object
+    PermissionChainXo:
+      properties:
+        permission:
+          description: The permission string
+          type: string
+        privilege:
+          $ref: '#/components/schemas/EntityRefXo'
+        role:
+          $ref: '#/components/schemas/EntityRefXo'
+        user:
+          $ref: '#/components/schemas/EntityRefXo'
+      type: object
     ProxyAttributes:
       properties:
         contentMaxAge:
@@ -3465,6 +3890,82 @@ components:
       - enabled
       - host
       - port
+      type: object
+    PubGroupRepositoryApiRequest:
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
+    PubHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
+      - storage
+      type: object
+    PubProxyRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - storage
       type: object
     PyPiProxyApiRepository:
       properties:
@@ -4113,6 +4614,32 @@ components:
         state:
           type: string
       type: object
+    RelatedEndpointXo:
+      properties:
+        description:
+          description: Description of the endpoint
+          type: string
+        endpoint:
+          description: The API endpoint path
+          type: string
+        method:
+          description: The HTTP method
+          type: string
+        permission:
+          description: The permission required for this endpoint
+          type: string
+      required:
+      - endpoint
+      - method
+      type: object
+    RemediateRequestXO:
+      properties:
+        findingIds:
+          items:
+            format: int32
+            type: integer
+          type: array
+      type: object
     ReplicationAttributes:
       properties:
         assetPathRegex:
@@ -4687,6 +5214,29 @@ components:
       - proxy
       - storage
       type: object
+    SsrfProtectionConfigurationXO:
+      properties:
+        allowedDomains:
+          description: List of domain names allowed to bypass SSRF protection
+          example: '["internal.corp.com", "registry.local"]'
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        allowedIPs:
+          description: List of IP addresses allowed to bypass SSRF protection
+          example: '["10.0.0.50", "192.168.1.100"]'
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        enabled:
+          description: Whether SSRF protection is enabled
+          example: true
+          type: boolean
+      required:
+      - enabled
+      type: object
     StackTraceElement:
       properties:
         classLoaderName:
@@ -4729,6 +5279,27 @@ components:
       required:
       - blobStoreName
       - strictContentTypeValidation
+      type: object
+    SuggestXO:
+      properties:
+        format:
+          readOnly: true
+          type: string
+        group:
+          readOnly: true
+          type: string
+        id:
+          readOnly: true
+          type: string
+        name:
+          readOnly: true
+          type: string
+        repository:
+          readOnly: true
+          type: string
+        version:
+          readOnly: true
+          type: string
       type: object
     SupportZipGeneratorRequest:
       properties:
@@ -5027,8 +5598,14 @@ components:
       type: object
     TaskXO:
       properties:
+        alertEmail:
+          type: string
+        cronExpression:
+          type: string
         currentState:
           type: string
+        enabled:
+          type: boolean
         id:
           type: string
         lastRun:
@@ -5042,6 +5619,27 @@ components:
           type: string
         nextRun:
           format: date-time
+          type: string
+        notificationCondition:
+          enum:
+          - FAILURE
+          - SUCCESS_FAILURE
+          type: string
+        properties:
+          additionalProperties:
+            type: string
+          type: object
+        recurringDays:
+          items:
+            format: int32
+            type: integer
+          type: array
+        schedule:
+          type: string
+        startDate:
+          format: date-time
+          type: string
+        timeZoneOffset:
           type: string
         type:
           type: string
@@ -5217,8 +5815,6 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
-        terraform:
-          $ref: '#/components/schemas/TerraformAttributes'
         type:
           description: Repository type
           example: proxy
@@ -5260,8 +5856,6 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
-        terraform:
-          $ref: '#/components/schemas/TerraformAttributes'
       required:
       - httpClient
       - name
@@ -5758,12 +6352,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.91.0-07.
+    as of version 3.92.0-03.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.91.0-07
+  version: 3.92.0-03
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -5854,6 +6448,76 @@ paths:
       summary: Get information about all nodes
       tags:
       - 'System: Nodes'
+  /internal/ui/api/permissions:
+    get:
+      operationId: list
+      parameters:
+      - in: query
+        name: method
+        schema:
+          type: string
+      - in: query
+        name: path
+        schema:
+          type: string
+      - in: query
+        name: permission
+        schema:
+          type: string
+      - in: query
+        name: tag
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiPermissionsResponse'
+          description: Permission map
+        '401':
+          content: {}
+          description: Not authenticated
+        '403':
+          content: {}
+          description: Missing nexus:settings:read
+        '500':
+          content: {}
+          description: Registry unavailable
+      summary: List REST endpoints with permission metadata for the API documentation
+        UI
+      tags:
+      - 'Internal UI: API permissions'
+  /internal/ui/security/access-check:
+    post:
+      operationId: checkAccess
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiAccessCheckXo'
+        description: Access check request
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiAccessResultXo'
+          description: Access check result
+        '400':
+          content: {}
+          description: Invalid request - userId and roleId are mutually exclusive
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: User or role not found
+      summary: Check if a user or role has access to an API endpoint
+      tags:
+      - 'Security management: API access'
+      x-codegen-request-body-name: body
   /v1/apikeys/encryption/re-encrypt:
     put:
       description: Ensure all nodes have access to the key, and they use the same
@@ -5972,7 +6636,7 @@ paths:
       - assets
   /v1/azureblobstore/test-connection:
     post:
-      operationId: verifyConnection_1
+      operationId: verifyConnection_2
       requestBody:
         content:
           application/json:
@@ -6515,7 +7179,7 @@ paths:
       - Blob store
   /v1/capabilities:
     get:
-      operationId: list_1
+      operationId: list_2
       responses:
         '200':
           content:
@@ -6698,48 +7362,6 @@ paths:
       tags:
       - Cleanup policies
       x-codegen-request-body-name: body
-  /v1/clustered/upgrade-database-schema:
-    delete:
-      operationId: clearResult
-      responses:
-        '204':
-          content: {}
-          description: An error was successfully cleared or no errors were stored.
-        '400':
-          content: {}
-          description: An error exists which cannot be cleared. Contact support for
-            assistance.
-      summary: Clears a stored database schema upgrade success or a recoverable error
-      tags:
-      - Database Upgrade
-    get:
-      operationId: getProgress
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiClusterDatabaseMigrationResultDTO'
-          description: See the response body for database schema upgrade details.
-      summary: Check the progress of a database schema upgrade
-      tags:
-      - Database Upgrade
-    post:
-      operationId: migrate
-      responses:
-        '204':
-          content: {}
-          description: The responding node was able to start database schema upgrade
-        '400':
-          content: {}
-          description: The cluster is not able to start the database schema upgrade;
-            see the response for details
-        '500':
-          content: {}
-          description: An internal error occurred
-      summary: Begins a database schema upgrade
-      tags:
-      - Database Upgrade
   /v1/components:
     get:
       operationId: getComponents
@@ -6793,6 +7415,38 @@ paths:
                   type: string
                 apt.tag:
                   description: apt Tag
+                  type: string
+                conda.arch:
+                  description: conda Architecture
+                  type: string
+                conda.asset:
+                  description: 'conda Asset '
+                  format: binary
+                  type: string
+                conda.build:
+                  description: conda Build String
+                  type: string
+                conda.filename:
+                  description: conda Filename
+                  type: string
+                conda.tag:
+                  description: conda Tag
+                  type: string
+                conda.version:
+                  description: conda Version
+                  type: string
+                go.asset:
+                  description: 'go Asset '
+                  format: binary
+                  type: string
+                go.module:
+                  description: go Module
+                  type: string
+                go.tag:
+                  description: go Tag
+                  type: string
+                go.version:
+                  description: go Version
                   type: string
                 helm.asset:
                   description: 'helm Asset '
@@ -6862,6 +7516,19 @@ paths:
                   type: string
                 nuget.tag:
                   description: nuget Tag
+                  type: string
+                pub.asset:
+                  description: 'pub Asset '
+                  format: binary
+                  type: string
+                pub.name:
+                  description: pub Package Name
+                  type: string
+                pub.tag:
+                  description: pub Tag
+                  type: string
+                pub.version:
+                  description: pub Version
                   type: string
                 pypi.asset:
                   description: 'pypi Asset '
@@ -7537,7 +8204,7 @@ paths:
       x-codegen-request-body-name: body
   /v1/iq:
     get:
-      operationId: getConfiguration
+      operationId: getConfiguration_1
       responses:
         '200':
           content:
@@ -7549,7 +8216,7 @@ paths:
       tags:
       - Manage Sonatype Repository Firewall configuration
     put:
-      operationId: updateConfiguration
+      operationId: updateConfiguration_1
       requestBody:
         content:
           application/json:
@@ -7557,9 +8224,13 @@ paths:
               $ref: '#/components/schemas/IqConnectionXo'
         required: false
       responses:
-        '204':
-          content: {}
-          description: Sonatype Repository Firewall configuration has been updated
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqConnectionXo'
+          description: Sonatype Repository Firewall configuration updated, returns
+            the current configuration
       summary: Update Sonatype Repository Firewall configuration
       tags:
       - Manage Sonatype Repository Firewall configuration
@@ -7620,6 +8291,39 @@ paths:
       summary: Get audit status for the repository
       tags:
       - Manage Sonatype Repository Firewall configuration
+  /v1/iq/capabilities:
+    get:
+      operationId: getCapabilities_1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqCapabilitiesXo'
+          description: IQ Server capabilities returned
+      summary: Get IQ Server capabilities (Firewall and Lifecycle)
+      tags:
+      - Manage Sonatype Repository Firewall configuration
+  /v1/iq/capabilities/test:
+    post:
+      operationId: getCapabilities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IqConnectionXo'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqCapabilitiesXo'
+          description: IQ Server capabilities returned
+      summary: Get IQ Server capabilities for a specific configuration
+      tags:
+      - Manage Sonatype Repository Firewall configuration
+      x-codegen-request-body-name: body
   /v1/iq/disable:
     post:
       operationId: disableIq
@@ -7646,6 +8350,26 @@ paths:
       summary: Enable Sonatype Repository Firewall
       tags:
       - Manage Sonatype Repository Firewall configuration
+  /v1/iq/test-new-connection:
+    post:
+      operationId: testNewConnection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IqConnectionXo'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IqConnectionVerificationXo'
+          description: Connection test complete, check response body for result
+      summary: Test new Sonatype Repository Firewall connection
+      tags:
+      - Manage Sonatype Repository Firewall configuration
+      x-codegen-request-body-name: body
   /v1/iq/verify-connection:
     post:
       operationId: verifyIqConnection
@@ -7708,6 +8432,94 @@ paths:
       tags:
       - Lifecycle
       x-codegen-request-body-name: body
+  /v1/malicious-risk/acknowledge/{id}:
+    post:
+      operationId: acknowledgeFinding
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: int32
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcknowledgeRequestXO'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - Malicious Risk On Disk
+      x-codegen-request-body-name: body
+  /v1/malicious-risk/active-findings:
+    get:
+      operationId: getActiveFindings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MaliciousRiskComponentXO'
+                type: array
+          description: successful operation
+      tags:
+      - Malicious Risk On Disk
+  /v1/malicious-risk/components:
+    get:
+      description: Returns paginated malware components from MalwareRemediatorTaskStore.
+        Use assetId with DELETE /v1/assets/{id}. The limit parameter is capped at
+        a maximum of 200 items per page.
+      operationId: getMaliciousRiskComponents
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          default: 50
+          format: int32
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      responses:
+        '200':
+          content: {}
+          description: Paginated list of malicious components
+        '400':
+          content: {}
+          description: Pro edition required
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: List malicious components with asset IDs for removal
+      tags:
+      - Malicious Risk On Disk
+  /v1/malicious-risk/delete-finding/{id}:
+    post:
+      operationId: deleteFinding
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: int32
+          type: integer
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - Malicious Risk On Disk
   /v1/malicious-risk/enabledRegistries:
     get:
       operationId: getEnabledRegistries
@@ -7724,6 +8536,54 @@ paths:
       summary: Get RHC Enabled registries for malicious risk scanning.
       tags:
       - Malicious Risk On Disk
+  /v1/malicious-risk/history:
+    get:
+      operationId: getHistory
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - in: query
+        name: sinceDays
+        schema:
+          default: 30
+          format: int32
+          type: integer
+      - in: query
+        name: repositoryName
+        schema:
+          type: string
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - Malicious Risk On Disk
+  /v1/malicious-risk/remediate:
+    post:
+      operationId: remediateFindings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemediateRequestXO'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - Malicious Risk On Disk
+      x-codegen-request-body-name: body
   /v1/malicious-risk/risk-on-disk:
     get:
       operationId: getMaliciousRiskOnDiskCount
@@ -8815,6 +9675,157 @@ paths:
       tags:
       - Repository Management
       x-codegen-request-body-name: body
+  /v1/repositories/conda/group:
+    post:
+      operationId: createCondaGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CondaGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Conda group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/conda/group/{repositoryName}:
+    get:
+      operationId: getCondaGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateCondaGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CondaGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Conda group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/conda/hosted:
+    post:
+      operationId: createCondaHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CondaHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '405':
+          content: {}
+          description: Feature is disabled in High Availability
+      summary: Create conda hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/conda/hosted/{repositoryName}:
+    get:
+      operationId: getCondaHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateCondaHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CondaHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update conda hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
   /v1/repositories/conda/proxy:
     post:
       operationId: createCondaProxyRepository
@@ -9354,6 +10365,80 @@ paths:
           content: {}
           description: Repository not found
       summary: Update a Go proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/helm/group:
+    post:
+      operationId: createHelmGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelmGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Helm group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/helm/group/{repositoryName}:
+    get:
+      operationId: getHelmGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateHelmGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelmGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Helm group repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
@@ -10325,6 +11410,228 @@ paths:
           content: {}
           description: Insufficient permissions
       summary: Update p2 proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/group:
+    post:
+      operationId: createPubGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Pub group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/group/{repositoryName}:
+    get:
+      operationId: getPubGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updatePubGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Pub group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/hosted:
+    post:
+      operationId: createPubHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Pub hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/hosted/{repositoryName}:
+    get:
+      operationId: getPubHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updatePubHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Pub hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/proxy:
+    post:
+      operationId: createPubProxyRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Pub proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/pub/proxy/{repositoryName}:
+    get:
+      operationId: getPubProxyRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updatePubProxyRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PubProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Pub proxy repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
@@ -11959,6 +13266,71 @@ paths:
       summary: Get repository details
       tags:
       - Repository Management
+  /v1/repositories/{repositoryName}/browse:
+    delete:
+      operationId: deleteFolder
+      parameters:
+      - description: Repository name
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      - description: Folder path to delete (URL-encoded)
+        in: query
+        name: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Folder deletion initiated
+        '400':
+          content: {}
+          description: Path parameter is required
+        '403':
+          content: {}
+          description: Insufficient permissions to delete folder
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Delete a folder and all its contents
+      tags:
+      - Repository Browse
+    get:
+      operationId: get{repositoryname}BrowseRepository
+      parameters:
+      - description: Repository name
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      - description: Path within the repository (URL-encoded, use '/' as separator).
+          Use '/' for root.
+        in: query
+        name: path
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BrowseNodeXO'
+                type: array
+          description: Browse nodes returned
+        '403':
+          content: {}
+          description: Insufficient permissions to browse repository
+        '404':
+          content: {}
+          description: Repository not found
+      summary: List browse nodes for a repository path
+      tags:
+      - Repository Browse
   /v1/repositories/{repositoryName}/health-check:
     delete:
       operationId: disableRepositoryHealthCheck
@@ -11992,6 +13364,12 @@ paths:
         in: path
         name: repositoryName
         required: true
+        schema:
+          type: string
+      - description: Source of the request (e.g. 'detect' for Malicious Packages Detect
+          module)
+        in: query
+        name: source
         schema:
           type: string
       responses:
@@ -12505,41 +13883,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -12663,6 +14006,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -12899,41 +14248,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -13057,6 +14371,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -13286,41 +14606,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -13446,6 +14731,12 @@ paths:
         name: p2.pluginName
         schema:
           type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
+        schema:
+          type: string
       - description: PyPI classifiers
         in: query
         name: pypi.classifiers
@@ -13531,6 +14822,39 @@ paths:
           content: {}
           description: Asset search returned no results
       summary: Search and download asset
+      tags:
+      - Search
+  /v1/search/suggest:
+    get:
+      description: Returns lightweight component suggestions matching the query. Optimized
+        for fast typeahead with minimal response payload.
+      operationId: suggest
+      parameters:
+      - description: Search query (minimum 2 characters)
+        in: query
+        name: q
+        required: true
+        schema:
+          type: string
+      - description: Filter by format (e.g., maven2, npm, pypi)
+        in: query
+        name: format
+        schema:
+          type: string
+      - description: 'Maximum number of suggestions (default: 10, max: 20)'
+        in: query
+        name: limit
+        schema:
+          format: int32
+          type: integer
+      responses:
+        '200':
+          content: {}
+          description: Suggestions returned successfully
+        '400':
+          content: {}
+          description: Query too short (minimum 2 characters)
+      summary: Get search suggestions for autocomplete
       tags:
       - Search
   /v1/secrets/encryption/re-encrypt:
@@ -13794,20 +15118,6 @@ paths:
       tags:
       - Content selectors
       x-codegen-request-body-name: body
-  /v1/security/jwt:
-    put:
-      operationId: resetSecret
-      responses:
-        '401':
-          content: {}
-          description: Authentication required
-        '403':
-          content: {}
-          description: Insufficient permissions
-      summary: Reset JWT secret (note that session will be expired for the all logged-in
-        users)
-      tags:
-      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: getLdapServers
@@ -13851,6 +15161,15 @@ paths:
       tags:
       - 'Security management: LDAP'
       x-codegen-request-body-name: body
+  /v1/security/ldap/cache:
+    delete:
+      operationId: clearCache_1
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - 'Security management: LDAP'
   /v1/security/ldap/change-order:
     post:
       operationId: changeOrder
@@ -13874,6 +15193,83 @@ paths:
           content: {}
           description: Insufficient permissions
       summary: Change LDAP server order
+      tags:
+      - 'Security management: LDAP'
+      x-codegen-request-body-name: body
+  /v1/security/ldap/templates:
+    get:
+      operationId: getTemplates
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LdapSchemaTemplateXo'
+                type: array
+          description: successful operation
+      tags:
+      - 'Security management: LDAP'
+  /v1/security/ldap/verify-connection:
+    post:
+      operationId: verifyConnection_1
+      parameters:
+      - in: query
+        name: existingServerName
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLdapServerXo'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - 'Security management: LDAP'
+      x-codegen-request-body-name: body
+  /v1/security/ldap/verify-login:
+    post:
+      operationId: verifyLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LdapVerifyLoginXo'
+        required: false
+      responses:
+        default:
+          content: {}
+          description: successful operation
+      tags:
+      - 'Security management: LDAP'
+      x-codegen-request-body-name: body
+  /v1/security/ldap/verify-user-mapping:
+    post:
+      operationId: verifyUserMapping
+      parameters:
+      - in: query
+        name: existingServerName
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLdapServerXo'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LdapTestUserMappingXo'
+                type: array
+          description: successful operation
       tags:
       - 'Security management: LDAP'
       x-codegen-request-body-name: body
@@ -14896,6 +16292,56 @@ paths:
       summary: Remove a certificate in the trust store.
       tags:
       - 'Security: certificates'
+  /v1/security/ssrf-protection:
+    get:
+      operationId: getConfiguration
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                allowedDomains:
+                - internal.corp.com
+                - registry.local
+                allowedIPs:
+                - 10.0.0.50
+                - 192.168.1.100
+                enabled: true
+          description: SSRF protection settings returned
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Get SSRF protection settings
+      tags:
+      - 'Security Management: SSRF Protection'
+    put:
+      operationId: updateConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SsrfProtectionConfigurationXO'
+        required: false
+      responses:
+        '200':
+          content: {}
+          description: SSRF protection settings updated
+        '400':
+          content: {}
+          description: Invalid configuration
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update SSRF protection settings
+      tags:
+      - 'Security Management: SSRF Protection'
+      x-codegen-request-body-name: body
   /v1/security/user-sources:
     get:
       operationId: getUserSources
@@ -14957,7 +16403,7 @@ paths:
     get:
       description: Lists all user tokens with optional filtering and pagination. Returns
         metadata only, never the passCode.
-      operationId: list
+      operationId: list_1
       parameters:
       - description: The realm of the user (optional for cloud, required for self-hosted)
         in: query
@@ -15437,41 +16883,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -15595,6 +17006,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -15805,41 +17222,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -15963,6 +17345,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -16410,41 +17798,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -16568,6 +17921,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -16775,41 +18134,6 @@ paths:
         name: conan.packageRevision
         schema:
           type: string
-      - description: Conan base version strict
-        in: query
-        name: conan.baseVersion.strict
-        schema:
-          type: string
-      - description: Return latest revision
-        in: query
-        name: conan.revision.latest
-        schema:
-          type: string
-      - description: Conan arch
-        in: query
-        name: conan.settings.arch
-        schema:
-          type: string
-      - description: Conan os
-        in: query
-        name: conan.settings.os
-        schema:
-          type: string
-      - description: Conan compiler
-        in: query
-        name: conan.settings.compiler
-        schema:
-          type: string
-      - description: Conan compiler version
-        in: query
-        name: conan.settings.compiler.version
-        schema:
-          type: string
-      - description: Conan compiler runtime
-        in: query
-        name: conan.settings.compiler.runtime
-        schema:
-          type: string
       - description: Docker image name
         in: query
         name: docker.imageName
@@ -16933,6 +18257,12 @@ paths:
       - description: p2 plugin name
         in: query
         name: p2.pluginName
+        schema:
+          type: string
+      - description: Pub asset kind (PACKAGE, PACKAGE_METADATA, VERSION_METADATA,
+          ADVISORIES)
+        in: query
+        name: pub.asset_kind
         schema:
           type: string
       - description: PyPI classifiers
@@ -17303,6 +18633,44 @@ paths:
       tags:
       - Tasks
       x-codegen-request-body-name: body
+  /v1/usage-history:
+    get:
+      description: Returns historical usage metrics for the specified metric type
+        and period. Used for rendering sparkline charts in the dashboard.
+      operationId: getUsageHistory
+      parameters:
+      - description: 'Metric type: ''requests'' or ''components'''
+        in: query
+        name: metric
+        required: true
+        schema:
+          type: string
+      - description: 'Period: ''daily'' (last 7 days) or ''monthly'' (last 12 months)'
+        in: query
+        name: period
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                data:
+                - date: '2026-01-18'
+                  value: 1234
+                metric: requests
+                period: daily
+          description: Usage history retrieved successfully
+        '400':
+          content: {}
+          description: Invalid metric or period specified
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Get usage history for sparklines
+      tags:
+      - Usage History
 security:
 - BasicAuth: []
 servers:
@@ -17316,10 +18684,12 @@ tags:
 - name: Search
 - name: 'Security management: privileges'
 - name: Tasks
+- name: 'Security management: API access'
+- name: 'Internal UI: API permissions'
 - name: 'Security management: users'
 - name: 'Security management: roles'
+- name: Repository Browse
 - name: Script
-- name: 'Security management: LDAP'
 - name: Status
 - name: Blob store
 - name: Email
@@ -17329,9 +18699,9 @@ tags:
 - name: 'Security Management: Anonymous Access'
 - name: 'Security management: api keys principals encryption'
 - name: Community Edition Eula
-- name: 'Security management: JWT'
 - name: 'Security management: realms'
 - name: 'Security management: secrets encryption'
+- name: 'Security Management: SSRF Protection'
 - name: Security management
 - name: Support
 - name: Instance configuration
@@ -17340,7 +18710,7 @@ tags:
 - name: Reconcile Plan
 - name: Recovery Mode
 - name: 'Security: Atlassian Crowd'
-- name: Database Upgrade
+- name: 'Security management: LDAP'
 - name: Product licensing
 - name: Data Store
 - name: 'Security management: SAML'
@@ -17353,5 +18723,6 @@ tags:
 - name: Capabilities
 - name: Manage Sonatype HTTP System Settings
 - name: Monthly Metrics
+- name: Usage History
 - name: 'Security: certificates'
 x-original-swagger-version: '2.0'
