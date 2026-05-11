@@ -5815,6 +5815,8 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        terraform:
+          $ref: '#/components/schemas/TerraformAttributes'
         type:
           description: Repository type
           example: proxy

@@ -648,5 +648,11 @@ json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolu
     '$ref'] = '#/components/schemas/LicensedSolution'
 print('     Done')
 
+# Patch TerraformProxyApiRepository schema - now missing `terraform` item
+json_spec['components']['schemas']['TerraformProxyApiRepository']['properties']['terraform'] = {
+    '$ref': '#/components/schemas/TerraformAttributes'
+}
+
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
