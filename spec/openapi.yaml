@@ -3017,7 +3017,7 @@ components:
         licensedSolutions:
           description: List of licensed solutions available in the connected IQ Server
           items:
-            $ref: '#/components/schemas/Licensed Solution'
+            $ref: '#/components/schemas/LicensedSolution'
           type: array
         password:
           description: Credentials for the Sonatype Repository Firewall User
@@ -3141,7 +3141,7 @@ components:
       - base64Username
       - ldapServer
       type: object
-    Licensed Solution:
+    LicensedSolution:
       properties:
         id:
           description: Solution identifier (lifecycle, firewall, sbom, developer)

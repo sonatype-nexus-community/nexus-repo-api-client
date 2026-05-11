@@ -639,5 +639,13 @@ json_spec['paths']['/v1/repositories/swift/proxy/{repositoryName}']['get']['resp
 }
 print('     Done')
 
+# Updates for NXRM 3.92.x
+print('Correct invalid schema name "Licensed Solution"...')
+json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
+del json_spec['components']['schemas']['Licensed Solution']
+
+json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
+    '$ref'] = '#/components/schemas/LicensedSolution'
+
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
