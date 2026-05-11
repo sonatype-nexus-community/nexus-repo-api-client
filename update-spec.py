@@ -646,6 +646,7 @@ del json_spec['components']['schemas']['Licensed Solution']
 
 json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
     '$ref'] = '#/components/schemas/LicensedSolution'
+print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
