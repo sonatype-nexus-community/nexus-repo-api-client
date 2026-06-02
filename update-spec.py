@@ -244,6 +244,18 @@ json_spec['components']['schemas']['ReadLdapServerXo']['required'] = temp_requir
 json_spec['components']['schemas']['UpdateLdapServerXo']['required'] = temp_required
 print('Done')
 
+print('Patching ReadLdapServerXo enum values to also accept uppercase...')
+for prop in ['groupType', 'protocol']:
+    if prop in json_spec['components']['schemas']['ReadLdapServerXo']['properties']:
+        prop_def = json_spec['components']['schemas']['ReadLdapServerXo']['properties'][prop]
+        if 'enum' in prop_def:
+            existing = prop_def['enum']
+            for val in existing:
+                upper = val.upper()
+                if upper not in existing:
+                    existing.append(upper)
+print('Done')
+
 # Not required from NXRM 3.85.0 onwards
 # print('Fixing response schema for IQ Connection...')
 # json_spec['paths']['/v1/iq']['get']['responses']['200']['content'] = {
