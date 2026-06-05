@@ -1,0 +1,208 @@
+name: Detect and Update NXRM Spec
+
+on:
+    schedule:
+        - cron: '23 7 * * *'
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    PYTHON_VERSION_DEFAULT: '3.12'
+    NXRM_PORT: '8081'
+
+jobs:
+    detect-and-update:
+        name: Detect New NXRM Release and Update Spec
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  fetch-depth: 0
+
+            - name: Get latest NXRM version from Sonatype release page
+              id: nxrm_latest
+              run: |
+                  VERSION=$(curl -sf https://help.sonatype.com/en/download-and-compatibility.html \
+                    | python3 -c "
+                  import re, sys
+                  content = sys.stdin.read()
+                  versions = re.findall(r'(?:3\.\d{2,}\.\d+)', content)
+                  if not versions:
+                      raise SystemExit('ERROR: Could not detect NXRM version - no version strings matched on release page')
+                  print(max(versions, key=lambda v: tuple(int(x) for x in v.split('.'))))
+                  ")
+                  echo "Latest NXRM version: ${VERSION}"
+                  echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+            - name: Get last processed version from git tags
+              id: nxrm_current
+              run: |
+                  TAG=$(git tag --list 'v3.*' | sort -V | tail -1)
+                  if [ -z "${TAG}" ]; then
+                      echo "No existing tags found - treating current version as 3.0.0"
+                      VERSION=3.0.0
+                  else
+                      VERSION=$(echo "${TAG}" | sed 's/^v//')
+                  fi
+                  echo "Current NXRM version: ${VERSION}"
+                  echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+            - name: Check if update is needed
+              id: check
+              run: |
+                  LATEST=${{ steps.nxrm_latest.outputs.version }}
+                  CURRENT=${{ steps.nxrm_current.outputs.version }}
+                  HIGHEST=$(printf '%s\n%s\n' "${CURRENT}" "${LATEST}" | sort -V | tail -1)
+                  if [ "${HIGHEST}" = "${CURRENT}" ]; then
+                      echo "Already up to date - latest: ${LATEST}, current: ${CURRENT}"
+                      echo "skip=true" >> $GITHUB_OUTPUT
+                  else
+                      echo "New NXRM version available: ${LATEST} (was ${CURRENT})"
+                  fi
+
+            - name: Notify Slack - new version detected
+              if: steps.check.outputs.skip != 'true'
+              uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+              with:
+                  webhook: ${{ secrets.SLACK_WEBHOOK_OSS_FUN }}
+                  webhook-type: incoming-webhook
+                  payload: |
+                      {
+                        "text": ":rocket: New Sonatype NXRM v${{ steps.nxrm_latest.outputs.version }} detected - generating updated OpenAPI spec...\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                      }
+
+            - name: Download Sonatype Nexus Repository Manager
+              if: steps.check.outputs.skip != 'true'
+              run: |
+                  NXRM_VERSION=${{ steps.nxrm_latest.outputs.version }}
+                  ARCHIVE="nexus-${NXRM_VERSION}-01-unix.tar.gz"
+                  curl -fLO "https://download.sonatype.com/nexus/3/${ARCHIVE}"
+                  mkdir -p ${{ github.workspace }}/nxrm
+                  tar -xzf "${ARCHIVE}" -C ${{ github.workspace }}/nxrm
+                  NXRM_DIR=$(find ${{ github.workspace }}/nxrm -maxdepth 1 -mindepth 1 -type d -name 'nexus-*' | head -1)
+                  if [ -z "${NXRM_DIR}" ]; then
+                      echo "ERROR: Could not find extracted NXRM directory"
+                      ls -la ${{ github.workspace }}/nxrm/
+                      exit 1
+                  fi
+                  echo "NXRM_DIR=${NXRM_DIR}" >> $GITHUB_ENV
+
+            - name: Configure NXRM license
+              if: steps.check.outputs.skip != 'true'
+              env:
+                  NXRM_LICENSE: ${{ secrets.NXRM_LICENSE }}
+              run: |
+                  if [ -n "${NXRM_LICENSE}" ]; then
+                      LICENSE_PATH="${{ github.workspace }}/nxrm/license.lic"
+                      echo "${NXRM_LICENSE}" | base64 -d > "${LICENSE_PATH}"
+                      echo "-Dnexus.licenseFile=${LICENSE_PATH}" >> "${NXRM_DIR}/bin/nexus.vmoptions"
+                      echo "License configured at ${LICENSE_PATH}"
+                  else
+                      echo "No NXRM_LICENSE secret provided - proceeding without license"
+                  fi
+
+            - name: Start Sonatype Nexus Repository Manager
+              if: steps.check.outputs.skip != 'true'
+              run: |
+                  "${NXRM_DIR}/bin/nexus" run \
+                    > "${{ github.workspace }}/nxrm/stdout.log" \
+                    2> "${{ github.workspace }}/nxrm/stderr.log" &
+
+            - name: Wait for NXRM to be ready
+              if: steps.check.outputs.skip != 'true'
+              run: |
+                  echo "Waiting for NXRM on port ${{ env.NXRM_PORT }}..."
+                  for i in $(seq 1 60); do
+                      if curl -sf --max-time 5 "http://localhost:${{ env.NXRM_PORT }}/service/rest/v1/status" > /dev/null 2>&1; then
+                          echo "NXRM is ready (after $((i * 5))s)"
+                          exit 0
+                      fi
+                      echo "  waiting... attempt ${i}/60"
+                      sleep 5
+                  done
+                  echo "ERROR: NXRM did not become ready within 5 minutes"
+                  echo "--- NXRM stderr ---"
+                  cat "${{ github.workspace }}/nxrm/stderr.log" 2>/dev/null || echo "(no stderr log)"
+                  echo "--- NXRM stdout ---"
+                  cat "${{ github.workspace }}/nxrm/stdout.log" 2>/dev/null || echo "(no stdout log)"
+                  exit 1
+
+            - name: Set up Python
+              if: steps.check.outputs.skip != 'true'
+              uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+              with:
+                  python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
+
+            - name: Install Python dependencies
+              if: steps.check.outputs.skip != 'true'
+              run: pip install requests pyyaml
+
+            - name: Run update-spec.py
+              if: steps.check.outputs.skip != 'true'
+              run: |
+                  python update-spec.py "http://localhost:${{ env.NXRM_PORT }}"
+
+            - name: Create branch and commit updated spec
+              if: steps.check.outputs.skip != 'true'
+              run: |
+                  git config --global user.name "GitHub Actions"
+                  git config --global user.email "<>"
+                  git checkout -b "feat/nxrm-${{ steps.nxrm_latest.outputs.version }}"
+                  git add spec/openapi.yaml
+                  git commit -m "feat: Generated Spec from NXRM ${{ steps.nxrm_latest.outputs.version }}"
+                  git push origin "feat/nxrm-${{ steps.nxrm_latest.outputs.version }}"
+
+            - name: Open PR
+              if: steps.check.outputs.skip != 'true'
+              id: pr
+              env:
+                  GH_TOKEN: ${{ secrets.GH_PAT }}
+              run: |
+                  cat > /tmp/pr-body.md << 'PREOF'
+                  ## Automated Sonatype Nexus Repository Manager Spec Update
+
+                  This PR was generated automatically by the `detect-nxrm-release` workflow.
+
+                  | | |
+                  |---|---|
+                  | **NXRM version** | ${{ steps.nxrm_latest.outputs.version }} |
+                  | **Workflow run** | [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+
+                  ### Before merging
+
+                  - [ ] Review `spec/openapi.yaml` diff for unexpected changes
+                  - [ ] Confirm all CI checks pass below
+                  PREOF
+
+                  URL=$(gh pr create \
+                      --title "feat: Generated Spec from NXRM ${{ steps.nxrm_latest.outputs.version }}" \
+                      --body-file /tmp/pr-body.md \
+                      --base main)
+                  echo "url=${URL}" >> $GITHUB_OUTPUT
+
+            - name: Notify Slack - PR created
+              if: steps.check.outputs.skip != 'true'
+              uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+              with:
+                  webhook: ${{ secrets.SLACK_WEBHOOK_OSS_FUN }}
+                  webhook-type: incoming-webhook
+                  payload: |
+                      {
+                        "text": ":white_check_mark: PR ready for NXRM v${{ steps.nxrm_latest.outputs.version }}: ${{ steps.pr.outputs.url }}"
+                      }
+
+            - name: Notify Slack - workflow failure
+              if: failure()
+              uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+              with:
+                  webhook: ${{ secrets.SLACK_WEBHOOK_OSS_FUN }}
+                  webhook-type: incoming-webhook
+                  payload: |
+                      {
+                        "text": ":x: NXRM spec auto-update FAILED for v${{ steps.nxrm_latest.outputs.version }}\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>"
+                      }
