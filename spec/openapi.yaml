@@ -35,6 +35,99 @@ components:
         reason:
           type: string
       type: object
+    AlpineGroupRepositoryApiRequest:
+      properties:
+        alpineSigning:
+          $ref: '#/components/schemas/AlpineSigningRepositoriesAttributes'
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - alpineSigning
+      - group
+      - name
+      - online
+      - storage
+      type: object
+    AlpineHostedRepositoryApiRequest:
+      properties:
+        alpineSigning:
+          $ref: '#/components/schemas/AlpineSigningRepositoriesAttributes'
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
+      - storage
+      type: object
+    AlpineProxyRepositoryApiRequest:
+      properties:
+        alpineSigning:
+          $ref: '#/components/schemas/AlpineSigningRepositoriesAttributes'
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - alpineSigning
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
+    AlpineSigningRepositoriesAttributes:
+      properties:
+        keypair:
+          description: RSA signing key pair (PEM armored private key)
+          type: string
+        passphrase:
+          description: Passphrase to access RSA signing key
+          type: string
+      type: object
     AnonymousAccessSettingsXO:
       properties:
         enabled:
@@ -46,6 +139,199 @@ components:
         userId:
           description: The username of the anonymous account
           type: string
+      type: object
+    AnsibleGalaxyGroupApiRepository:
+      description: Ansible Galaxy group repository configuration
+      properties:
+        format:
+          description: Component format held in this repository
+          example: ansiblegalaxy
+          type: string
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Repository type
+          example: group
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/ansiblegalaxy-example
+          type: string
+      required:
+      - group
+      - online
+      - storage
+      type: object
+    AnsibleGalaxyGroupRepositoryApiRequest:
+      description: Request body for creating or updating an Ansible Galaxy group repository
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
+    AnsibleGalaxyHostedApiRepository:
+      description: Ansible Galaxy hosted repository configuration
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          description: Component format held in this repository
+          example: ansiblegalaxy
+          type: string
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          description: Repository type
+          example: hosted
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/ansiblegalaxy-example
+          type: string
+      required:
+      - online
+      - storage
+      type: object
+    AnsibleGalaxyHostedRepositoryApiRequest:
+      description: Request body for creating or updating an Ansible Galaxy hosted
+        repository
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
+      - storage
+      type: object
+    AnsibleGalaxyProxyApiRepository:
+      description: Ansible Galaxy proxy repository configuration
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: ansiblegalaxy
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Repository type
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/ansiblegalaxy-example
+          type: string
+      required:
+      - httpClient
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
+    AnsibleGalaxyProxyRepositoryApiRequest:
+      description: Request body for creating or updating an Ansible Galaxy proxy repository
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRule:
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - httpClient
+      - name
+      - negativeCache
+      - online
+      - proxy
+      - storage
       type: object
     ApiAccessCheckXo:
       properties:
@@ -696,12 +982,10 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
-          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
-          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -716,7 +1000,6 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
-          readOnly: true
           type: string
       required:
       - apt
@@ -1088,6 +1371,43 @@ components:
         type:
           type: string
       type: object
+    BulkUploadRequest:
+      properties:
+        csvContent:
+          type: string
+      required:
+      - csvContent
+      type: object
+    BulkUploadResultXO:
+      description: Result of bulk CSV upload operation
+      properties:
+        addedCount:
+          description: Number of entries successfully added
+          example: 17
+          format: int32
+          type: integer
+        rejectedCount:
+          description: Number of entries rejected due to validation errors
+          example: 10
+          format: int32
+          type: integer
+        rejectedEntries:
+          description: Structured list of rejected entries with line number, value,
+            and reason
+          items:
+            $ref: '#/components/schemas/RejectedEntryXO'
+          type: array
+        skippedCount:
+          description: Number of entries skipped (duplicates)
+          example: 5
+          format: int32
+          type: integer
+        totalRows:
+          description: Total number of data rows processed (excluding header)
+          example: 32
+          format: int32
+          type: integer
+      type: object
     CapabilityDTO:
       properties:
         active:
@@ -1109,6 +1429,8 @@ components:
         state:
           type: string
         stateDescription:
+          type: string
+        status:
           type: string
         tags:
           additionalProperties:
@@ -2274,6 +2596,22 @@ components:
       required:
       - id
       type: object
+    EntryXO:
+      description: Request to add an IP Allow List entry
+      properties:
+        description:
+          description: Optional description for this IP address
+          example: Office network
+          maxLength: 255
+          minLength: 0
+          type: string
+        ipOrCidr:
+          description: IP address or CIDR notation to add
+          example: 192.168.1.0/24
+          type: string
+      required:
+      - ipOrCidr
+      type: object
     EulaStatus:
       properties:
         accepted:
@@ -2456,6 +2794,28 @@ components:
           $ref: '#/components/schemas/StorageAttributes'
       required:
       - group
+      - name
+      - online
+      - storage
+      type: object
+    GolangHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
       - name
       - online
       - storage
@@ -2952,6 +3312,119 @@ components:
             $ref: '#/components/schemas/ConfigurationXO'
           type: array
       type: object
+    IpAllowListEntriesPageXO:
+      description: Paginated list of IP Allow List entries
+      properties:
+        entries:
+          description: List of entries on the current page
+          items:
+            $ref: '#/components/schemas/IpAllowListEntryXO'
+          type: array
+        page:
+          description: Current page number (0-based)
+          example: 0
+          format: int32
+          type: integer
+        pageSize:
+          description: Number of entries per page
+          example: 20
+          format: int32
+          type: integer
+        totalEntries:
+          description: Total number of entries across all pages
+          example: 42
+          format: int32
+          type: integer
+        totalPages:
+          description: Total number of pages
+          example: 3
+          format: int32
+          type: integer
+      type: object
+    IpAllowListEntryXO:
+      description: IP Allow List entry
+      properties:
+        createdAt:
+          description: When the entry was created
+          format: date-time
+          type: string
+        createdBy:
+          description: Username who created the entry
+          example: admin
+          type: string
+        description:
+          description: Optional description for this IP address
+          example: Office network
+          type: string
+        entry:
+          description: The IP address or CIDR notation
+          example: 192.168.1.0/24
+          type: string
+        entryType:
+          description: 'Entry type: IPV4, IPV6, CIDR_IPV4, or CIDR_IPV6'
+          example: CIDR_IPV4
+          type: string
+        id:
+          description: Unique identifier for the entry
+          example: 550e8400-e29b-41d4-a716-446655440000
+          type: string
+        updatedAt:
+          description: When the entry was last updated
+          format: date-time
+          type: string
+        updatedBy:
+          description: Username who last updated the entry
+          example: admin
+          type: string
+      type: object
+    IpAllowListSettingsXO:
+      description: IP Allow List settings
+      properties:
+        effectiveMode:
+          description: Effective mode after applying forceDisable and feature flag
+            overrides. May differ from 'mode' when the feature is force-disabled or
+            the feature flag is off.
+          enum:
+          - DISABLED
+          - MONITOR
+          - ENFORCE
+          example: DISABLED
+          type: string
+        featureEnabled:
+          description: Whether the IP Allow List feature is currently enabled
+          example: true
+          type: boolean
+        ipv4AddressesCovered:
+          description: Number of individual IPv4 addresses covered by IPv4 and CIDR_IPV4
+            entries
+          example: 257
+          format: int64
+          type: integer
+        ipv6AddressesCovered:
+          description: Number of individual IPv6 addresses covered by IPv6 and CIDR_IPV6
+            entries
+          example: 15
+          format: int64
+          type: integer
+        maxEntries:
+          description: Maximum number of entries allowed
+          example: 256
+          format: int32
+          type: integer
+        mode:
+          description: 'Current mode: DISABLED, MONITOR, or ENFORCE'
+          enum:
+          - DISABLED
+          - MONITOR
+          - ENFORCE
+          example: DISABLED
+          type: string
+        totalEntries:
+          description: Total number of entries in the allow list
+          example: 42
+          format: int32
+          type: integer
+      type: object
     IqAuditXo:
       properties:
         enabled:
@@ -3420,6 +3893,20 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    ModeChangeXO:
+      description: Request to change IP Allow List mode
+      properties:
+        mode:
+          description: 'The new mode: DISABLED, MONITOR, or ENFORCE'
+          enum:
+          - DISABLED
+          - MONITOR
+          - ENFORCE
+          example: MONITOR
+          type: string
+      required:
+      - mode
       type: object
     NegativeCacheAttributes:
       properties:
@@ -4187,6 +4674,19 @@ components:
           - ATTACHMENT
           example: ATTACHMENT
           type: string
+        excludedQueryParameters:
+          description: List of query parameter names to exclude from forwarding (case-insensitive).
+            Maximum 100 entries.
+          example: '["apiKey", "token"]'
+          items:
+            type: string
+          maxItems: 100
+          minItems: 0
+          type: array
+        forwardQueryParameters:
+          description: Whether to forward query parameters to the upstream repository
+          example: true
+          type: boolean
       type: object
     RawGroupApiRepository:
       properties:
@@ -4612,6 +5112,23 @@ components:
           format: date-time
           type: string
         state:
+          type: string
+      type: object
+    RejectedEntryXO:
+      description: A rejected entry from a bulk CSV upload
+      properties:
+        line:
+          description: Line number in the CSV file
+          example: 19
+          format: int32
+          type: integer
+        reason:
+          description: Reason the entry was rejected
+          example: 'Invalid IP address: ''999.999.999.999'''
+          type: string
+        value:
+          description: The value that was rejected
+          example: 999.999.999.999
           type: string
       type: object
     RelatedEndpointXo:
@@ -5214,6 +5731,17 @@ components:
       - proxy
       - storage
       type: object
+    SimpleApiResponse:
+      properties:
+        data:
+          properties: {}
+          type: object
+        message:
+          type: string
+        status:
+          format: int32
+          type: integer
+      type: object
     SsrfProtectionConfigurationXO:
       properties:
         allowedDomains:
@@ -5597,51 +6125,82 @@ components:
       - type
       type: object
     TaskXO:
+      description: Represents a task in Nexus Repository Manager
       properties:
         alertEmail:
+          description: Email address to send notifications to
+          example: admin@example.com
           type: string
         cronExpression:
+          description: Cron expression for advanced schedules
+          example: 0 0 12 * * ?
           type: string
         currentState:
+          description: The current state of the task
+          example: WAITING
           type: string
         enabled:
+          description: Whether the task is enabled
+          example: true
           type: boolean
         id:
+          description: The unique identifier of the task
           type: string
         lastRun:
+          description: The last run start time (ISO 8601 format)
           format: date-time
           type: string
         lastRunResult:
+          description: The result of the last run
+          example: OK
           type: string
         message:
+          description: A human-readable message describing the task
+          example: Admin - Compact blob store
           type: string
         name:
+          description: The name of the task
+          example: Compact blob store
           type: string
         nextRun:
+          description: The next scheduled run time (ISO 8601 format)
           format: date-time
           type: string
         notificationCondition:
+          description: Condition for sending notifications
           enum:
           - FAILURE
           - SUCCESS_FAILURE
+          example: FAILURE
           type: string
         properties:
           additionalProperties:
             type: string
+          description: Task-specific configuration properties
           type: object
         recurringDays:
+          description: Days of the week/month for recurring schedules (1=Sunday, 7=Saturday,
+            999=last day of month)
+          example: '[1, 4]'
           items:
             format: int32
             type: integer
           type: array
         schedule:
+          description: The schedule type
+          example: manual
           type: string
         startDate:
+          description: The start date for scheduled tasks (ISO 8601 format)
           format: date-time
           type: string
         timeZoneOffset:
+          description: Time zone offset for cron schedules
+          example: +00:00
           type: string
         type:
+          description: The type identifier of the task
+          example: blobstore.compact
           type: string
       type: object
     TerraformAttributes:
@@ -6134,17 +6693,6 @@ components:
         type:
           type: string
       type: object
-    UserTokenListXO:
-      properties:
-        continuationToken:
-          type: string
-        items:
-          items:
-            $ref: '#/components/schemas/UserTokenXO'
-          type: array
-      type: object
-      xml:
-        name: userTokenList
     UserTokenXO:
       properties:
         created:
@@ -6354,12 +6902,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.92.0-03.
+    as of version 3.93.0-06.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.92.0-03
+  version: 3.93.0-06
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -7411,6 +7959,35 @@ paths:
           multipart/form-data:
             schema:
               properties:
+                alpine.asset:
+                  description: 'alpine Asset '
+                  format: binary
+                  type: string
+                alpine.repository:
+                  description: alpine Repository
+                  type: string
+                alpine.tag:
+                  description: alpine Tag
+                  type: string
+                alpine.version:
+                  description: alpine Alpine Version
+                  type: string
+                ansiblegalaxy.asset:
+                  description: 'ansiblegalaxy Asset '
+                  format: binary
+                  type: string
+                ansiblegalaxy.name:
+                  description: ansiblegalaxy Name
+                  type: string
+                ansiblegalaxy.namespace:
+                  description: ansiblegalaxy Namespace
+                  type: string
+                ansiblegalaxy.tag:
+                  description: ansiblegalaxy Tag
+                  type: string
+                ansiblegalaxy.version:
+                  description: ansiblegalaxy Version
+                  type: string
                 apt.asset:
                   description: 'apt Asset '
                   format: binary
@@ -7440,9 +8017,6 @@ paths:
                 go.asset:
                   description: 'go Asset '
                   format: binary
-                  type: string
-                go.module:
-                  description: go Module
                   type: string
                 go.tag:
                   description: go Tag
@@ -8295,7 +8869,7 @@ paths:
       - Manage Sonatype Repository Firewall configuration
   /v1/iq/capabilities:
     get:
-      operationId: getCapabilities_1
+      operationId: getCapabilities
       responses:
         '200':
           content:
@@ -8308,7 +8882,7 @@ paths:
       - Manage Sonatype Repository Firewall configuration
   /v1/iq/capabilities/test:
     post:
-      operationId: getCapabilities
+      operationId: getCapabilities_1
       requestBody:
         content:
           application/json:
@@ -8913,6 +9487,493 @@ paths:
       summary: List repositories
       tags:
       - Repository Management
+  /v1/repositories/alpine/group:
+    post:
+      operationId: createAlpineGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '405':
+          content: {}
+          description: Feature is disabled in High Availability
+      summary: Create Alpine group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/alpine/group/{repositoryName}:
+    get:
+      operationId: getAlpineGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateAlpineGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineGroupRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Alpine group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/alpine/hosted:
+    post:
+      operationId: createAlpineHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '405':
+          content: {}
+          description: Feature is disabled in High Availability
+      summary: Create Alpine hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/alpine/hosted/{repositoryName}:
+    get:
+      operationId: getAlpineHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateAlpineHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Alpine hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/alpine/proxy:
+    post:
+      operationId: createAlpineProxyRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '405':
+          content: {}
+          description: Feature is disabled in High Availability
+      summary: Create Alpine proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/alpine/proxy/{repositoryName}:
+    get:
+      operationId: getAlpineProxyRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateAlpineProxyRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlpineProxyRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Update Alpine proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/group:
+    post:
+      description: Creates a new Ansible Galaxy group repository that aggregates content
+        from member repositories
+      operationId: createAnsiblegalaxyGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyGroupRepositoryApiRequest'
+        description: Configuration for the new Ansible Galaxy group repository
+        required: true
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Ansible Galaxy group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/group/{repositoryName}:
+    get:
+      operationId: getAnsiblegalaxyGroupRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnsibleGalaxyGroupApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      description: Updates the configuration of an existing Ansible Galaxy group repository
+      operationId: updateAnsiblegalaxyGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyGroupRepositoryApiRequest'
+        description: Updated configuration for the Ansible Galaxy group repository
+        required: true
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update Ansible Galaxy group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/hosted:
+    post:
+      description: Creates a new Ansible Galaxy hosted repository for storing Ansible
+        Collections
+      operationId: createAnsiblegalaxyHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyHostedRepositoryApiRequest'
+        description: Configuration for the new Ansible Galaxy hosted repository
+        required: true
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Ansible Galaxy hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/hosted/{repositoryName}:
+    get:
+      operationId: getAnsiblegalaxyHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnsibleGalaxyHostedApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      description: Updates the configuration of an existing Ansible Galaxy hosted
+        repository
+      operationId: updateAnsiblegalaxyHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyHostedRepositoryApiRequest'
+        description: Updated configuration for the Ansible Galaxy hosted repository
+        required: true
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update Ansible Galaxy hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/proxy:
+    post:
+      description: Creates a new Ansible Galaxy proxy repository that proxies requests
+        to an upstream Ansible Galaxy server
+      operationId: createAnsiblegalaxyProxyRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyProxyRepositoryApiRequest'
+        description: Configuration for the new Ansible Galaxy proxy repository
+        required: true
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Create Ansible Galaxy proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/ansiblegalaxy/proxy/{repositoryName}:
+    get:
+      operationId: getAnsiblegalaxyProxyRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnsibleGalaxyProxyApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      description: Updates the configuration of an existing Ansible Galaxy proxy repository
+      operationId: updateAnsiblegalaxyProxyRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnsibleGalaxyProxyRepositoryApiRequest'
+        description: Updated configuration for the Ansible Galaxy proxy repository
+        required: true
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '400':
+          content: {}
+          description: Bad request
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update Ansible Galaxy proxy repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
   /v1/repositories/apt/hosted:
     post:
       operationId: createAptHostedRepository
@@ -10287,6 +11348,83 @@ paths:
           content: {}
           description: Repository not found
       summary: Update a Go group repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/go/hosted:
+    post:
+      operationId: createGoHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GolangHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '201':
+          content: {}
+          description: Repository created
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '405':
+          content: {}
+          description: Feature is disabled in High Availability
+      summary: Create a Go hosted repository
+      tags:
+      - Repository Management
+      x-codegen-request-body-name: body
+  /v1/repositories/go/hosted/{repositoryName}:
+    get:
+      operationId: getGoHostedRepository
+      parameters:
+      - in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateGoHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GolangHostedRepositoryApiRequest'
+        required: false
+      responses:
+        '204':
+          content: {}
+          description: Repository updated
+        '401':
+          content: {}
+          description: Authentication required
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '404':
+          content: {}
+          description: Repository not found
+      summary: Update a Go hosted repository
       tags:
       - Repository Management
       x-codegen-request-body-name: body
@@ -13845,6 +14983,21 @@ paths:
         name: sha512
         schema:
           type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
+        schema:
+          type: string
       - description: Vendor
         in: query
         name: composer.vendor
@@ -14210,6 +15363,21 @@ paths:
         name: sha512
         schema:
           type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
+        schema:
+          type: string
       - description: Vendor
         in: query
         name: composer.vendor
@@ -14566,6 +15734,21 @@ paths:
       - description: Specific SHA-512 hash of component's asset
         in: query
         name: sha512
+        schema:
+          type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
         schema:
           type: string
       - description: Vendor
@@ -15119,6 +16302,243 @@ paths:
       summary: Update a content selector
       tags:
       - Content selectors
+      x-codegen-request-body-name: body
+  /v1/security/ip-allowlist:
+    get:
+      operationId: getSettings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpAllowListSettingsXO'
+          description: Settings retrieved successfully
+        '403':
+          content: {}
+          description: Insufficient permissions to view settings
+      summary: Get IP Allow List settings (mode, entry counts, max entries)
+      tags:
+      - 'Security: IP Allow List'
+  /v1/security/ip-allowlist/current-ip:
+    get:
+      operationId: getCurrentIp
+      responses:
+        '200':
+          content: {}
+          description: Current IP and allowed status retrieved
+        '403':
+          content: {}
+          description: Insufficient permissions
+      summary: Get the current user's IP address and whether it is in the allow list
+      tags:
+      - 'Security: IP Allow List'
+  /v1/security/ip-allowlist/entries:
+    delete:
+      operationId: clearAllEntries
+      parameters:
+      - description: Must be 'true' to confirm the destructive operation
+        in: query
+        name: confirm
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '204':
+          content: {}
+          description: All entries cleared successfully
+        '400':
+          content: {}
+          description: confirm=true query parameter is required to prevent accidental
+            data loss
+        '403':
+          content: {}
+          description: Insufficient permissions to clear entries
+      summary: Clear all entries from the IP Allow List
+      tags:
+      - 'Security: IP Allow List'
+    get:
+      operationId: browseEntries
+      parameters:
+      - description: Page number (0-based)
+        in: query
+        name: page
+        schema:
+          default: 0
+          format: int32
+          type: integer
+      - description: Number of entries per page
+        in: query
+        name: pageSize
+        schema:
+          default: 20
+          format: int32
+          type: integer
+      - description: Search query (matches against IP address, CIDR notation, and
+          description)
+        in: query
+        name: search
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpAllowListEntriesPageXO'
+          description: Entries retrieved successfully
+        '400':
+          content: {}
+          description: Invalid pagination parameters
+        '403':
+          content: {}
+          description: Insufficient permissions to view entries
+      summary: Get paginated list of IP Allow List entries with optional search filter
+      tags:
+      - 'Security: IP Allow List'
+    post:
+      operationId: addEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryXO'
+        description: Entry to add
+        required: true
+      responses:
+        '201':
+          content: {}
+          description: Entry added successfully
+        '400':
+          content: {}
+          description: Invalid IP address or CIDR notation
+        '403':
+          content: {}
+          description: Insufficient permissions to add entries
+        '409':
+          content: {}
+          description: Entry already exists or would exceed maximum entries limit
+      summary: Add a new entry to the IP Allow List
+      tags:
+      - 'Security: IP Allow List'
+      x-codegen-request-body-name: body
+  /v1/security/ip-allowlist/entries/bulk:
+    delete:
+      operationId: bulkDelete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                type: string
+              type: array
+        description: List of entry IDs to remove
+        required: true
+      responses:
+        '200':
+          content: {}
+          description: Bulk delete result with counts of deleted and failed IDs
+        '400':
+          content: {}
+          description: Entry IDs list cannot be empty
+        '403':
+          content: {}
+          description: Insufficient permissions to remove entries
+      summary: Remove one or more entries from the IP Allow List by ID
+      tags:
+      - 'Security: IP Allow List'
+      x-codegen-request-body-name: body
+    post:
+      operationId: bulkUpload
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUploadRequest'
+        description: CSV upload request
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUploadResultXO'
+          description: Upload processed
+        '400':
+          content: {}
+          description: Invalid CSV content or size exceeds limit
+        '403':
+          content: {}
+          description: Insufficient permissions
+        '500':
+          content: {}
+          description: Error processing CSV
+      summary: Bulk upload entries from CSV content
+      tags:
+      - 'Security: IP Allow List'
+      x-codegen-request-body-name: body
+  /v1/security/ip-allowlist/entries/{id}:
+    put:
+      operationId: updateEntry
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryXO'
+        description: Updated entry data
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpAllowListEntryXO'
+          description: Entry updated successfully
+        '400':
+          content: {}
+          description: Invalid IP address or CIDR notation
+        '403':
+          content: {}
+          description: Insufficient permissions to update entries
+        '404':
+          content: {}
+          description: Entry not found
+        '409':
+          content: {}
+          description: IP address already exists
+      summary: Update an existing entry in the IP Allow List
+      tags:
+      - 'Security: IP Allow List'
+      x-codegen-request-body-name: body
+  /v1/security/ip-allowlist/mode:
+    put:
+      operationId: updateMode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeChangeXO'
+        description: Mode change request
+        required: true
+      responses:
+        '204':
+          content: {}
+          description: Mode updated successfully
+        '400':
+          content: {}
+          description: Invalid mode value provided
+        '403':
+          content: {}
+          description: Insufficient permissions to change mode
+      summary: Update the IP Allow List operational mode
+      tags:
+      - 'Security: IP Allow List'
       x-codegen-request-body-name: body
   /v1/security/ldap:
     get:
@@ -16403,32 +17823,47 @@ paths:
       x-codegen-request-body-name: body
   /v1/security/user-tokens/tokens:
     get:
-      description: Lists all user tokens with optional filtering and pagination. Returns
-        metadata only, never the passCode.
+      description: "Without 'namecode': lists all tokens with optional realm/userId\
+        \ filters and pagination. Returns metadata only \u2014 passCode is never returned.\
+        \ With 'namecode': switches to single-token lookup mode. Returns a single\
+        \ UserTokenXO (200) if the nameCode exists (expired tokens included), or 404\
+        \ if not found. The userId, includeExpired, skip, and limit parameters are\
+        \ ignored in lookup mode."
       operationId: list_1
       parameters:
-      - description: The realm of the user (optional for cloud, required for self-hosted)
+      - description: Filter by realm (optional). Also acts as a realm constraint in
+          namecode lookup mode.
         in: query
         name: realm
         schema:
           type: string
-      - description: Filter by user ID (optional)
+      - description: Filter by user ID (optional). Ignored when 'namecode' is provided.
         in: query
         name: userId
         schema:
           type: string
-      - description: 'Include expired tokens (default: false)'
+      - description: Look up the token owner by nameCode. When present, the endpoint
+          resolves a single token and returns 404 if not found. Expired tokens are
+          always included in lookup results.
+        in: query
+        name: namecode
+        schema:
+          type: string
+      - description: "Include expired tokens in list results (default: false). Ignored\
+          \ in namecode lookup mode \u2014 expired tokens are always included."
         in: query
         name: includeExpired
         schema:
           type: boolean
-      - description: 'Number of items to skip for pagination (default: 0)'
+      - description: 'Number of items to skip for pagination (default: 0). Ignored
+          in lookup mode.'
         in: query
         name: skip
         schema:
           format: int32
           type: integer
-      - description: 'Maximum number of items to return (default: 25, max: 100)'
+      - description: 'Maximum number of items to return (default: 25, max: 100). Ignored
+          in lookup mode.'
         in: query
         name: limit
         schema:
@@ -16436,22 +17871,26 @@ paths:
           type: integer
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserTokenListXO'
-          description: User tokens retrieved successfully
+          content: {}
+          description: Success. In list mode (no 'namecode' param) returns UserTokenListXO.
+            In lookup mode ('namecode' present) returns a single UserTokenXO.
         '400':
           content: {}
-          description: Invalid request parameters. Check filter values and pagination
-            settings.
+          description: Invalid request parameters, or user token capability is disabled.
         '403':
           content: {}
           description: Insufficient privileges to view or audit user tokens.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleApiResponse'
+          description: No user token found with the given namecode. Only returned
+            when 'namecode' is provided.
         '500':
           content: {}
           description: Unexpected server error. Please try again later.
-      summary: List all user tokens
+      summary: List user tokens or look up a token owner by namecode
       tags:
       - 'Security management: user tokens'
   /v1/security/users:
@@ -16845,6 +18284,21 @@ paths:
         name: sha512
         schema:
           type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
+        schema:
+          type: string
       - description: Vendor
         in: query
         name: composer.vendor
@@ -17182,6 +18636,21 @@ paths:
       - description: Specific SHA-512 hash of component's asset
         in: query
         name: sha512
+        schema:
+          type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
         schema:
           type: string
       - description: Vendor
@@ -17760,6 +19229,21 @@ paths:
         name: sha512
         schema:
           type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
+        schema:
+          type: string
       - description: Vendor
         in: query
         name: composer.vendor
@@ -18094,6 +19578,21 @@ paths:
       - description: Specific SHA-512 hash of component's asset
         in: query
         name: sha512
+        schema:
+          type: string
+      - description: ansible-galaxy namespace
+        in: query
+        name: ansible-galaxy.namespace
+        schema:
+          type: string
+      - description: ansible-galaxy name
+        in: query
+        name: ansible-galaxy.name
+        schema:
+          type: string
+      - description: ansible-galaxy version
+        in: query
+        name: ansible-galaxy.version
         schema:
           type: string
       - description: Vendor
@@ -18722,6 +20221,7 @@ tags:
 - name: 'Security management: user tokens'
 - name: Azure blob store
 - name: Malicious Risk On Disk
+- name: 'Security: IP Allow List'
 - name: Capabilities
 - name: Manage Sonatype HTTP System Settings
 - name: Monthly Metrics
