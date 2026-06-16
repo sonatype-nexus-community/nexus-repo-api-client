@@ -87,7 +87,7 @@ jobs:
               if: steps.check.outputs.skip != 'true'
               run: |
                   NXRM_VERSION=${{ steps.nxrm_latest.outputs.version }}
-                  ARCHIVE="nexus-${NXRM_VERSION}-unix.tar.gz"
+                  ARCHIVE="nexus-${NXRM_VERSION}-linux-x86_64.tar.gz"
                   curl -fLO "https://download.sonatype.com/nexus/3/${ARCHIVE}"
                   mkdir -p ${{ github.workspace }}/nxrm
                   tar -xzf "${ARCHIVE}" -C ${{ github.workspace }}/nxrm
