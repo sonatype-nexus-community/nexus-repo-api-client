@@ -24,17 +24,24 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Get latest NXRM version from Sonatype release page
+            - name: Get latest NXRM version from Sonatype download page
               id: nxrm_latest
               run: |
-                  VERSION=$(curl -sf https://help.sonatype.com/en/download-and-compatibility.html \
+                  VERSION=$(curl -sf https://help.sonatype.com/en/download.html \
                     | python3 -c "
                   import re, sys
                   content = sys.stdin.read()
-                  versions = re.findall(r'(?:3\.\d{2,}\.\d+)', content)
+                  # Match versions like 3.93.0-06 (with optional build suffix)
+                  versions = re.findall(r'3\.\d{2,}\.\d+(?:-\d{2})?', content)
                   if not versions:
-                      raise SystemExit('ERROR: Could not detect NXRM version - no version strings matched on release page')
-                  print(max(versions, key=lambda v: tuple(int(x) for x in v.split('.'))))
+                      raise SystemExit('ERROR: Could not detect NXRM version - no version strings matched on download page')
+                  # Parse version for comparison, handling the optional build suffix
+                  def parse_version(v):
+                      parts = v.split('-')
+                      main = [int(x) for x in parts[0].split('.')]
+                      build = int(parts[1]) if len(parts) > 1 else 0
+                      return tuple(main + [build])
+                  print(max(versions, key=parse_version))
                   ")
                   echo "Latest NXRM version: ${VERSION}"
                   echo "version=${VERSION}" >> $GITHUB_OUTPUT
