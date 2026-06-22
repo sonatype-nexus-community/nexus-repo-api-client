@@ -982,10 +982,12 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
+          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -1000,6 +1002,7 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
+          readOnly: true
           type: string
       required:
       - apt
@@ -6902,12 +6905,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.93.0-06.
+    as of version 3.93.1-04.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.93.0-06
+  version: 3.93.1-04
 openapi: 3.0.1
 paths:
   /beta/data-store:
