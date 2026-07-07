@@ -653,6 +653,60 @@ json_spec['components']['schemas']['TerraformProxyApiRepository']['properties'][
     '$ref': '#/components/schemas/TerraformAttributes'
 }
 
+print('Correct response schema for GET /v1/repositories/yum/proxy/{repositoryName}...')
+json_spec['components']['schemas'].update({
+    'YumProxyApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/YumProxyRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'yum'},
+                    'type': {'type': 'string', 'default': 'proxy'},
+                    'url': {'type': 'string'},
+                    'routingRuleName': {
+                        'description': 'The name of the routing rule assigned to this repository',
+                        'type': 'string'
+                    }
+                }
+            }
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/yum/proxy/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/YumProxyApiRepository'
+}
+print('     Done')
+
+print('Correct response schema for GET /v1/repositories/yum/group/{repositoryName}...')
+json_spec['components']['schemas'].update({
+    'YumGroupApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/YumGroupRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'yum'},
+                    'type': {'type': 'string', 'default': 'group'},
+                    'url': {'type': 'string'}
+                }
+            }
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/YumGroupApiRepository'
+}
+print('     Done')
+
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))

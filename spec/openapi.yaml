@@ -982,12 +982,10 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
-          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
-          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -1002,7 +1000,6 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
-          readOnly: true
           type: string
       required:
       - apt
@@ -6763,6 +6760,23 @@ components:
       required:
       - repodataDepth
       type: object
+    YumGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/YumGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: yum
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     YumGroupRepositoryApiRequest:
       properties:
         group:
@@ -6851,6 +6865,26 @@ components:
       - storage
       - yum
       type: object
+    YumProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/YumProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: yum
+            type: string
+          routingRuleName:
+            description: The name of the routing rule assigned to this repository
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     YumProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -14170,7 +14204,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiGroupRepository'
+                $ref: '#/components/schemas/YumGroupApiRepository'
           description: successful operation
       summary: Get repository
       tags:
@@ -14318,7 +14352,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiProxyRepository'
+                $ref: '#/components/schemas/YumProxyApiRepository'
           description: successful operation
       summary: Get repository
       tags:
