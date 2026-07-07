@@ -982,10 +982,12 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
+          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -1000,6 +1002,7 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
+          readOnly: true
           type: string
       required:
       - apt
@@ -8906,7 +8909,7 @@ paths:
       - Manage Sonatype Repository Firewall configuration
   /v1/iq/capabilities:
     get:
-      operationId: getCapabilities_1
+      operationId: getCapabilities
       responses:
         '200':
           content:
@@ -8919,7 +8922,7 @@ paths:
       - Manage Sonatype Repository Firewall configuration
   /v1/iq/capabilities/test:
     post:
-      operationId: getCapabilities
+      operationId: getCapabilities_1
       requestBody:
         content:
           application/json:
