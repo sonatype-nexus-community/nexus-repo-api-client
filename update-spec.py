@@ -707,6 +707,85 @@ json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['respon
 }
 print('     Done')
 
+print('Correct response schema for GET /v1/repositories/alpine/hosted/{repositoryName}...')
+json_spec['components']['schemas'].update({
+    'AlpineHostedApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/AlpineHostedRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'alpine'},
+                    'type': {'type': 'string', 'default': 'hosted'},
+                    'url': {'type': 'string'},
+                }
+            }
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/alpine/hosted/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/AlpineHostedApiRepository'
+}
+print('     Done')
+
+print('Correct response schema for GET /v1/repositories/alpine/proxy/{repositoryName}...')
+json_spec['components']['schemas'].update({
+    'AlpineProxyApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/AlpineProxyRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'alpine'},
+                    'type': {'type': 'string', 'default': 'proxy'},
+                    'url': {'type': 'string'},
+                    'routingRuleName': {
+                        'description': 'The name of the routing rule assigned to this repository',
+                        'type': 'string'
+                    }
+                }
+            }
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/alpine/proxy/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/AlpineProxyApiRepository'
+}
+print('     Done')
+
+print('Correct response schema for GET /v1/repositories/alpine/group/{repositoryName}...')
+json_spec['components']['schemas'].update({
+    'AlpineGroupApiRepository': {
+        'allOf': [
+            {
+                '$ref': '#/components/schemas/AlpineGroupRepositoryApiRequest'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': 'alpine'},
+                    'type': {'type': 'string', 'default': 'group'},
+                    'url': {'type': 'string'},
+                }
+            }
+        ]
+    }
+})
+json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['responses']['200']['content'][
+    'application/json']['schema'] = {
+    '$ref': '#/components/schemas/AlpineGroupApiRepository'
+}
+print('     Done')
+
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))

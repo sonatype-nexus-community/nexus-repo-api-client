@@ -35,6 +35,23 @@ components:
         reason:
           type: string
       type: object
+    AlpineGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/AlpineGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: alpine
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     AlpineGroupRepositoryApiRequest:
       properties:
         alpineSigning:
@@ -59,6 +76,23 @@ components:
       - online
       - storage
       type: object
+    AlpineHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/AlpineHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: alpine
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     AlpineHostedRepositoryApiRequest:
       properties:
         alpineSigning:
@@ -83,6 +117,26 @@ components:
       - online
       - storage
       type: object
+    AlpineProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/AlpineProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: alpine
+            type: string
+          routingRuleName:
+            description: The name of the routing rule assigned to this repository
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     AlpineProxyRepositoryApiRequest:
       properties:
         alpineSigning:
@@ -982,10 +1036,12 @@ components:
           description: A unique identifier for this repository
           example: internal
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          readOnly: true
           type: string
         online:
           description: Whether this repository accepts incoming requests
           example: true
+          readOnly: true
           type: boolean
         storage:
           $ref: '#/components/schemas/HostedStorageAttributes'
@@ -1000,6 +1056,7 @@ components:
         url:
           description: URL to the repository
           example: http://localhost:8081/repository/apt-example
+          readOnly: true
           type: string
       required:
       - apt
@@ -9564,7 +9621,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiGroupRepository'
+                $ref: '#/components/schemas/AlpineGroupApiRepository'
           description: successful operation
       summary: Get repository
       tags:
@@ -9641,7 +9698,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiHostedRepository'
+                $ref: '#/components/schemas/AlpineHostedApiRepository'
           description: successful operation
       summary: Get repository
       tags:
@@ -9718,7 +9775,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SimpleApiProxyRepository'
+                $ref: '#/components/schemas/AlpineProxyApiRepository'
           description: successful operation
       summary: Get repository
       tags:
