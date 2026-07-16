@@ -52,12 +52,16 @@ See `update-spec.py` for amendments made to the Specification prior to client ge
 
 Get it from your Sonatype Nexus Repository Server at `/service/rest/swagger.json`.
 
+```shell
+poetry run -- python update-spec.py https://nexus.example.com
+```
+
 ## Generation of API Clients
 
 ```
-docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli batch --clean /local/typescript.yaml
+docker run --pull always --rm -v "$(PWD):/local" openapitools/openapi-generator-cli batch --clean /local/typescript.yaml
 
-docker run --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/test -c /local/openapi-config.yaml -v > out.log
+docker run --pull always --rm -v "$(PWD):/local" openapitools/openapi-generator-cli generate -i /local/spec/openapi.yaml -g typescript-fetch -o /local/out/test -c /local/openapi-config.yaml -v > out.log
 ```
 
 ## Diagnosing Responses that are not Schema Compliant
@@ -117,7 +121,7 @@ Through the use of [Postman](https://www.postman.com) and [opeapi-request-respon
 
 3. Start the `openapi-request-response-validation` Container locally:
     ```
-    docker run -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
+    docker run --pull always -p 8080:8080 -v ./spec:/openapi -it --rm gcatanese/openapi-request-response-validation
     ```
 4. Execute the request in Postman - if the test does not show as passed then you can get details of the failure from two places:
     1. The Postman console

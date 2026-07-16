@@ -23,7 +23,7 @@ from yaml import dump as yaml_dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
-    from yaml import Loader, Dumper
+    pass
 
 if len(sys.argv) != 2:
     print(f'Usage: {sys.argv[0]} <REPO_SERVER_URL>')
@@ -132,6 +132,9 @@ with open(os.path.join(os.path.dirname(__file__), "snippets", "ApiPrivilegeReque
     json_spec['components']['schemas']['ApiPrivilegeRequest'] = json.load(o)
 
 json_spec['paths']['/v1/security/privileges']['get']['operationId'] = 'getAllPrivileges'
+if '200' not in json_spec['paths']['/v1/security/privileges']['get']['responses']:
+    json_spec['paths']['/v1/security/privileges']['get']['responses']['200'] = {}
+
 json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -142,6 +145,8 @@ json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['conten
         }
     }
 }
+if '200' not in json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses']:
+    json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses']['200'] = {}
 json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -208,6 +213,8 @@ operations_to_fix = [
     {'path': '/v1/blobstores/s3', 'method': 'post', 'operation_id': 'CreateS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'get', 'operation_id': 'GetS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'put', 'operation_id': 'UpdateS3BlobStore'},
+    {'path': '/v1/plan/{planId}', 'method': 'delete', 'operation_id': "DeletePlanId"},
+    {'path': '/v1/plan/{planId}', 'method': 'put', 'operation_id': "UpdatePlanId"},
 ]
 i = 0
 print('Overriding operation IDs...')
@@ -373,6 +380,16 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/raw/group/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/raw/group/{repositoryName}']['get']['responses'] = {
+        '200': {
+            'content': {
+                'application/json': {
+                    'schema': {}
+                }
+            }
+        }
+    }
 json_spec['paths']['/v1/repositories/raw/group/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawGroupApiRepository'
@@ -401,6 +418,16 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses'] = {
+        '200': {
+            'content': {
+                'application/json': {
+                    'schema': {}
+                }
+            }
+        }
+    }
 json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                           '/json')][
     'schema']['$ref'] = '#/components/schemas/RawHostedApiRepository'
@@ -433,6 +460,16 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses'] = {
+        '200': {
+            'content': {
+                'application/json': {
+                    'schema': {}
+                }
+            }
+        }
+    }
 json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawProxyApiRepository'
@@ -450,8 +487,34 @@ json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['resp
     'schema']['$ref'] = '#/components/schemas/SimpleApiGroupDeployRepository'
 print('     Done')
 
-print('Injecting requestBody schema for PUT /v1/tasks/{taskId}...')
-json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content']['application/json']['schema'] = {
+taskKey = '/v1/tasks/{taskId}'
+if NXRM_VERSION.split('.')[1] >= '94':
+    json_spec['paths'][taskKey] = json_spec['paths']['/v1/tasks/{id}']
+    del json_spec['paths']['/v1/tasks/{id}']
+    for method in json_spec['paths'][taskKey]:
+        if 'parameters' in json_spec['paths'][taskKey][method]:
+            for param in json_spec['paths'][taskKey][method]['parameters']:
+                if param['name'] == 'id':
+                    param['name'] = 'taskId'
+
+print('Injecting requestBody schema for PUT /v1/tasks/{id}...')
+if 'put' not in json_spec['paths'][taskKey]:
+    json_spec["paths"][taskKey] = {
+        "put": {
+            "parameters": [
+                {
+                    "name": "taskId",
+                    "in": "path",
+                    "description": "Id of the task to get",
+                    "required": True,
+                    "schema": {"type": "string"},
+                }
+            ],
+            "requestBody": {"content": {"application/json": {}}},
+            "responses": {"200": {}},
+        }
+    }
+json_spec['paths'][taskKey]['put']['requestBody']['content']['application/json']['schema'] = {
     'properties': {
         'alertEmail': {
             'description': 'e-mail for task notifications.',
@@ -461,9 +524,9 @@ json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content']['appli
             'description': 'Indicates if the task would be enabled.',
             'type': 'boolean'
         },
-        'frequency': {
-            '$ref': '#/components/schemas/FrequencyXO'
-        },
+        # 'frequency': {
+        #     '$ref': '#/components/schemas/FrequencyXO'
+        # },
         'name': {
             'description': 'The name of the task template.',
             'type': 'string'
@@ -492,6 +555,8 @@ json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content']['appli
 print('     Done')
 
 print('Injecting Response Schema for POST /v1/tasks...')
+if 'post' not in json_spec['paths']['/v1/tasks']:
+    json_spec['paths']['/v1/tasks'] = {'post': {}}
 json_spec['paths']['/v1/tasks']['post']['responses'] = {
     '201': {
         'content': {
@@ -523,6 +588,8 @@ json_spec['components']['schemas']['ComponentXO']['properties']['tags'] = {
 print('     Done')
 
 print('Correct `attributes` field for schema `TagXO`...')
+if 'TagXO' not in json_spec['components']['schemas']:
+    json_spec['components']['schemas']['TagXO'] = {'properties': {}}
 json_spec['components']['schemas']['TagXO']['properties']['attributes'] = {
     'additionalProperties': {},
     'type': 'object'
@@ -552,6 +619,13 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']:
+
+    json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']['200'] = {
+        'content': {
+            'application/json': {}
+        }
+    }
 json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/ConanProxyApiRepository'
@@ -559,8 +633,17 @@ json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['resp
 print('     Done')
 
 print('Patching schema `HttpSettingsXo`...')
+if 'HttpSettingsXo' not in json_spec['components']['schemas']:
+    json_spec['components']['schemas']['HttpSettingsXo'] = {
+        'properties': {
+            'nonProxyHosts': {},
+            'userAgent': {},
+        }
+    }
 json_spec['components']['schemas']['HttpSettingsXo']['properties']['nonProxyHosts'].update({'nullable': 'true'})
 json_spec['components']['schemas']['HttpSettingsXo']['properties']['userAgent'].update({'nullable': 'true'})
+if 'ProxySettingsXo' not in json_spec['components']['schemas']:
+    json_spec['components']['schemas']['ProxySettingsXo'] = {}
 json_spec['components']['schemas']['ProxySettingsXo'].update({'nullable': 'true'})
 print('     Done')
 
@@ -586,6 +669,8 @@ json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['
 print('     Done')
 
 print('Complete type for `terraform.uploadType` for POST /v1/components')
+if 'requestBody' not in json_spec['paths']['/v1/components']['post']:
+    json_spec['paths']['/v1/components']['post']['requestBody'] = {'content': {'multipart/form-data': {'schema': {'properties': {}}}}}
 json_spec['paths']['/v1/components']['post']['requestBody']['content']['multipart/form-data']['schema']['properties'][
     'terraform.uploadType'] = {
     'description': 'terraform Upload Type',
@@ -640,12 +725,14 @@ json_spec['paths']['/v1/repositories/swift/proxy/{repositoryName}']['get']['resp
 print('     Done')
 
 # Updates for NXRM 3.92.x
+# 2026-07-16: NXRM 3.94.x defines LicensedSolutionsXO
 print('Correct invalid schema name "Licensed Solution"...')
-json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
-del json_spec['components']['schemas']['Licensed Solution']
+if 'Licensed Solution' in json_spec['components']['schemas']:
+    json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
+    del json_spec['components']['schemas']['Licensed Solution']
 
-json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
-    '$ref'] = '#/components/schemas/LicensedSolution'
+    json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
+        '$ref'] = '#/components/schemas/LicensedSolution'
 print('     Done')
 
 # Patch TerraformProxyApiRepository schema - now missing `terraform` item
@@ -676,6 +763,8 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/yum/proxy/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/yum/proxy/{repositoryName}']['get']['responses']['200'] = {'content': {'application/json': {}}}
 json_spec['paths']['/v1/repositories/yum/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/YumProxyApiRepository'
@@ -701,6 +790,8 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['responses']['200'] = {'content': {'application/json': {}}}
 json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/YumGroupApiRepository'
@@ -726,6 +817,8 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/alpine/hosted/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/alpine/hosted/{repositoryName}']['get']['responses']['200'] = {'content': {'application/json': {}}}
 json_spec['paths']['/v1/repositories/alpine/hosted/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineHostedApiRepository'
@@ -755,6 +848,8 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/alpine/proxy/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/alpine/proxy/{repositoryName}']['get']['responses']['200'] = {'content': {'application/json': {}}}
 json_spec['paths']['/v1/repositories/alpine/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineProxyApiRepository'
@@ -780,12 +875,24 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+if '200' not in json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['responses']:
+    json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['responses']['200'] = {'content': {'application/json': {}}}
 json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineGroupApiRepository'
 }
 print('     Done')
 
+
+print('Add missing descriptions...')
+for path in json_spec['paths']:
+    for method in json_spec['paths'][path]:
+        if 'responses' in json_spec['paths'][path][method]:
+            for responseCode in json_spec['paths'][path][method]['responses']:
+                if 'description' not in json_spec['paths'][path][method]['responses'][responseCode]:
+                    json_spec['paths'][path][method]['responses'][responseCode]["description"] = ""
+
+print('     Done')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
