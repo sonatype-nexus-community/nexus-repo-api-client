@@ -690,9 +690,12 @@ else:
     # Resolved upstream - NXRM no longer emits the schema under the invalid, space-containing name.
     print('     Skipped - schema name already correct')
 
-# The converter can leave a stray, invalid sibling key (named after the inlined model) directly on
-# the referencing schema when the original model name contained invalid characters - strip it.
-json_spec['components']['schemas']['IqConnectionXo'].pop('LicensedSolution', None)
+# The converter can leave a stray, invalid sibling key (named after the inlined model, spelling/casing
+# not guaranteed) directly on the referencing schema when the original model name contained invalid
+# characters. IqConnectionXo only ever legitimately has 'type'/'properties'/'required' - strip anything else.
+for stray_key in [k for k in json_spec['components']['schemas']['IqConnectionXo'] if k not in ('type', 'properties', 'required')]:
+    print(f'     Stripping stray key "{stray_key}" from IqConnectionXo')
+    json_spec['components']['schemas']['IqConnectionXo'].pop(stray_key)
 
 json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
     '$ref'] = '#/components/schemas/LicensedSolution'
