@@ -37,6 +37,21 @@ def parse_version_from_server_header(header: str) -> str:
     return header.split('/')[1].split(' ')[0]
 
 
+def ensure_response(path: str, method: str, code: str, description: str) -> None:
+    """NXRM has, on occasion, dropped a response entirely from the generated Swagger doc.
+    Recreate it (matching the last known-good spec) before patching its content. The skeleton
+    includes an empty `application/json` schema so call sites that only patch a nested key
+    (e.g. `...['content']['application/json']['schema']['$ref'] = ...`) have something to patch."""
+    json_spec['paths'][path][method]['responses'].setdefault(code, {
+        'description': description,
+        'content': {
+            'application/json': {
+                'schema': {}
+            }
+        }
+    })
+
+
 json_spec_response_v2 = requests.get(f'{NXRM_SERVER_URL}{NXRM_SPEC_PATH}')
 NXRM_VERSION = parse_version_from_server_header(json_spec_response_v2.headers.get('Server', ''))
 json_spec_v2 = json_spec_response_v2.json()
@@ -132,6 +147,7 @@ with open(os.path.join(os.path.dirname(__file__), "snippets", "ApiPrivilegeReque
     json_spec['components']['schemas']['ApiPrivilegeRequest'] = json.load(o)
 
 json_spec['paths']['/v1/security/privileges']['get']['operationId'] = 'getAllPrivileges'
+ensure_response('/v1/security/privileges', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -142,6 +158,7 @@ json_spec['paths']['/v1/security/privileges']['get']['responses']['200']['conten
         }
     }
 }
+ensure_response('/v1/security/privileges/{privilegeName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/security/privileges/{privilegeName}']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -208,6 +225,11 @@ operations_to_fix = [
     {'path': '/v1/blobstores/s3', 'method': 'post', 'operation_id': 'CreateS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'get', 'operation_id': 'GetS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'put', 'operation_id': 'UpdateS3BlobStore'},
+    # `/v1/plan` and `/v1/plan/{planId}` reuse the same operationId for delete/put - disambiguate
+    # the bulk (no id) operations, matching their "all"/"execute" semantics from `summary`.
+    {'path': '/v1/plan', 'method': 'delete', 'operation_id': 'deleteAllPlans'},
+    {'path': '/v1/plan', 'method': 'put', 'operation_id': 'executeAllPlans'},
+    {'path': '/v1/plan/{planId}', 'method': 'put', 'operation_id': 'executePlan'},
 ]
 i = 0
 print('Overriding operation IDs...')
@@ -219,6 +241,7 @@ print(f'Overwrote {i} Operation IDs')
 
 # Add Response Schema /system/ldap/* PATHS
 print('Fixing /security/ldap/* response schemas...')
+ensure_response('/v1/security/ldap', 'get', '200', 'LDAP server list returned')
 json_spec['paths']['/v1/security/ldap']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -229,6 +252,7 @@ json_spec['paths']['/v1/security/ldap']['get']['responses']['200']['content'] = 
         }
     }
 }
+ensure_response('/v1/security/ldap/{name}', 'get', '200', 'LDAP server returned')
 json_spec['paths']['/v1/security/ldap/{name}']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -329,6 +353,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/pypi/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/pypi/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                           '/json')][
     'schema']['$ref'] = '#/components/schemas/PyPiProxyApiRepository'
@@ -339,6 +364,7 @@ paths_to_fix_writable_member = [
     '/v1/repositories/pypi/group/{repositoryName}'
 ]
 for p in paths_to_fix_writable_member:
+    ensure_response(p, 'get', '200', 'successful operation')
     json_spec['paths'][p]['get']['responses']['200']['content']['application/json']['schema'] = {
         '$ref': '#/components/schemas/SimpleApiGroupDeployRepository'
     }
@@ -373,6 +399,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/raw/group/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/raw/group/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawGroupApiRepository'
@@ -401,6 +428,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/raw/hosted/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/raw/hosted/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                           '/json')][
     'schema']['$ref'] = '#/components/schemas/RawHostedApiRepository'
@@ -433,6 +461,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/raw/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/raw/proxy/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                          '/json')][
     'schema']['$ref'] = '#/components/schemas/RawProxyApiRepository'
@@ -445,6 +474,7 @@ json_spec['components']['schemas']['CargoGroupApiRepository']['properties']['gro
 print('     Done')
 
 print('Correcting response schema for GET /v1/repositories/conan/group/{repositoryName}...')
+ensure_response('/v1/repositories/conan/group/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['responses']['200']['content'][('application'
                                                                                                            '/json')][
     'schema']['$ref'] = '#/components/schemas/SimpleApiGroupDeployRepository'
@@ -552,6 +582,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/conan/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/conan/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/ConanProxyApiRepository'
@@ -566,6 +597,8 @@ print('     Done')
 
 print('Inject response schema for POST /v1/iq/verify-connection and set OperationId')
 json_spec['paths']['/v1/iq/verify-connection']['post']['operationId'] = 'verifyIqConnection'
+ensure_response('/v1/iq/verify-connection', 'post', '200',
+                 'Connection verification complete, check response body for result')
 json_spec['paths']['/v1/iq/verify-connection']['post']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -576,6 +609,7 @@ json_spec['paths']['/v1/iq/verify-connection']['post']['responses']['200']['cont
 print('     Done')
 
 print('Inject response schema for GET /v1/repositories/terraform/proxy/{repositoryName}')
+ensure_response('/v1/repositories/terraform/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['responses']['200']['content'] = {
     'application/json': {
         'schema': {
@@ -586,6 +620,11 @@ json_spec['paths']['/v1/repositories/terraform/proxy/{repositoryName}']['get']['
 print('     Done')
 
 print('Complete type for `terraform.uploadType` for POST /v1/components')
+# NXRM has, on occasion, dropped the entire multipart `requestBody` for this operation from the
+# generated Swagger doc. Re-create it (as seen in NXRM 3.93) before patching `terraform.uploadType`.
+if 'requestBody' not in json_spec['paths']['/v1/components']['post']:
+    with open(os.path.join(os.path.dirname(__file__), "snippets", "ComponentsUploadRequestBody.json"), 'r') as o:
+        json_spec['paths']['/v1/components']['post']['requestBody'] = json.load(o)
 json_spec['paths']['/v1/components']['post']['requestBody']['content']['multipart/form-data']['schema']['properties'][
     'terraform.uploadType'] = {
     'description': 'terraform Upload Type',
@@ -622,6 +661,7 @@ json_spec['components']['schemas']['TerraformHostedRepositoryApiRequest']['prope
 print('     Done')
 
 print('Correct response schema for GET /v1/repositories/terraform/hosted/{repositoryName')
+ensure_response('/v1/repositories/terraform/hosted/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get']['responses']['200']['content'][
     'application/json'] = {
     'schema': {
@@ -631,6 +671,7 @@ json_spec['paths']['/v1/repositories/terraform/hosted/{repositoryName}']['get'][
 print('     Done')
 
 print('Correct response schema for GET /v1/repositories/swift/proxy/{repositoryName}')
+ensure_response('/v1/repositories/swift/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/swift/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json'] = {
     'schema': {
@@ -641,12 +682,18 @@ print('     Done')
 
 # Updates for NXRM 3.92.x
 print('Correct invalid schema name "Licensed Solution"...')
-json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
-del json_spec['components']['schemas']['Licensed Solution']
-
-json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
-    '$ref'] = '#/components/schemas/LicensedSolution'
-print('     Done')
+if 'Licensed Solution' in json_spec['components']['schemas']:
+    json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
+    del json_spec['components']['schemas']['Licensed Solution']
+    # Only repoint the ref when we actually performed the rename above - otherwise NXRM is already
+    # emitting a validly-named schema (e.g. `LicensedSolutionXO`) and the existing $ref is correct;
+    # forcibly overwriting it here would point at a component that no longer exists.
+    json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
+        '$ref'] = '#/components/schemas/LicensedSolution'
+    print('     Done')
+else:
+    # Resolved upstream - NXRM no longer emits the schema under the invalid, space-containing name.
+    print('     Skipped - schema name already correct')
 
 # Patch TerraformProxyApiRepository schema - now missing `terraform` item
 json_spec['components']['schemas']['TerraformProxyApiRepository']['properties']['terraform'] = {
@@ -676,6 +723,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/yum/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/yum/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/YumProxyApiRepository'
@@ -701,6 +749,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/yum/group/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/yum/group/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/YumGroupApiRepository'
@@ -726,6 +775,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/alpine/hosted/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/alpine/hosted/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineHostedApiRepository'
@@ -755,6 +805,7 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/alpine/proxy/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/alpine/proxy/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineProxyApiRepository'
@@ -780,11 +831,25 @@ json_spec['components']['schemas'].update({
         ]
     }
 })
+ensure_response('/v1/repositories/alpine/group/{repositoryName}', 'get', '200', 'successful operation')
 json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['responses']['200']['content'][
     'application/json']['schema'] = {
     '$ref': '#/components/schemas/AlpineGroupApiRepository'
 }
 print('     Done')
+
+# NXRM has, on occasion, dropped `description` from the `200` response of repository-format GET
+# endpoints across many/all formats (not just the ones patched by name above). OpenAPI Generator
+# requires it, so backfill it wherever it's missing rather than special-casing every format.
+print('Backfilling missing `200` response descriptions for /v1/repositories/* GET endpoints...')
+i = 0
+for path in json_spec['paths']:
+    if str(path).startswith('/v1/repositories/'):
+        get_op = json_spec['paths'][path].get('get')
+        if get_op and '200' in get_op.get('responses', {}) and 'description' not in get_op['responses']['200']:
+            get_op['responses']['200']['description'] = 'successful operation'
+            i = i + 1
+print(f'   Fixed {i} missing response descriptions')
 
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:

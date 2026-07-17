@@ -1,0 +1,352 @@
+{
+    "content": {
+        "multipart/form-data": {
+            "schema": {
+                "properties": {
+                    "alpine.asset": {
+                        "description": "alpine Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "alpine.repository": {
+                        "description": "alpine Repository",
+                        "type": "string"
+                    },
+                    "alpine.tag": {
+                        "description": "alpine Tag",
+                        "type": "string"
+                    },
+                    "alpine.version": {
+                        "description": "alpine Alpine Version",
+                        "type": "string"
+                    },
+                    "ansiblegalaxy.asset": {
+                        "description": "ansiblegalaxy Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "ansiblegalaxy.name": {
+                        "description": "ansiblegalaxy Name",
+                        "type": "string"
+                    },
+                    "ansiblegalaxy.namespace": {
+                        "description": "ansiblegalaxy Namespace",
+                        "type": "string"
+                    },
+                    "ansiblegalaxy.tag": {
+                        "description": "ansiblegalaxy Tag",
+                        "type": "string"
+                    },
+                    "ansiblegalaxy.version": {
+                        "description": "ansiblegalaxy Version",
+                        "type": "string"
+                    },
+                    "apt.asset": {
+                        "description": "apt Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "apt.tag": {
+                        "description": "apt Tag",
+                        "type": "string"
+                    },
+                    "conda.arch": {
+                        "description": "conda Architecture",
+                        "type": "string"
+                    },
+                    "conda.asset": {
+                        "description": "conda Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "conda.build": {
+                        "description": "conda Build String",
+                        "type": "string"
+                    },
+                    "conda.filename": {
+                        "description": "conda Filename",
+                        "type": "string"
+                    },
+                    "conda.tag": {
+                        "description": "conda Tag",
+                        "type": "string"
+                    },
+                    "conda.version": {
+                        "description": "conda Version",
+                        "type": "string"
+                    },
+                    "go.asset": {
+                        "description": "go Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "go.tag": {
+                        "description": "go Tag",
+                        "type": "string"
+                    },
+                    "go.version": {
+                        "description": "go Version",
+                        "type": "string"
+                    },
+                    "helm.asset": {
+                        "description": "helm Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "helm.tag": {
+                        "description": "helm Tag",
+                        "type": "string"
+                    },
+                    "maven2.artifactId": {
+                        "description": "maven2 Artifact ID",
+                        "type": "string"
+                    },
+                    "maven2.asset1": {
+                        "description": "maven2 Asset 1",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "maven2.asset1.classifier": {
+                        "description": "maven2 Asset 1 Classifier",
+                        "type": "string"
+                    },
+                    "maven2.asset1.extension": {
+                        "description": "maven2 Asset 1 Extension",
+                        "type": "string"
+                    },
+                    "maven2.asset2": {
+                        "description": "maven2 Asset 2",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "maven2.asset2.classifier": {
+                        "description": "maven2 Asset 2 Classifier",
+                        "type": "string"
+                    },
+                    "maven2.asset2.extension": {
+                        "description": "maven2 Asset 2 Extension",
+                        "type": "string"
+                    },
+                    "maven2.asset3": {
+                        "description": "maven2 Asset 3",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "maven2.asset3.classifier": {
+                        "description": "maven2 Asset 3 Classifier",
+                        "type": "string"
+                    },
+                    "maven2.asset3.extension": {
+                        "description": "maven2 Asset 3 Extension",
+                        "type": "string"
+                    },
+                    "maven2.generate-pom": {
+                        "description": "maven2 Generate a POM file with these coordinates",
+                        "type": "boolean"
+                    },
+                    "maven2.groupId": {
+                        "description": "maven2 Group ID",
+                        "type": "string"
+                    },
+                    "maven2.packaging": {
+                        "description": "maven2 Packaging",
+                        "type": "string"
+                    },
+                    "maven2.tag": {
+                        "description": "maven2 Tag",
+                        "type": "string"
+                    },
+                    "maven2.version": {
+                        "description": "maven2 Version",
+                        "type": "string"
+                    },
+                    "npm.asset": {
+                        "description": "npm Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "npm.tag": {
+                        "description": "npm Tag",
+                        "type": "string"
+                    },
+                    "nuget.asset": {
+                        "description": "nuget Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "nuget.tag": {
+                        "description": "nuget Tag",
+                        "type": "string"
+                    },
+                    "pub.asset": {
+                        "description": "pub Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "pub.name": {
+                        "description": "pub Package Name",
+                        "type": "string"
+                    },
+                    "pub.tag": {
+                        "description": "pub Tag",
+                        "type": "string"
+                    },
+                    "pub.version": {
+                        "description": "pub Version",
+                        "type": "string"
+                    },
+                    "pypi.asset": {
+                        "description": "pypi Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "pypi.tag": {
+                        "description": "pypi Tag",
+                        "type": "string"
+                    },
+                    "r.asset": {
+                        "description": "r Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "r.asset.pathId": {
+                        "description": "r Asset  Package Path",
+                        "type": "string"
+                    },
+                    "r.tag": {
+                        "description": "r Tag",
+                        "type": "string"
+                    },
+                    "raw.asset1": {
+                        "description": "raw Asset 1",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "raw.asset1.filename": {
+                        "description": "raw Asset 1 Filename",
+                        "type": "string"
+                    },
+                    "raw.asset2": {
+                        "description": "raw Asset 2",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "raw.asset2.filename": {
+                        "description": "raw Asset 2 Filename",
+                        "type": "string"
+                    },
+                    "raw.asset3": {
+                        "description": "raw Asset 3",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "raw.asset3.filename": {
+                        "description": "raw Asset 3 Filename",
+                        "type": "string"
+                    },
+                    "raw.directory": {
+                        "description": "raw Directory",
+                        "type": "string"
+                    },
+                    "raw.tag": {
+                        "description": "raw Tag",
+                        "type": "string"
+                    },
+                    "rubygems.asset": {
+                        "description": "rubygems Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "rubygems.tag": {
+                        "description": "rubygems Tag",
+                        "type": "string"
+                    },
+                    "swift.asset": {
+                        "description": "swift Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "swift.name": {
+                        "description": "swift Name",
+                        "type": "string"
+                    },
+                    "swift.scope": {
+                        "description": "swift Scope",
+                        "type": "string"
+                    },
+                    "swift.tag": {
+                        "description": "swift Tag",
+                        "type": "string"
+                    },
+                    "swift.version": {
+                        "description": "swift Version",
+                        "type": "string"
+                    },
+                    "terraform.architecture": {
+                        "description": "terraform Architecture",
+                        "type": "string"
+                    },
+                    "terraform.asset": {
+                        "description": "terraform Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "terraform.name": {
+                        "description": "terraform Module Name",
+                        "type": "string"
+                    },
+                    "terraform.namespace": {
+                        "description": "terraform Namespace",
+                        "type": "string"
+                    },
+                    "terraform.os": {
+                        "description": "terraform Operating System",
+                        "type": "string"
+                    },
+                    "terraform.provider": {
+                        "description": "terraform Provider",
+                        "type": "string"
+                    },
+                    "terraform.tag": {
+                        "description": "terraform Tag",
+                        "type": "string"
+                    },
+                    "terraform.type": {
+                        "description": "terraform Provider Type",
+                        "type": "string"
+                    },
+                    "terraform.uploadType": {
+                        "description": "terraform Upload Type",
+                        "enum": [
+                            "module",
+                            "provider"
+                        ],
+                        "type": "string"
+                    },
+                    "terraform.version": {
+                        "description": "terraform Version",
+                        "type": "string"
+                    },
+                    "yum.asset": {
+                        "description": "yum Asset ",
+                        "format": "binary",
+                        "type": "string"
+                    },
+                    "yum.asset.filename": {
+                        "description": "yum Asset  Filename",
+                        "type": "string"
+                    },
+                    "yum.directory": {
+                        "description": "yum Directory",
+                        "type": "string"
+                    },
+                    "yum.tag": {
+                        "description": "yum Tag",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
