@@ -3883,7 +3883,7 @@ components:
         licensedSolutions:
           description: List of licensed solutions available in the connected IQ Server
           items:
-            $ref: '#/components/schemas/LicensedSolution'
+            $ref: '#/components/schemas/LicensedSolutionXO'
           type: array
         password:
           description: Credentials for the Sonatype Repository Firewall User
