@@ -685,20 +685,15 @@ print('Correct invalid schema name "Licensed Solution"...')
 if 'Licensed Solution' in json_spec['components']['schemas']:
     json_spec['components']['schemas']['LicensedSolution'] = json_spec['components']['schemas']['Licensed Solution']
     del json_spec['components']['schemas']['Licensed Solution']
+    # Only repoint the ref when we actually performed the rename above - otherwise NXRM is already
+    # emitting a validly-named schema (e.g. `LicensedSolutionXO`) and the existing $ref is correct;
+    # forcibly overwriting it here would point at a component that no longer exists.
+    json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
+        '$ref'] = '#/components/schemas/LicensedSolution'
     print('     Done')
 else:
     # Resolved upstream - NXRM no longer emits the schema under the invalid, space-containing name.
     print('     Skipped - schema name already correct')
-
-# The converter can leave a stray, invalid sibling key (named after the inlined model, spelling/casing
-# not guaranteed) directly on the referencing schema when the original model name contained invalid
-# characters. IqConnectionXo only ever legitimately has 'type'/'properties'/'required' - strip anything else.
-for stray_key in [k for k in json_spec['components']['schemas']['IqConnectionXo'] if k not in ('type', 'properties', 'required')]:
-    print(f'     Stripping stray key "{stray_key}" from IqConnectionXo')
-    json_spec['components']['schemas']['IqConnectionXo'].pop(stray_key)
-
-json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
-    '$ref'] = '#/components/schemas/LicensedSolution'
 
 # Patch TerraformProxyApiRepository schema - now missing `terraform` item
 json_spec['components']['schemas']['TerraformProxyApiRepository']['properties']['terraform'] = {
