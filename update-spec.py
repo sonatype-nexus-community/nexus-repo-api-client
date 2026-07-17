@@ -225,6 +225,11 @@ operations_to_fix = [
     {'path': '/v1/blobstores/s3', 'method': 'post', 'operation_id': 'CreateS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'get', 'operation_id': 'GetS3BlobStore'},
     {'path': '/v1/blobstores/s3/{name}', 'method': 'put', 'operation_id': 'UpdateS3BlobStore'},
+    # `/v1/plan` and `/v1/plan/{planId}` reuse the same operationId for delete/put - disambiguate
+    # the bulk (no id) operations, matching their "all"/"execute" semantics from `summary`.
+    {'path': '/v1/plan', 'method': 'delete', 'operation_id': 'deleteAllPlans'},
+    {'path': '/v1/plan', 'method': 'put', 'operation_id': 'executeAllPlans'},
+    {'path': '/v1/plan/{planId}', 'method': 'put', 'operation_id': 'executePlan'},
 ]
 i = 0
 print('Overriding operation IDs...')
@@ -685,6 +690,10 @@ else:
     # Resolved upstream - NXRM no longer emits the schema under the invalid, space-containing name.
     print('     Skipped - schema name already correct')
 
+# The converter can leave a stray, invalid sibling key (named after the inlined model) directly on
+# the referencing schema when the original model name contained invalid characters - strip it.
+json_spec['components']['schemas']['IqConnectionXo'].pop('LicensedSolution', None)
+
 json_spec['components']['schemas']['IqConnectionXo']['properties']['licensedSolutions']['items'][
     '$ref'] = '#/components/schemas/LicensedSolution'
 
@@ -830,6 +839,19 @@ json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['res
     '$ref': '#/components/schemas/AlpineGroupApiRepository'
 }
 print('     Done')
+
+# NXRM has, on occasion, dropped `description` from the `200` response of repository-format GET
+# endpoints across many/all formats (not just the ones patched by name above). OpenAPI Generator
+# requires it, so backfill it wherever it's missing rather than special-casing every format.
+print('Backfilling missing `200` response descriptions for /v1/repositories/* GET endpoints...')
+i = 0
+for path in json_spec['paths']:
+    if str(path).startswith('/v1/repositories/'):
+        get_op = json_spec['paths'][path].get('get')
+        if get_op and '200' in get_op.get('responses', {}) and 'description' not in get_op['responses']['200']:
+            get_op['responses']['200']['description'] = 'successful operation'
+            i = i + 1
+print(f'   Fixed {i} missing response descriptions')
 
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:

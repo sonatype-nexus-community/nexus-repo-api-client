@@ -9591,7 +9591,7 @@ paths:
       - Monthly Metrics
   /v1/plan:
     delete:
-      operationId: deletePlan
+      operationId: deleteAllPlans
       responses:
         '204':
           description: Reconciliation plans deleted
@@ -9702,7 +9702,7 @@ paths:
       tags:
       - Reconcile Plan
     put:
-      operationId: updatePlan
+      operationId: executeAllPlans
       responses:
         '204':
           description: Reconciliation plans executed
@@ -9825,7 +9825,7 @@ paths:
       tags:
       - Reconcile Plan
     put:
-      operationId: updatePlan
+      operationId: executePlan
       parameters:
       - description: Id of the plan to execute
         explode: false
@@ -10163,6 +10163,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnsibleGalaxyGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10240,6 +10241,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnsibleGalaxyHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10318,6 +10320,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnsibleGalaxyProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10536,6 +10539,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CargoGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10673,6 +10677,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CargoProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11100,6 +11105,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11310,6 +11316,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DockerGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11380,6 +11387,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DockerHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11450,6 +11458,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DockerProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11806,6 +11815,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HelmGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12292,6 +12302,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApiGroupDeployRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12429,6 +12440,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NpmProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12635,6 +12647,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NugetProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13332,6 +13345,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PyPiProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14047,6 +14061,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwiftGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14184,6 +14199,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwiftProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14252,6 +14268,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TerraformGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14320,6 +14337,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TerraformHostedRepositoryApiRequest'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14393,6 +14411,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TerraformProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14540,6 +14559,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/YumHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
