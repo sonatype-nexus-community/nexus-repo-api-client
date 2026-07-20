@@ -1148,6 +1148,52 @@ components:
           - FAILED
           type: string
       type: object
+    AptHostedApiRepository:
+      properties:
+        apt:
+          $ref: '#/components/schemas/AptHostedRepositoriesAttributes'
+        aptSigning:
+          $ref: '#/components/schemas/AptSigningRepositoriesAttributes'
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          description: Component format held in this repository
+          example: apt
+          type: string
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          readOnly: true
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          readOnly: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/apt-example
+          readOnly: true
+          type: string
+      required:
+      - apt
+      - aptSigning
+      - online
+      - storage
+      type: object
     AptHostedRepositoriesAttributes:
       properties:
         distribution:
@@ -1187,6 +1233,60 @@ components:
       - aptSigning
       - name
       - online
+      - storage
+      type: object
+    AptProxyApiRepository:
+      properties:
+        apt:
+          $ref: '#/components/schemas/AptProxyRepositoriesAttributes'
+        aptSigning:
+          $ref: '#/components/schemas/AptSigningRepositoriesAttributes'
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: apt
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/apt-example
+          type: string
+      required:
+      - apt
+      - httpClient
+      - negativeCache
+      - online
+      - proxy
       - storage
       type: object
     AptProxyRepositoriesAttributes:
@@ -4085,6 +4185,46 @@ components:
       - online
       - storage
       type: object
+    MavenHostedApiRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          description: Component format held in this repository
+          example: maven2
+          type: string
+        maven:
+          $ref: '#/components/schemas/MavenAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/maven2-example
+          type: string
+      required:
+      - maven
+      - online
+      - storage
+      type: object
     MavenHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4109,6 +4249,58 @@ components:
       - maven
       - name
       - online
+      - storage
+      type: object
+    MavenProxyApiRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: maven2
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        maven:
+          $ref: '#/components/schemas/MavenAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/maven2-example
+          type: string
+      required:
+      - httpClient
+      - maven
+      - negativeCache
+      - online
+      - proxy
       - storage
       type: object
     MavenProxyRepositoryApiRequest:
@@ -6204,6 +6396,92 @@ components:
       - storage
       - type
       type: object
+    SimpleApiHostedRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        format:
+          description: Component format held in this repository
+          example: simpleapihostedrepository
+          type: string
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: hosted
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapihostedrepository-example
+          type: string
+      required:
+      - online
+      - storage
+      type: object
+    SimpleApiProxyRepository:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        format:
+          description: Component format held in this repository
+          example: simpleapiproxyrepository
+          type: string
+        httpClient:
+          $ref: '#/components/schemas/HttpClientAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        negativeCache:
+          $ref: '#/components/schemas/NegativeCacheAttributes'
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        proxy:
+          $ref: '#/components/schemas/ProxyAttributes'
+        replication:
+          $ref: '#/components/schemas/ReplicationAttributes'
+        routingRuleName:
+          description: The name of the routing rule assigned to this repository
+          type: string
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+        type:
+          description: Controls if deployments of and updates to artifacts are allowed
+          enum:
+          - hosted
+          - proxy
+          - group
+          example: proxy
+          type: string
+        url:
+          description: URL to the repository
+          example: http://localhost:8081/repository/simpleapiproxyrepository-example
+          type: string
+      required:
+      - httpClient
+      - negativeCache
+      - online
+      - proxy
+      - storage
+      type: object
     SimpleApiResponse:
       properties:
         data:
@@ -7500,6 +7778,14 @@ paths:
     get:
       operationId: listStatusCheckCluster
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SystemCheckResultsApiDTO'
+                type: array
+          description: successful operation
         '403':
           description: Insufficient permissions to retrieve system status checks
       summary: Health check endpoint that returns the results of the system status
@@ -7785,6 +8071,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageAssetXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to list assets
         '422':
@@ -7828,6 +8120,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to get asset
         '404':
@@ -7862,14 +8160,14 @@ paths:
     get:
       operationId: listBlobstores
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/GenericBlobStoreApiResponse'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the blob stores
       tags:
       - Blob store
@@ -8328,12 +8626,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlobStoreQuotaResultXO'
-          description: default response
+          description: successful operation
       summary: Get quota status for a given blob store
       tags:
       - Blob store
@@ -8341,14 +8639,14 @@ paths:
     get:
       operationId: listCapabilities
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/CapabilityDTO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the active capabilities
       tags:
       - Capabilities
@@ -8360,12 +8658,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CapabilityDTO'
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapabilityDTO'
-          description: default response
+          description: successful operation
       summary: Create a capability
       tags:
       - Capabilities
@@ -8373,14 +8671,14 @@ paths:
     get:
       operationId: listCapabilitiesTypes
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/CapabilityTypeDTO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List all capability types available and exposed in the system
       tags:
       - Capabilities
@@ -8505,6 +8803,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageComponentXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to list components
         '422':
@@ -8835,6 +9139,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to get component
         '404':
@@ -9215,6 +9525,12 @@ paths:
     get:
       operationId: listEmail
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailConfiguration'
+          description: successful operation
         '403':
           description: Insufficient permissions to retrieve the email configuration
       summary: Retrieve the current email configuration
@@ -9270,14 +9586,14 @@ paths:
     get:
       operationId: listFormatsUploadSpecs
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/UploadDefinitionXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: Get upload field requirements for each supported format
       tags:
       - Formats
@@ -9294,12 +9610,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadDefinitionXO'
-          description: default response
+          description: successful operation
       summary: Get upload field requirements for the desired format
       tags:
       - Formats
@@ -9529,12 +9845,12 @@ paths:
     get:
       operationId: listLifecyclePhase
       responses:
-        default:
+        '200':
           content:
             text/plain:
               schema:
                 type: string
-          description: default response
+          description: successful operation
       summary: Get current lifecycle phase
       tags:
       - Lifecycle
@@ -9585,6 +9901,14 @@ paths:
       operationId: listMonthlyMetrics
       responses:
         '200':
+          content:
+            application/json:
+              example:
+              - componentCount: 0
+                metricDate: '2025-03-01T00:00:00Z'
+                percentageChangeComponent: N/A
+                percentageChangeRequest: N/A
+                requestCount: 0
           description: Successful response
       summary: Get the last 12 months of metrics.
       tags:
@@ -9880,14 +10204,14 @@ paths:
     get:
       operationId: getAllRepositories
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/RepositoryXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List repositories
       tags:
       - Repository Management
@@ -10390,12 +10714,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/AptHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10463,12 +10787,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/AptProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10603,12 +10927,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10743,12 +11067,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10812,12 +11136,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10950,12 +11274,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11171,12 +11495,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11242,12 +11566,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11524,12 +11848,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11595,12 +11919,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11668,12 +11992,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11739,12 +12063,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11881,12 +12205,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11952,12 +12276,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12021,12 +12345,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12090,12 +12414,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12159,12 +12483,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/MavenHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12228,12 +12552,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/MavenProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12366,12 +12690,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12504,12 +12828,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12573,12 +12897,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12926,12 +13250,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12995,12 +13319,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13064,12 +13388,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13133,12 +13457,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13271,12 +13595,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13411,12 +13735,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13482,12 +13806,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13553,12 +13877,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13849,12 +14173,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiGroupRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13918,12 +14242,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13987,12 +14311,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiProxyRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14125,12 +14449,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SimpleApiHostedRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14703,6 +15027,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryXO'
+          description: successful operation
         '401':
           description: Authentication required
         '403':
@@ -14915,6 +15245,14 @@ paths:
     get:
       operationId: listRoutingRules
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoutingRuleXO'
+                type: array
+          description: successful operation
         '403':
           description: Insufficient permissions to read routing rules
       summary: List routing rules
@@ -14974,6 +15312,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutingRuleXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to read routing rules
         '404':
@@ -15016,14 +15360,14 @@ paths:
     get:
       operationId: listScript
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ScriptXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List all stored scripts
       tags:
       - Script
@@ -15073,6 +15417,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptXO'
+          description: successful operation
         '404':
           description: No script with the specified name
       summary: Read stored script by name
@@ -15124,6 +15474,12 @@ paths:
             schema:
               type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptResultXO'
+          description: successful operation
         '404':
           description: No script with the specified name
         '500':
@@ -15790,12 +16146,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageComponentXO'
-          description: default response
+          description: successful operation
       summary: Search components
       tags:
       - Search
@@ -16457,12 +16813,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageAssetXO'
-          description: default response
+          description: successful operation
       summary: Search assets
       tags:
       - Search
@@ -17196,6 +17552,12 @@ paths:
     get:
       operationId: listSecurityAnonymous
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnonymousAccessSettingsXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to update settings
       summary: Get Anonymous Access settings
@@ -17209,6 +17571,12 @@ paths:
             schema:
               $ref: '#/components/schemas/AnonymousAccessSettingsXO'
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnonymousAccessSettingsXO'
+          description: successful operation
         '403':
           description: Insufficient permissions to update settings
       summary: Update Anonymous Access settings
@@ -17676,14 +18044,14 @@ paths:
     get:
       operationId: listSecurityLdapTemplates
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/LdapSchemaTemplateXo'
                 type: array
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/verify-connection:
@@ -17744,14 +18112,14 @@ paths:
               $ref: '#/components/schemas/CreateLdapServerXo'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/LdapTestUserMappingXo'
                 type: array
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/{name}:
@@ -18221,14 +18589,14 @@ paths:
     get:
       operationId: listSecurityRealmsActive
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   type: string
                 type: array
-          description: default response
+          description: successful operation
       summary: List the active realm IDs in order
       tags:
       - 'Security management: realms'
@@ -18254,14 +18622,14 @@ paths:
     get:
       operationId: listSecurityRealmsAvailable
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/RealmApiXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the available realms
       tags:
       - 'Security management: realms'
@@ -18279,6 +18647,14 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoleXOResponse'
+                type: array
+          description: successful operation
         '400':
           description: The specified source does not exist
         '403':
@@ -18296,6 +18672,12 @@ paths:
         description: A role configuration
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleXOResponse'
+          description: successful operation
         '403':
           description: Insufficient permissions to create role
       summary: Create role
@@ -18348,6 +18730,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleXOResponse'
+          description: successful operation
         '400':
           description: The specified source does not exist
         '403':
@@ -18621,6 +19009,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiCertificate'
+          description: successful operation
         '400':
           description: A certificate could not be retrieved, see the message for details.
         '403':
@@ -18632,6 +19026,14 @@ paths:
     get:
       operationId: listSecuritySslTruststore
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiCertificate'
+                type: array
+          description: successful operation
         '403':
           description: Insufficient permissions to list certificates in the trust
             store.
@@ -18686,6 +19088,16 @@ paths:
       operationId: listSecuritySsrfProtection
       responses:
         '200':
+          content:
+            application/json:
+              example:
+                allowedDomains:
+                - internal.corp.com
+                - registry.local
+                allowedIPs:
+                - 10.0.0.50
+                - 192.168.1.100
+                enabled: true
           description: SSRF protection settings returned
         '401':
           description: Authentication required
@@ -18718,6 +19130,14 @@ paths:
     get:
       operationId: listSecurityUserSources
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiUserSource'
+                type: array
+          description: successful operation
         '403':
           description: The user does not have permission to perform the operation.
       summary: Retrieve a list of the available user sources.
@@ -18736,12 +19156,12 @@ paths:
     get:
       operationId: listSecurityUserTokens
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokensApiModel'
-          description: default response
+          description: successful operation
       summary: Show if the user token capability is enabled or not
       tags:
       - 'Security management: user tokens'
@@ -18754,12 +19174,12 @@ paths:
               $ref: '#/components/schemas/UserTokensApiModel'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokensApiModel'
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: user tokens'
   /v1/security/user-tokens/tokens:
@@ -18869,6 +19289,14 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiUser'
+                type: array
+          description: successful operation
         '400':
           description: Password was not supplied in the body of the request
         '403':
@@ -18887,6 +19315,12 @@ paths:
         description: A representation of the user to create.
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiUser'
+          description: successful operation
         '400':
           description: Password was not supplied in the body of the request
         '403':
@@ -20410,6 +20844,12 @@ paths:
       operationId: listStatusCheck
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  $ref: '#/components/schemas/Result'
+                type: object
           description: The system status check results
       summary: Health check endpoint that returns the results of the system status
         checks
@@ -20464,6 +20904,15 @@ paths:
       operationId: listSystemEula
       responses:
         '200':
+          content:
+            application/json:
+              example:
+                accepted: false
+                disclaimer: "Use of Sonatype Nexus Repository - Community Edition\
+                  \ is governed by the End User License Agreement at https://links.sonatype.com/products/nxrm/ce-eula.\
+                  \ By returning the value from \u2018accepted:false\u2019 to \u2018\
+                  accepted:true\u2019, you acknowledge that you have read and agree\
+                  \ to the End User License Agreement at https://links.sonatype.com/products/nxrm/ce-eula."
           description: Successful response
       summary: Get the current Community Eula status.
       tags:
@@ -20497,12 +20946,12 @@ paths:
     get:
       operationId: listSystemLicense
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiLicenseDetailsXO'
-          description: default response
+          description: successful operation
       summary: Get the current license status.
       tags:
       - Product licensing
@@ -20516,12 +20965,12 @@ paths:
               type: object
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiLicenseDetailsXO'
-          description: default response
+          description: successful operation
       summary: Upload a new license file.
       tags:
       - Product licensing
@@ -20538,6 +20987,12 @@ paths:
     get:
       operationId: listSystemNode
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInformation'
+          description: successful operation
         '403':
           description: Insufficient permissions to update settings
       summary: Get information about this node
@@ -20557,12 +21012,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTagXO'
-          description: default response
+          description: successful operation
       summary: List tags
       tags:
       - Tags
@@ -21876,6 +22331,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagXO'
+          description: successful operation
         '404':
           description: Tag not found
       summary: Get a tag
@@ -21898,6 +22359,12 @@ paths:
               $ref: '#/components/schemas/BaseTagXO'
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagXO'
+          description: successful operation
         '400':
           description: Bad request. Check tag attributes. The attributes is a JSON
             document which cannot exceed 20k
@@ -21919,12 +22386,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTaskXO'
-          description: default response
+          description: successful operation
       summary: List tasks
       tags:
       - Tasks
@@ -21950,14 +22417,14 @@ paths:
     get:
       operationId: listTasksTemplates
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/TaskTemplateXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List tasks of template tasks. This is the base to create new tasks
       tags:
       - Tasks
@@ -21973,12 +22440,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskTemplateXO'
-          description: default response
+          description: successful operation
       summary: Get task template by type. This is the base to create new tasks
       tags:
       - Tasks
@@ -22013,6 +22480,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskXO'
+          description: successful operation
         '404':
           description: Task not found
       summary: Get a single task by id
@@ -22141,6 +22614,14 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              example:
+                data:
+                - date: '2026-01-18'
+                  value: 1234
+                metric: requests
+                period: daily
           description: Usage history retrieved successfully
         '400':
           description: Invalid metric or period specified

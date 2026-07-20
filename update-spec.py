@@ -851,6 +851,348 @@ for path in json_spec['paths']:
             i = i + 1
 print(f'   Fixed {i} missing response descriptions')
 
+# Correcting response content dropped from several `200` responses (description was retained,
+# but `content` was not) - restoring the content/examples last seen in 3.93.2.
+print('Correcting missing `200` response content...')
+json_spec['paths']['/v1/status/check']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            'type': 'object',
+            'additionalProperties': {
+                '$ref': '#/components/schemas/Result'
+            }
+        }
+    }
+}
+json_spec['paths']['/v1/system/eula']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'example': {
+            'accepted': False,
+            'disclaimer': 'Use of Sonatype Nexus Repository - Community Edition is governed by the End '
+                          'User License Agreement at https://links.sonatype.com/products/nxrm/ce-eula. '
+                          'By returning the value from ‘accepted:false’ to ‘accepted:true’, '
+                          'you acknowledge that you have read and agree to the End User License Agreement '
+                          'at https://links.sonatype.com/products/nxrm/ce-eula.'
+        }
+    }
+}
+json_spec['paths']['/v1/security/ssrf-protection']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'example': {
+            'enabled': True,
+            'allowedDomains': ['internal.corp.com', 'registry.local'],
+            'allowedIPs': ['10.0.0.50', '192.168.1.100']
+        }
+    }
+}
+json_spec['paths']['/v1/monthly-metrics']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'example': [
+            {
+                'metricDate': '2025-03-01T00:00:00Z',
+                'requestCount': 0,
+                'componentCount': 0,
+                'percentageChangeRequest': 'N/A',
+                'percentageChangeComponent': 'N/A'
+            }
+        ]
+    }
+}
+json_spec['paths']['/v1/usage-history']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'example': {
+            'metric': 'requests',
+            'period': 'daily',
+            'data': [
+                {'date': '2026-01-18', 'value': 1234}
+            ]
+        }
+    }
+}
+print('     Done')
+
+# Correcting several responses that were relabeled from `200` to `default`. The schema/content
+# is otherwise unchanged - move it back under `200` with its original description.
+print('Correcting responses relabeled from `200` to `default`...')
+paths_relabel_default_to_200 = [
+    ('/v1/repositories', 'get'),
+    ('/v1/search', 'get'),
+    ('/v1/search/assets', 'get'),
+    ('/v1/tasks', 'get'),
+    ('/v1/tasks/templates', 'get'),
+    ('/v1/tasks/templates/{typeId}', 'get'),
+    ('/v1/capabilities', 'get'),
+    ('/v1/capabilities', 'post'),
+    ('/v1/capabilities/types', 'get'),
+    ('/v1/blobstores', 'get'),
+    ('/v1/blobstores/{name}/quota-status', 'get'),
+    ('/v1/security/realms/active', 'get'),
+    ('/v1/security/realms/available', 'get'),
+    ('/v1/security/ldap/templates', 'get'),
+    ('/v1/security/ldap/verify-user-mapping', 'post'),
+    ('/v1/security/user-tokens', 'get'),
+    ('/v1/security/user-tokens', 'put'),
+    ('/v1/script', 'get'),
+    ('/v1/system/license', 'get'),
+    ('/v1/system/license', 'post'),
+    ('/v1/tags', 'get'),
+    ('/v1/formats/upload-specs', 'get'),
+    ('/v1/formats/{format}/upload-specs', 'get'),
+    ('/v1/lifecycle/phase', 'get'),
+]
+i = 0
+for p, m in paths_relabel_default_to_200:
+    responses = json_spec['paths'][p][m]['responses']
+    default_response = responses.pop('default', None)
+    if default_response is not None:
+        default_response['description'] = 'successful operation'
+        responses['200'] = default_response
+        i = i + 1
+print(f'   Relabeled {i} responses')
+
+# Correcting several `200` response objects that were dropped entirely (only error responses
+# remain) - recreate them, matching the last known-good description/content from 3.93.2.
+print('Correcting missing `200` responses...')
+paths_missing_200: list[dict] = [
+    {'path': '/v1/assets', 'method': 'get', 'schema': {'$ref': '#/components/schemas/PageAssetXO'}},
+    {'path': '/v1/assets/{id}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/AssetXO'}},
+    {'path': '/v1/components', 'method': 'get', 'schema': {'$ref': '#/components/schemas/PageComponentXO'}},
+    {'path': '/v1/components/{id}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/ComponentXO'}},
+    {'path': '/v1/email', 'method': 'get', 'schema': {'$ref': '#/components/schemas/ApiEmailConfiguration'}},
+    {'path': '/v1/repositories/{repositoryName}', 'method': 'get',
+     'schema': {'$ref': '#/components/schemas/RepositoryXO'}},
+    {'path': '/v1/routing-rules', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/RoutingRuleXO'}}},
+    {'path': '/v1/routing-rules/{name}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/RoutingRuleXO'}},
+    {'path': '/v1/script/{name}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/ScriptXO'}},
+    {'path': '/v1/script/{name}/run', 'method': 'post', 'schema': {'$ref': '#/components/schemas/ScriptResultXO'}},
+    {'path': '/v1/security/anonymous', 'method': 'get',
+     'schema': {'$ref': '#/components/schemas/AnonymousAccessSettingsXO'}},
+    {'path': '/v1/security/anonymous', 'method': 'put',
+     'schema': {'$ref': '#/components/schemas/AnonymousAccessSettingsXO'}},
+    {'path': '/v1/security/roles', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/RoleXOResponse'}}},
+    {'path': '/v1/security/roles', 'method': 'post', 'schema': {'$ref': '#/components/schemas/RoleXOResponse'}},
+    {'path': '/v1/security/roles/{id}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/RoleXOResponse'}},
+    {'path': '/v1/security/ssl', 'method': 'get', 'schema': {'$ref': '#/components/schemas/ApiCertificate'}},
+    {'path': '/v1/security/ssl/truststore', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/ApiCertificate'}}},
+    {'path': '/v1/security/user-sources', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/ApiUserSource'}}},
+    {'path': '/v1/security/users', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/ApiUser'}}},
+    {'path': '/v1/security/users', 'method': 'post', 'schema': {'$ref': '#/components/schemas/ApiUser'}},
+    {'path': '/v1/system/node', 'method': 'get', 'schema': {'$ref': '#/components/schemas/NodeInformation'}},
+    {'path': '/v1/tags/{name}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/TagXO'}},
+    {'path': '/v1/tags/{name}', 'method': 'put', 'schema': {'$ref': '#/components/schemas/TagXO'}},
+    {'path': '/v1/tasks/{id}', 'method': 'get', 'schema': {'$ref': '#/components/schemas/TaskXO'}},
+    {'path': '/beta/status/check/cluster', 'method': 'get',
+     'schema': {'type': 'array', 'items': {'$ref': '#/components/schemas/SystemCheckResultsApiDTO'}}},
+]
+for entry in paths_missing_200:
+    ensure_response(entry['path'], entry['method'], '200', 'successful operation')
+    json_spec['paths'][entry['path']][entry['method']]['responses']['200']['content'] = {
+        'application/json': {
+            'schema': entry['schema']
+        }
+    }
+print(f'   Restored {len(paths_missing_200)} `200` responses')
+
+# Correcting several repository-format polymorphic GET endpoints whose `200` response schema
+# was replaced by the generic `AbstractApiRepository` under a relabeled `default` response. Some
+# of these formats reuse a schema that still exists (`SimpleApiGroupRepository`); others reuse a
+# schema that was deleted from `components.schemas` entirely - recreate those verbatim from
+# 3.93.2 before repointing the ref.
+# Note: `/v1/repositories/helm/group/{repositoryName}` is deliberately excluded here - it already
+# has its own valid concrete schema (`HelmGroupApiRepository`) under `200`.
+print('Correcting repository schemas under `200`...')
+json_spec['components']['schemas'].update({
+    'AptHostedApiRepository': {
+        'type': 'object',
+        'required': ['apt', 'aptSigning', 'online', 'storage'],
+        'properties': {
+            'apt': {'$ref': '#/components/schemas/AptHostedRepositoriesAttributes'},
+            'aptSigning': {'$ref': '#/components/schemas/AptSigningRepositoriesAttributes'},
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'component': {'$ref': '#/components/schemas/ComponentAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'apt'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal',
+                     'readOnly': True},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True, 'readOnly': True},
+            'storage': {'$ref': '#/components/schemas/HostedStorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'hosted'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/apt-example', 'readOnly': True},
+        }
+    },
+    'AptProxyApiRepository': {
+        'type': 'object',
+        'required': ['apt', 'httpClient', 'negativeCache', 'online', 'proxy', 'storage'],
+        'properties': {
+            'apt': {'$ref': '#/components/schemas/AptProxyRepositoriesAttributes'},
+            'aptSigning': {'$ref': '#/components/schemas/AptSigningRepositoriesAttributes'},
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'apt'},
+            'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal'},
+            'negativeCache': {'$ref': '#/components/schemas/NegativeCacheAttributes'},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True},
+            'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
+            'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
+            'routingRuleName': {'type': 'string',
+                                'description': 'The name of the routing rule assigned to this repository'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'proxy'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/apt-example'},
+        }
+    },
+    'MavenHostedApiRepository': {
+        'type': 'object',
+        'required': ['maven', 'online', 'storage'],
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'component': {'$ref': '#/components/schemas/ComponentAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'maven2'},
+            'maven': {'$ref': '#/components/schemas/MavenAttributes'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal'},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True},
+            'storage': {'$ref': '#/components/schemas/HostedStorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'hosted'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/maven2-example'},
+        }
+    },
+    'MavenProxyApiRepository': {
+        'type': 'object',
+        'required': ['httpClient', 'maven', 'negativeCache', 'online', 'proxy', 'storage'],
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'maven2'},
+            'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
+            'maven': {'$ref': '#/components/schemas/MavenAttributes'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal'},
+            'negativeCache': {'$ref': '#/components/schemas/NegativeCacheAttributes'},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True},
+            'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
+            'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
+            'routingRuleName': {'type': 'string',
+                                'description': 'The name of the routing rule assigned to this repository'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'proxy'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/maven2-example'},
+        }
+    },
+    'SimpleApiHostedRepository': {
+        'type': 'object',
+        'required': ['online', 'storage'],
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'component': {'$ref': '#/components/schemas/ComponentAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'simpleapihostedrepository'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal'},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True},
+            'storage': {'$ref': '#/components/schemas/HostedStorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'hosted'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/simpleapihostedrepository-example'},
+        }
+    },
+    'SimpleApiProxyRepository': {
+        'type': 'object',
+        'required': ['httpClient', 'negativeCache', 'online', 'proxy', 'storage'],
+        'properties': {
+            'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'format': {'type': 'string', 'description': 'Component format held in this repository',
+                       'example': 'simpleapiproxyrepository'},
+            'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
+            'name': {'type': 'string', 'description': 'A unique identifier for this repository',
+                     'pattern': '^[a-zA-Z0-9\\-]{1}[a-zA-Z0-9_\\-\\.]*$', 'example': 'internal'},
+            'negativeCache': {'$ref': '#/components/schemas/NegativeCacheAttributes'},
+            'online': {'type': 'boolean', 'description': 'Whether this repository accepts incoming requests',
+                       'example': True},
+            'proxy': {'$ref': '#/components/schemas/ProxyAttributes'},
+            'replication': {'$ref': '#/components/schemas/ReplicationAttributes'},
+            'routingRuleName': {'type': 'string',
+                                'description': 'The name of the routing rule assigned to this repository'},
+            'storage': {'$ref': '#/components/schemas/StorageAttributes'},
+            'type': {'type': 'string',
+                     'description': 'Controls if deployments of and updates to artifacts are allowed',
+                     'enum': ['hosted', 'proxy', 'group'], 'example': 'proxy'},
+            'url': {'type': 'string', 'description': 'URL to the repository',
+                    'example': 'http://localhost:8081/repository/simpleapiproxyrepository-example'},
+        }
+    },
+})
+paths_to_fix_repository_schema_ref = [
+    ('/v1/repositories/apt/hosted/{repositoryName}', '#/components/schemas/AptHostedApiRepository'),
+    ('/v1/repositories/apt/proxy/{repositoryName}', '#/components/schemas/AptProxyApiRepository'),
+    ('/v1/repositories/cargo/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/cocoapods/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/composer/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/conan/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/conda/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/conda/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/gitlfs/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/go/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/go/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/go/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/helm/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/helm/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/huggingface/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/maven/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/maven/hosted/{repositoryName}', '#/components/schemas/MavenHostedApiRepository'),
+    ('/v1/repositories/maven/proxy/{repositoryName}', '#/components/schemas/MavenProxyApiRepository'),
+    ('/v1/repositories/npm/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/nuget/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/nuget/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/p2/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/pub/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/pub/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/pub/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/pypi/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/r/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/r/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/r/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/rubygems/group/{repositoryName}', '#/components/schemas/SimpleApiGroupRepository'),
+    ('/v1/repositories/rubygems/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+    ('/v1/repositories/rubygems/proxy/{repositoryName}', '#/components/schemas/SimpleApiProxyRepository'),
+    ('/v1/repositories/swift/hosted/{repositoryName}', '#/components/schemas/SimpleApiHostedRepository'),
+]
+i = 0
+for p, ref in paths_to_fix_repository_schema_ref:
+    responses = json_spec['paths'][p]['get']['responses']
+    responses.pop('default', None)
+    ensure_response(p, 'get', '200', 'successful operation')
+    responses['200']['content']['application/json']['schema'] = {'$ref': ref}
+    i = i + 1
+print(f'   Fixed {i} repository responses')
 
 with open('./spec/openapi.yaml', 'w') as output_yaml_specfile:
     output_yaml_specfile.write(yaml_dump(json_spec))
