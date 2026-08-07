@@ -92,10 +92,8 @@ jobs:
           with:
             python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
 
-        - name: Install poetry
-          uses: Gr1N/setup-poetry@48b0f77c8c1b1b19cb962f0f00dff7b4be8f81ec # v9
-          with:
-            poetry-version: ${{ env.POETRY_VERSION }}
+        - name: Install Poetry
+          run: pipx install poetry==${{ env.POETRY_VERSION }}
 
         - name: Get generated code from cache
           uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
