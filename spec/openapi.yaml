@@ -729,6 +729,59 @@ components:
       required:
       - name
       type: object
+    ApiPrivilegeApplication:
+      properties:
+        actions:
+          description: A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script
+            privileges.
+          items:
+            description: A collection of actions to associate with the privilege,
+              using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run'
+              for script privileges.
+            enum:
+            - READ
+            - BROWSE
+            - EDIT
+            - ADD
+            - DELETE
+            - RUN
+            - START
+            - STOP
+            - ASSOCIATE
+            - DISASSOCIATE
+            - ALL
+            type: string
+          minItems: 1
+          type: array
+        description:
+          type: string
+        domain:
+          description: The domain (i.e. 'blobstores', 'capabilities' or even '*' for
+            all) that this privilege is granting access to.  Note that creating new
+            privileges with a domain is only necessary when using plugins that define
+            their own domain(s).
+          minLength: 1
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - actions
+      - domain
+      - name
+      type: object
     ApiPrivilegeApplicationRequest:
       properties:
         actions:
@@ -772,6 +825,63 @@ components:
       - actions
       - domain
       - name
+      type: object
+    ApiPrivilegeRepositoryAdmin:
+      properties:
+        actions:
+          description: A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script
+            privileges.
+          items:
+            description: A collection of actions to associate with the privilege,
+              using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run'
+              for script privileges.
+            enum:
+            - READ
+            - BROWSE
+            - EDIT
+            - ADD
+            - DELETE
+            - RUN
+            - START
+            - STOP
+            - ASSOCIATE
+            - DISASSOCIATE
+            - ALL
+            type: string
+          minItems: 1
+          type: array
+        description:
+          type: string
+        format:
+          description: The repository format (i.e 'nuget', 'npm') this privilege will
+            grant access to (or * for all).
+          minLength: 1
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        repository:
+          description: The name of the repository this privilege will grant access
+            to (or * for all).
+          minLength: 1
+          type: string
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - actions
+      - format
+      - name
+      - repository
       type: object
     ApiPrivilegeRepositoryAdminRequest:
       properties:
@@ -817,6 +927,69 @@ components:
           type: string
       required:
       - actions
+      - format
+      - name
+      - repository
+      type: object
+    ApiPrivilegeRepositoryContentSelector:
+      properties:
+        actions:
+          description: A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script
+            privileges.
+          items:
+            description: A collection of actions to associate with the privilege,
+              using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run'
+              for script privileges.
+            enum:
+            - READ
+            - BROWSE
+            - EDIT
+            - ADD
+            - DELETE
+            - RUN
+            - START
+            - STOP
+            - ASSOCIATE
+            - DISASSOCIATE
+            - ALL
+            type: string
+          minItems: 1
+          type: array
+        contentSelector:
+          description: The name of a content selector that will be used to grant access
+            to content via this privilege.
+          minLength: 1
+          type: string
+        description:
+          type: string
+        format:
+          description: The repository format (i.e 'nuget', 'npm') this privilege will
+            grant access to (or * for all).
+          minLength: 1
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        repository:
+          description: The name of the repository this privilege will grant access
+            to (or * for all).
+          minLength: 1
+          type: string
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - actions
+      - contentSelector
       - format
       - name
       - repository
@@ -871,6 +1044,63 @@ components:
       required:
       - actions
       - contentSelector
+      - format
+      - name
+      - repository
+      type: object
+    ApiPrivilegeRepositoryView:
+      properties:
+        actions:
+          description: A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script
+            privileges.
+          items:
+            description: A collection of actions to associate with the privilege,
+              using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run'
+              for script privileges.
+            enum:
+            - READ
+            - BROWSE
+            - EDIT
+            - ADD
+            - DELETE
+            - RUN
+            - START
+            - STOP
+            - ASSOCIATE
+            - DISASSOCIATE
+            - ALL
+            type: string
+          minItems: 1
+          type: array
+        description:
+          type: string
+        format:
+          description: The repository format (i.e 'nuget', 'npm') this privilege will
+            grant access to (or * for all).
+          minLength: 1
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        repository:
+          description: The name of the repository this privilege will grant access
+            to (or * for all).
+          minLength: 1
+          type: string
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - actions
       - format
       - name
       - repository
@@ -1005,6 +1235,56 @@ components:
       - name
       - type
       type: object
+    ApiPrivilegeScript:
+      properties:
+        actions:
+          description: A collection of actions to associate with the privilege, using
+            BREAD syntax (browse,read,edit,add,delete,all) as well as 'run' for script
+            privileges.
+          items:
+            description: A collection of actions to associate with the privilege,
+              using BREAD syntax (browse,read,edit,add,delete,all) as well as 'run'
+              for script privileges.
+            enum:
+            - READ
+            - BROWSE
+            - EDIT
+            - ADD
+            - DELETE
+            - RUN
+            - START
+            - STOP
+            - ASSOCIATE
+            - DISASSOCIATE
+            - ALL
+            type: string
+          minItems: 1
+          type: array
+        description:
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        scriptName:
+          description: The name of a script to give access to.
+          minLength: 1
+          type: string
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - actions
+      - name
+      - scriptName
+      type: object
     ApiPrivilegeScriptRequest:
       properties:
         actions:
@@ -1046,6 +1326,32 @@ components:
       - name
       - scriptName
       type: object
+    ApiPrivilegeWildcard:
+      properties:
+        description:
+          type: string
+        name:
+          description: The name of the privilege.  This value cannot be changed.
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        pattern:
+          description: A colon separated list of parts that create a permission string.
+          minLength: 1
+          type: string
+        readOnly:
+          description: Indicates whether the privilege can be changed. External values
+            supplied to this will be ignored by the system.
+          type: boolean
+        type:
+          description: The type of privilege, each type covers different portions
+            of the system. External values supplied to this will be ignored by the
+            system.
+          type: string
+      required:
+      - name
+      - pattern
+      type: object
     ApiPrivilegeWildcardRequest:
       properties:
         description:
@@ -1068,7 +1374,7 @@ components:
         emailAddress:
           description: The email address associated with the user.
           format: email
-          minLength: 1
+          nullable: true
           type: string
         externalRoles:
           description: The roles which the user has been assigned in an external source,
@@ -1082,11 +1388,11 @@ components:
           uniqueItems: true
         firstName:
           description: The first name of the user.
-          minLength: 1
+          nullable: true
           type: string
         lastName:
           description: The last name of the user.
-          minLength: 1
+          nullable: true
           type: string
         readOnly:
           description: Indicates whether the user's properties could be modified by
@@ -1121,9 +1427,6 @@ components:
           minLength: 1
           type: string
       required:
-      - emailAddress
-      - firstName
-      - lastName
       - source
       - status
       - userId
@@ -1148,6 +1451,23 @@ components:
           - FAILED
           type: string
       type: object
+    AptHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/AptHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: apt
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     AptHostedRepositoriesAttributes:
       properties:
         distribution:
@@ -1189,6 +1509,23 @@ components:
       - online
       - storage
       type: object
+    AptProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/AptProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: apt
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     AptProxyRepositoriesAttributes:
       properties:
         distribution:
@@ -1657,6 +1994,23 @@ components:
       - online
       - storage
       type: object
+    CargoHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/CargoHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: cargo
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     CargoHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -1773,46 +2127,6 @@ components:
       - proxy
       - storage
       type: object
-    CleanupExecutionRequestXO:
-      properties:
-        dryRun:
-          type: boolean
-        policy:
-          type: string
-        repository:
-          minLength: 1
-          type: string
-      required:
-      - repository
-      type: object
-    CleanupExecutionStatusXO:
-      properties:
-        componentCount:
-          format: int64
-          type: integer
-        componentsDeleted:
-          format: int64
-          type: integer
-        dryRun:
-          type: boolean
-        durationMs:
-          format: int64
-          type: integer
-        error:
-          type: string
-        id:
-          type: string
-        policy:
-          type: string
-        repository:
-          type: string
-        status:
-          enum:
-          - RUNNING
-          - COMPLETED
-          - FAILED
-          type: string
-      type: object
     CleanupPolicyAttributes:
       properties:
         policyNames:
@@ -1823,49 +2137,77 @@ components:
             type: string
           type: array
       type: object
-    CleanupPolicyXO:
+    CleanupPolicyResourceXO:
       properties:
         criteriaAssetRegex:
+          description: asset name matcher (Remove components that have at least one
+            asset name matching the following regular expression pattern:)
           type: string
         criteriaLastBlobUpdated:
+          description: "component age (Components published over \u201Cx\u201D days\
+            \ ago (e.g 1-999))"
           format: int64
           type: integer
         criteriaLastDownloaded:
+          description: "component usage (Components downloaded in \u201Cx\u201D amount\
+            \ of days (e.g 1-999))"
           format: int64
           type: integer
         criteriaReleaseType:
+          description: release type (Remove components that are of the following release
+            type:)
           enum:
           - RELEASES
           - PRERELEASES
+          - RELEASES_AND_PRERELEASES
           type: string
         format:
+          description: repository format
           minLength: 1
           type: string
-        inUseCount:
-          format: int32
-          type: integer
         name:
+          description: policy name
           maxLength: 255
           minLength: 0
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
           type: string
         notes:
+          description: description
           type: string
         repositories:
+          description: Repositories to attach this policy to. When provided on update,
+            replaces the existing attachment set.
           items:
-            minLength: 1
+            description: Repositories to attach this policy to. When provided on update,
+              replaces the existing attachment set.
             type: string
           type: array
         retain:
+          description: keep the latest "x" number of versions
           format: int32
           minimum: 1
           type: integer
-        sortBy:
-          type: string
       required:
       - format
       - name
       type: object
+    CocoapodsProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/CocoapodsProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: cocoapods
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     CocoapodsProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -1936,6 +2278,102 @@ components:
         version:
           type: string
       type: object
+    ComposerGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/ComposerGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: composer
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
+    ComposerGroupRepositoryApiRequest:
+      properties:
+        group:
+          $ref: '#/components/schemas/GroupAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/StorageAttributes'
+      required:
+      - group
+      - name
+      - online
+      - storage
+      type: object
+    ComposerHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/ComposerHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: composer
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
+    ComposerHostedRepositoryApiRequest:
+      properties:
+        cleanup:
+          $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
+        name:
+          description: A unique identifier for this repository
+          example: internal
+          minLength: 1
+          pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
+          type: string
+        online:
+          description: Whether this repository accepts incoming requests
+          example: true
+          type: boolean
+        storage:
+          $ref: '#/components/schemas/HostedStorageAttributes'
+      required:
+      - name
+      - online
+      - storage
+      type: object
+    ComposerProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/ComposerProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: composer
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     ComposerProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -1994,6 +2432,23 @@ components:
       - online
       - storage
       type: object
+    ConanHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/ConanHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: conan
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     ConanHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -2107,6 +2562,23 @@ components:
       - online
       - storage
       type: object
+    CondaHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/CondaHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: conda
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     CondaHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -2130,6 +2602,23 @@ components:
       - online
       - storage
       type: object
+    CondaProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/CondaProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: conda
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     CondaProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -2248,10 +2737,10 @@ components:
         authScheme:
           description: Authentication scheme used for connecting to LDAP server
           enum:
-          - none
-          - simple
-          - CRAM-MD5
-          - DIGEST-MD5
+          - NONE
+          - SIMPLE
+          - CRAM_MD5
+          - DIGEST_MD5
           type: string
         authUsername:
           description: This must be a fully qualified username if simple authentication
@@ -2853,6 +3342,11 @@ components:
             by the API
           type: string
           writeOnly: true
+        sessionToken:
+          description: Optional AWS session token for short-lived (STS) credentials;
+            never returned by the API
+          type: string
+          writeOnly: true
       type: object
     EntityRefXo:
       description: The privilege in the permission chain
@@ -3007,6 +3501,59 @@ components:
           description: Field type (e.g., string, password, number, checkbox, combobox)
           type: string
       type: object
+    FormFieldInfo:
+      description: Metadata for each form field declared by the task descriptor, in
+        the order the descriptor declares them. Populated on read responses; ignored
+        on create/update.
+      properties:
+        helpText:
+          description: Help text shown beneath the input.
+          type: string
+        id:
+          description: Identifier of the form field; matches a key in the task's properties
+            map.
+          type: string
+        initialValue:
+          description: Initial value to seed the form with.
+          nullable: true
+          type: string
+        label:
+          description: Human-readable label.
+          type: string
+        maxValue:
+          description: Maximum numeric value (number fields only).
+          nullable: true
+          type: string
+        minValue:
+          description: Minimum numeric value (number fields only).
+          nullable: true
+          type: string
+        regexValidation:
+          description: Regular expression the value must match.
+          nullable: true
+          type: string
+        required:
+          description: Whether the field must be supplied when creating or updating
+            the task.
+          type: boolean
+        storeApi:
+          description: Backend store API for Selectable fields (e.g. repository combobox).
+          nullable: true
+          type: string
+        storeFilters:
+          additionalProperties:
+            description: Filters to apply to the Selectable's store (e.g. 'type' =
+              'hosted,proxy', 'format' = 'maven2').
+            nullable: true
+            type: string
+          description: Filters to apply to the Selectable's store (e.g. 'type' = 'hosted,proxy',
+            'format' = 'maven2').
+          nullable: true
+          type: object
+        type:
+          description: Form field type, e.g. 'string', 'number', 'checkbox', 'repository'.
+          type: string
+      type: object
     FrequencyXO:
       description: Frequency of execution of the task.
       properties:
@@ -3063,6 +3610,23 @@ components:
         unavailable:
           type: boolean
       type: object
+    GitLfsHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/GitLfsHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: gitlfs
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     GitLfsHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -3086,6 +3650,23 @@ components:
       - online
       - storage
       type: object
+    GolangGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/GolangGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: go
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     GolangGroupRepositoryApiRequest:
       properties:
         group:
@@ -3108,6 +3689,23 @@ components:
       - online
       - storage
       type: object
+    GolangHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/GolangHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: go
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     GolangHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -3131,6 +3729,23 @@ components:
       - online
       - storage
       type: object
+    GolangProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/GolangProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: go
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     GolangProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -3425,6 +4040,23 @@ components:
       - online
       - storage
       type: object
+    HelmHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/HelmHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: helm
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     HelmHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -3448,6 +4080,23 @@ components:
       - online
       - storage
       type: object
+    HelmProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/HelmProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: helm
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     HelmProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -3659,6 +4308,23 @@ components:
       - timeout
       - userAgent
       type: object
+    HuggingFaceProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/HuggingFaceProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: huggingface
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     HuggingFaceProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -4063,6 +4729,23 @@ components:
       - layoutPolicy
       - versionPolicy
       type: object
+    MavenGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/MavenGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: maven
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     MavenGroupRepositoryApiRequest:
       properties:
         group:
@@ -4085,6 +4768,23 @@ components:
       - online
       - storage
       type: object
+    MavenHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/MavenHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: maven
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     MavenHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4111,6 +4811,23 @@ components:
       - online
       - storage
       type: object
+    MavenProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/MavenProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: maven
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     MavenProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -4208,6 +4925,23 @@ components:
       - online
       - storage
       type: object
+    NpmHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/NpmHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: npm
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     NpmHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4350,6 +5084,23 @@ components:
           minLength: 0
           type: string
       type: object
+    NugetGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/NugetGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: nuget
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     NugetGroupRepositoryApiRequest:
       properties:
         group:
@@ -4372,6 +5123,23 @@ components:
       - online
       - storage
       type: object
+    NugetHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/NugetHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: nuget
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     NugetHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4552,6 +5320,23 @@ components:
       required:
       - enforcement
       type: object
+    OciGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/OciGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: oci
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     OciGroupRepositoryApiRequest:
       properties:
         cosign:
@@ -4580,6 +5365,23 @@ components:
       - online
       - storage
       type: object
+    OciHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/OciHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: oci
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     OciHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4609,6 +5411,23 @@ components:
       - online
       - storage
       type: object
+    OciProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/OciProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: oci
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     OciProxyAttributes:
       properties:
         cacheForeignLayers:
@@ -4680,6 +5499,23 @@ components:
       - proxy
       - storage
       type: object
+    P2ProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/P2ProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: p2
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     P2ProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -4848,6 +5684,23 @@ components:
       - host
       - port
       type: object
+    PubGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/PubGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: pub
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     PubGroupRepositoryApiRequest:
       properties:
         group:
@@ -4870,6 +5723,23 @@ components:
       - online
       - storage
       type: object
+    PubHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/PubHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: pub
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     PubHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -4893,6 +5763,23 @@ components:
       - online
       - storage
       type: object
+    PubProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/PubProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: pub
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     PubProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -5002,6 +5889,23 @@ components:
       - online
       - storage
       type: object
+    PypiHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/PypiHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: pypi
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     PypiHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -5032,7 +5936,7 @@ components:
         firewall:
           $ref: '#/components/schemas/FirewallAttributes'
         httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
+          $ref: '#/components/schemas/HttpClientAttributesWithPreemptiveAuth'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -5056,13 +5960,29 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
       required:
-      - httpClient
       - name
       - negativeCache
       - online
       - proxy
       - storage
       type: object
+    RGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: r
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RGroupRepositoryApiRequest:
       properties:
         group:
@@ -5085,6 +6005,23 @@ components:
       - online
       - storage
       type: object
+    RHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: r
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -5108,6 +6045,23 @@ components:
       - online
       - storage
       type: object
+    RProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: r
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -5390,10 +6344,10 @@ components:
         authScheme:
           description: Authentication scheme used for connecting to LDAP server
           enum:
-          - none
-          - simple
-          - CRAM-MD5
-          - DIGEST-MD5
+          - NONE
+          - SIMPLE
+          - CRAM_MD5
+          - DIGEST_MD5
           type: string
         authUsername:
           description: This must be a fully qualified username if simple authentication
@@ -5567,6 +6521,24 @@ components:
           type: string
         state:
           type: string
+      type: object
+    ReconcilePlanSummaryXO:
+      properties:
+        blobStoreCount:
+          format: int32
+          type: integer
+        maxEndDate:
+          format: date-time
+          type: string
+        minStartDate:
+          format: date-time
+          type: string
+        planCount:
+          format: int32
+          type: integer
+        repositoryCount:
+          format: int32
+          type: integer
       type: object
     ReconcilePlanWithDetailsXO:
       properties:
@@ -5819,6 +6791,23 @@ components:
           pattern: ^[a-zA-Z0-9\-]{1}[a-zA-Z0-9_\-\.]*$
           type: string
       type: object
+    RubyGemsGroupApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RubyGemsGroupRepositoryApiRequest'
+      - properties:
+          format:
+            default: rubygems
+            type: string
+          type:
+            default: group
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RubyGemsGroupRepositoryApiRequest:
       properties:
         group:
@@ -5841,6 +6830,23 @@ components:
       - online
       - storage
       type: object
+    RubyGemsHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RubyGemsHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: rubygems
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RubyGemsHostedRepositoryApiRequest:
       properties:
         cleanup:
@@ -5864,6 +6870,23 @@ components:
       - online
       - storage
       type: object
+    RubyGemsProxyApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/RubyGemsProxyRepositoryApiRequest'
+      - properties:
+          format:
+            default: rubygems
+            type: string
+          type:
+            default: proxy
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     RubyGemsProxyRepositoryApiRequest:
       properties:
         cleanup:
@@ -6397,10 +7420,29 @@ components:
       - online
       - storage
       type: object
+    SwiftHostedApiRepository:
+      allOf:
+      - $ref: '#/components/schemas/SwiftHostedRepositoryApiRequest'
+      - properties:
+          format:
+            default: swift
+            type: string
+          type:
+            default: hosted
+            type: string
+          url:
+            type: string
+        required:
+        - format
+        - type
+        - url
+        type: object
     SwiftHostedRepositoryApiRequest:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        component:
+          $ref: '#/components/schemas/ComponentAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -6577,6 +7619,13 @@ components:
         enabled:
           description: Indicates if the task would be enabled.
           type: boolean
+        formFields:
+          description: Metadata for each form field declared by the task descriptor,
+            in the order the descriptor declares them. Populated on read responses;
+            ignored on create/update.
+          items:
+            $ref: '#/components/schemas/FormFieldInfo'
+          type: array
         frequency:
           $ref: '#/components/schemas/FrequencyXO'
         name:
@@ -6687,6 +7736,10 @@ components:
         type:
           description: The type identifier of the task
           example: blobstore.compact
+          type: string
+        typeName:
+          description: The human-readable name of the task type
+          example: Admin - Compact blob store
           type: string
       type: object
     TerraformAttributes:
@@ -6904,7 +7957,7 @@ components:
         firewall:
           $ref: '#/components/schemas/FirewallAttributes'
         httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
+          $ref: '#/components/schemas/HttpClientAttributesWithPreemptiveAuth'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -6928,7 +7981,6 @@ components:
         terraform:
           $ref: '#/components/schemas/TerraformAttributes'
       required:
-      - httpClient
       - name
       - negativeCache
       - online
@@ -6988,10 +8040,10 @@ components:
         authScheme:
           description: Authentication scheme used for connecting to LDAP server
           enum:
-          - none
-          - simple
-          - CRAM-MD5
-          - DIGEST-MD5
+          - NONE
+          - SIMPLE
+          - CRAM_MD5
+          - DIGEST_MD5
           type: string
         authUsername:
           description: This must be a fully qualified username if simple authentication
@@ -7144,6 +8196,13 @@ components:
         enabled:
           description: Indicates if the task would be enabled.
           type: boolean
+        formFields:
+          description: Metadata for each form field declared by the task descriptor,
+            in the order the descriptor declares them. Populated on read responses;
+            ignored on create/update.
+          items:
+            $ref: '#/components/schemas/FormFieldInfo'
+          type: array
         frequency:
           $ref: '#/components/schemas/FrequencyXO'
         name:
@@ -7202,6 +8261,17 @@ components:
         type:
           type: string
       type: object
+    UserTokenListXO:
+      properties:
+        continuationToken:
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/UserTokenXO'
+          type: array
+      type: object
+      xml:
+        name: userTokenList
     UserTokenXO:
       properties:
         created:
@@ -7460,12 +8530,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.94.0-12.
+    as of version 3.95.0-07.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.94.0-12
+  version: 3.95.0-07
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -7473,6 +8543,10 @@ paths:
       operationId: listDataStore
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataStoreApiXO'
           description: Data Store configuration returned
         '403':
           description: Authentication required
@@ -7500,6 +8574,14 @@ paths:
     get:
       operationId: listStatusCheckCluster
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SystemCheckResultsApiDTO'
+                type: array
+          description: The system status check results
         '403':
           description: Insufficient permissions to retrieve system status checks
       summary: Health check endpoint that returns the results of the system status
@@ -7520,6 +8602,10 @@ paths:
         style: simple
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemCheckResultsApiDTO'
           description: The system status check results
         '404':
           description: System status information not found
@@ -7532,137 +8618,16 @@ paths:
       operationId: listSystemInformation
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                type: object
           description: System information for all running nodes grouped by nodeID
         '403':
           description: Insufficient permissions to request this data
       summary: Get information about all nodes
       tags:
       - 'System: Nodes'
-  /internal/cleanup-policies:
-    get:
-      description: Returns all configured cleanup policies sorted by name. Pass the
-        optional `format` query parameter to return only policies for that format
-        (e.g. `maven2`, `npm`, `docker`); omit it or pass `*` to return policies across
-        all formats. Each entry includes the policy definition and the number of repositories
-        currently using it.
-      operationId: listInternalCleanupPolicies
-      parameters:
-      - explode: true
-        in: query
-        name: format
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/CleanupPolicyXO'
-                type: array
-          description: Cleanup policies matching the request
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions
-      summary: List cleanup policies
-      tags:
-      - Cleanup policies
-    post:
-      description: Creates a new cleanup policy with the supplied name, format, and
-        criteria. The policy name must be unique. At least one criterion (`criteriaLastBlobUpdated`,
-        `criteriaLastDownloaded`, or `criteriaAssetRegex`) is required. Only criteria
-        supported by the selected format are accepted; unsupported criteria are rejected.
-        The created policy is returned with an `inUseCount` of 0.
-      operationId: createInternalCleanupPolicies
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CleanupPolicyXO'
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupPolicyXO'
-          description: Policy created
-        '400':
-          description: Invalid payload (unknown format, missing/invalid criteria,
-            or unsupported criterion for the format)
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions
-        '409':
-          description: A policy with the given name already exists
-      summary: Create a cleanup policy
-      tags:
-      - Cleanup policies
-  /internal/cleanup-policies/{name}:
-    delete:
-      operationId: deleteInternalCleanupPolicies
-      parameters:
-      - explode: false
-        in: path
-        name: name
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        default:
-          content:
-            application/json: {}
-          description: default response
-      tags:
-      - Cleanup policies
-    get:
-      operationId: getInternalCleanupPolicies
-      parameters:
-      - explode: false
-        in: path
-        name: name
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupPolicyXO'
-          description: default response
-      tags:
-      - Cleanup policies
-    put:
-      operationId: updateInternalCleanupPolicies
-      parameters:
-      - explode: false
-        in: path
-        name: name
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CleanupPolicyXO'
-        required: true
-      responses:
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupPolicyXO'
-          description: default response
-      tags:
-      - Cleanup policies
   /internal/ui/api/permissions:
     get:
       operationId: listInternalUiApiPermissions
@@ -7785,6 +8750,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: Assets returned
         '403':
           description: Insufficient permissions to list assets
         '422':
@@ -7828,6 +8799,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetXO'
+          description: Asset returned
         '403':
           description: Insufficient permissions to get asset
         '404':
@@ -7862,14 +8839,14 @@ paths:
     get:
       operationId: listBlobstores
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/GenericBlobStoreApiResponse'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the blob stores
       tags:
       - Blob store
@@ -8309,10 +9286,10 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Delete a blob store by name
       tags:
       - Blob store
@@ -8328,12 +9305,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlobStoreQuotaResultXO'
-          description: default response
+          description: successful operation
       summary: Get quota status for a given blob store
       tags:
       - Blob store
@@ -8341,14 +9318,14 @@ paths:
     get:
       operationId: listCapabilities
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/CapabilityDTO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the active capabilities
       tags:
       - Capabilities
@@ -8360,12 +9337,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CapabilityDTO'
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CapabilityDTO'
-          description: default response
+          description: successful operation
       summary: Create a capability
       tags:
       - Capabilities
@@ -8373,14 +9350,14 @@ paths:
     get:
       operationId: listCapabilitiesTypes
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/CapabilityTypeDTO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List all capability types available and exposed in the system
       tags:
       - Capabilities
@@ -8397,10 +9374,10 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Delete a capability
       tags:
       - Capabilities
@@ -8422,65 +9399,100 @@ paths:
               $ref: '#/components/schemas/CapabilityDTO'
         description: capability
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Update a capability
       tags:
       - Capabilities
-  /v1/cleanup/run:
+  /v1/cleanup-policies:
+    get:
+      operationId: listCleanupPolicies
+      responses:
+        '200':
+          description: The list of existing policies
+      summary: Get a list of existing policies
+      tags:
+      - Cleanup policies
     post:
-      description: "Runs cleanup on the specified `repository` against the policies\
-        \ attached to it. Behavior depends on the `dryRun` flag in the request body:\n\
-        \n- `dryRun: true` \u2014 Synchronously evaluates the policies and returns\
-        \ **200 OK** with a `CleanupExecutionStatusXO` whose `componentCount` is the\
-        \ number of components that *would* be deleted. No components are removed.\n\
-        - `dryRun: false` \u2014 Schedules an asynchronous deletion and returns **202\
-        \ Accepted** immediately with a `CleanupExecutionStatusXO` containing the\
-        \ generated execution `id` and `status=RUNNING`. Poll `GET /service/rest/v1/cleanup/run/{id}`\
-        \ to observe the terminal `COMPLETED` or `FAILED` state and the final `componentsDeleted`\
-        \ count. Execution records are retained for 24 hours.\n\nAt most one non-dry-run\
-        \ cleanup may be `RUNNING` per repository. A second non-dry-run submitted\
-        \ while one is in progress is rejected with **409 Conflict** and the body\
-        \ of the existing execution's status."
-      operationId: createCleanupRun
+      operationId: createCleanupPolicies
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CleanupExecutionRequestXO'
+              $ref: '#/components/schemas/CleanupPolicyResourceXO'
+        required: true
+      responses:
+        '201':
+          description: Policy was successfully created
+        '400':
+          description: Given payload has invalid data
+        '409':
+          description: Given policy name already exists
+      summary: Create a new policy
+      tags:
+      - Cleanup policies
+  /v1/cleanup-policies/{name}:
+    delete:
+      operationId: deleteCleanupPolicies
+      parameters:
+      - explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: Given policy successfully deleted
+        '404':
+          description: The policy with the given name not found
+      summary: Delete cleanup policy
+      tags:
+      - Cleanup policies
+    get:
+      operationId: getCleanupPolicies
+      parameters:
+      - explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupExecutionStatusXO'
-          description: Dry run completed; `componentCount` reports how many components
-            match
-        '202':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupExecutionStatusXO'
-          description: Async cleanup accepted; use the returned `id` with GET /cleanup/run/{id}
-            to poll for status
+          description: Policy if exists
+      summary: Get a policy by name
+      tags:
+      - Cleanup policies
+  /v1/cleanup-policies/{policyName}:
+    put:
+      operationId: updateCleanupPolicies
+      parameters:
+      - explode: false
+        in: path
+        name: policyName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CleanupPolicyResourceXO'
+        required: true
+      responses:
+        '204':
+          description: Policy was successfully updated
         '400':
-          description: Invalid request body (missing `repository`)
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions
+          description: Given payload has invalid data
         '404':
-          description: The specified repository does not exist
-        '409':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CleanupExecutionStatusXO'
-          description: A non-dry-run cleanup is already RUNNING for this repository;
-            the response body is the existing execution's status
-      summary: Run cleanup on a repository (dry run or async execution)
+          description: Given policy name does not exist
+      summary: Update existing policy
       tags:
       - Cleanup policies
   /v1/components:
@@ -8505,6 +9517,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+          description: Components returned
         '403':
           description: Insufficient permissions to list components
         '422':
@@ -8835,6 +9853,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentXO'
+          description: Component returned
         '403':
           description: Insufficient permissions to get component
         '404':
@@ -9215,6 +10239,12 @@ paths:
     get:
       operationId: listEmail
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiEmailConfiguration'
+          description: Email configuration returned
         '403':
           description: Insufficient permissions to retrieve the email configuration
       summary: Retrieve the current email configuration
@@ -9270,14 +10300,14 @@ paths:
     get:
       operationId: listFormatsUploadSpecs
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/UploadDefinitionXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: Get upload field requirements for each supported format
       tags:
       - Formats
@@ -9294,12 +10324,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UploadDefinitionXO'
-          description: default response
+          description: successful operation
       summary: Get upload field requirements for the desired format
       tags:
       - Formats
@@ -9518,10 +10548,10 @@ paths:
               type: string
         description: The phase to bounce
       responses:
-        default:
+        '200':
           content:
             '*/*': {}
-          description: default response
+          description: successful operation
       summary: Bounce lifecycle phase
       tags:
       - Lifecycle
@@ -9529,12 +10559,12 @@ paths:
     get:
       operationId: listLifecyclePhase
       responses:
-        default:
+        '200':
           content:
             text/plain:
               schema:
                 type: string
-          description: default response
+          description: successful operation
       summary: Get current lifecycle phase
       tags:
       - Lifecycle
@@ -9547,10 +10577,10 @@ paths:
               type: string
         description: The phase to move to
       responses:
-        default:
+        '200':
           content:
             '*/*': {}
-          description: default response
+          description: successful operation
       summary: Move to new lifecycle phase
       tags:
       - Lifecycle
@@ -9559,6 +10589,10 @@ paths:
       operationId: listMaliciousRiskEnabledRegistries
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                type: object
           description: RHC Enabled registries returned
         '401':
           description: Authentication required
@@ -9572,6 +10606,10 @@ paths:
       operationId: listMaliciousRiskRiskOnDisk
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaliciousRiskOnDiskCountResponse'
           description: Malicious Risk On Disk Count returned
         '401':
           description: Authentication required
@@ -9618,6 +10656,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
           description: List of plans found
         '401':
           description: Authentication required
@@ -9753,12 +10795,33 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
           description: Reconciliation plan details found
         '401':
           description: Authentication required
         '403':
           description: Insufficient permissions
       summary: Get reconciliation plan details
+      tags:
+      - Reconcile Plan
+  /v1/plan/summary:
+    get:
+      operationId: listPlanSummary
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconcilePlanSummaryXO'
+          description: Aggregate plan summary returned
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Get aggregate summary of available reconciliation plans
       tags:
       - Reconcile Plan
   /v1/plan/{planId}:
@@ -9816,6 +10879,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconcilePlanWithDetailsXO'
           description: Reconciliation plan found
         '401':
           description: Authentication required
@@ -9880,14 +10947,14 @@ paths:
     get:
       operationId: getAllRepositories
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/RepositoryXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List repositories
       tags:
       - Repository Management
@@ -9930,12 +10997,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlpineGroupApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -10007,12 +11068,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlpineHostedApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -10084,12 +11139,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/AlpineProxyApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -10390,12 +11439,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/AptHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10463,12 +11512,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/AptProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10603,12 +11652,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/CargoHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10743,12 +11792,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/CocoapodsProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10779,6 +11828,144 @@ paths:
         '403':
           description: Insufficient permissions
       summary: Update Cocoapods proxy repository
+      tags:
+      - Repository Management
+  /v1/repositories/composer/group:
+    post:
+      operationId: createComposerGroupRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComposerGroupRepositoryApiRequest'
+        required: true
+      responses:
+        '201':
+          description: Repository created
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Create composer group repository
+      tags:
+      - Repository Management
+  /v1/repositories/composer/group/{repositoryName}:
+    get:
+      operationId: getComposerGroupRepository
+      parameters:
+      - explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComposerGroupApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateComposerGroupRepository
+      parameters:
+      - description: Name of the repository to update
+        explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComposerGroupRepositoryApiRequest'
+        required: true
+      responses:
+        '204':
+          description: Repository updated
+        '400':
+          description: Bad request
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Update composer group repository
+      tags:
+      - Repository Management
+  /v1/repositories/composer/hosted:
+    post:
+      operationId: createComposerHostedRepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComposerHostedRepositoryApiRequest'
+        required: true
+      responses:
+        '201':
+          description: Repository created
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Create composer hosted repository
+      tags:
+      - Repository Management
+  /v1/repositories/composer/hosted/{repositoryName}:
+    get:
+      operationId: getComposerHostedRepository
+      parameters:
+      - explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComposerHostedApiRepository'
+          description: successful operation
+      summary: Get repository
+      tags:
+      - Repository Management
+    put:
+      operationId: updateComposerHostedRepository
+      parameters:
+      - description: Name of the repository to update
+        explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComposerHostedRepositoryApiRequest'
+        required: true
+      responses:
+        '204':
+          description: Repository updated
+        '400':
+          description: Bad request
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Update composer hosted repository
       tags:
       - Repository Management
   /v1/repositories/composer/proxy:
@@ -10812,12 +11999,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/ComposerProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -10950,12 +12137,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/ConanHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11029,12 +12216,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConanProxyApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -11171,12 +12352,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/CondaHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11242,12 +12423,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/CondaProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11524,12 +12705,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/GitLfsHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11595,12 +12776,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/GolangGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11668,12 +12849,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/GolangHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11739,12 +12920,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/GolangProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11881,12 +13062,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/HelmHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -11952,12 +13133,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/HelmProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12021,12 +13202,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/HuggingFaceProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12090,12 +13271,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/MavenGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12159,12 +13340,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/MavenHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12228,12 +13409,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/MavenProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12366,12 +13547,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/NpmHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12504,12 +13685,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/NugetGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12573,12 +13754,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/NugetHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12711,12 +13892,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/OciGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12782,12 +13963,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/OciHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12853,12 +14034,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/OciProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12926,12 +14107,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/P2ProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -12995,12 +14176,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/PubGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13064,12 +14245,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/PubHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13133,12 +14314,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/PubProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13271,12 +14452,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/PypiHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13411,12 +14592,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13482,12 +14663,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13553,12 +14734,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13630,12 +14811,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/RawGroupApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -13705,12 +14880,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/RawHostedApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -13780,12 +14949,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/RawProxyApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -13849,12 +15012,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RubyGemsGroupApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13918,12 +15081,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RubyGemsHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -13987,12 +15150,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/RubyGemsProxyApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14125,12 +15288,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
+                $ref: '#/components/schemas/SwiftHostedApiRepository'
+          description: successful operation
       summary: Get repository
       tags:
       - Repository Management
@@ -14485,12 +15648,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/YumGroupApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -14629,12 +15786,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/YumProxyApiRepository'
           description: successful operation
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractApiRepository'
-          description: default response
       summary: Get repository
       tags:
       - Repository Management
@@ -14703,6 +15854,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryXO'
+          description: Repository returned
         '401':
           description: Authentication required
         '403':
@@ -14915,6 +16072,14 @@ paths:
     get:
       operationId: listRoutingRules
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoutingRuleXO'
+                type: array
+          description: Routing rules returned
         '403':
           description: Insufficient permissions to read routing rules
       summary: List routing rules
@@ -14974,6 +16139,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutingRuleXO'
+          description: Routing rule returned
         '403':
           description: Insufficient permissions to read routing rules
         '404':
@@ -15016,14 +16187,14 @@ paths:
     get:
       operationId: listScript
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/ScriptXO'
                 type: array
-          description: default response
+          description: Stored scripts returned
       summary: List all stored scripts
       tags:
       - Script
@@ -15073,6 +16244,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptXO'
+          description: Script returned
         '404':
           description: No script with the specified name
       summary: Read stored script by name
@@ -15124,6 +16301,12 @@ paths:
             schema:
               type: string
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScriptResultXO'
+          description: Script executed successfully
         '404':
           description: No script with the specified name
         '500':
@@ -15701,6 +16884,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -15790,12 +16981,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageComponentXO'
-          description: default response
+          description: successful operation
       summary: Search components
       tags:
       - Search
@@ -16368,6 +17559,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -16457,12 +17656,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageAssetXO'
-          description: default response
+          description: successful operation
       summary: Search assets
       tags:
       - Search
@@ -17025,6 +18224,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -17196,6 +18403,12 @@ paths:
     get:
       operationId: listSecurityAnonymous
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnonymousAccessSettingsXO'
+          description: Anonymous access settings returned
         '403':
           description: Insufficient permissions to update settings
       summary: Get Anonymous Access settings
@@ -17209,6 +18422,12 @@ paths:
             schema:
               $ref: '#/components/schemas/AnonymousAccessSettingsXO'
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnonymousAccessSettingsXO'
+          description: Anonymous access settings updated
         '403':
           description: Insufficient permissions to update settings
       summary: Update Anonymous Access settings
@@ -17219,6 +18438,10 @@ paths:
       operationId: listSecurityAtlassianCrowd
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrowdApiXO'
           description: Atlassian Crowd settings returned
         '401':
           description: Authentication required
@@ -17237,6 +18460,10 @@ paths:
         required: true
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrowdApiXO'
           description: Atlassian Crowd settings updated
         '401':
           description: Authentication required
@@ -17644,10 +18871,10 @@ paths:
     delete:
       operationId: deleteSecurityLdapCache
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/change-order:
@@ -17676,14 +18903,14 @@ paths:
     get:
       operationId: listSecurityLdapTemplates
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/LdapSchemaTemplateXo'
                 type: array
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/verify-connection:
@@ -17704,15 +18931,23 @@ paths:
               $ref: '#/components/schemas/CreateLdapServerXo'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/verify-login:
     post:
       operationId: createSecurityLdapVerifyLogin
+      parameters:
+      - explode: true
+        in: query
+        name: existingServerName
+        required: false
+        schema:
+          type: string
+        style: form
       requestBody:
         content:
           application/json:
@@ -17720,10 +18955,10 @@ paths:
               $ref: '#/components/schemas/LdapVerifyLoginXo'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/verify-user-mapping:
@@ -17744,14 +18979,14 @@ paths:
               $ref: '#/components/schemas/CreateLdapServerXo'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/LdapTestUserMappingXo'
                 type: array
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: LDAP'
   /v1/security/ldap/{name}:
@@ -17902,6 +19137,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update an application type privilege.
       tags:
       - 'Security management: privileges'
@@ -17955,6 +19193,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update a repository admin type privilege.
       tags:
       - 'Security management: privileges'
@@ -18008,6 +19249,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update a repository content selector type privilege.
       tags:
       - 'Security management: privileges'
@@ -18061,6 +19305,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update a repository view type privilege.
       tags:
       - 'Security management: privileges'
@@ -18114,6 +19361,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update a script type privilege.
       tags:
       - 'Security management: privileges'
@@ -18167,6 +19417,9 @@ paths:
           description: The user does not have permission to perform the operation.
         '404':
           description: Privilege not found in the system.
+        '409':
+          description: 'Privilege conflict: name in request body does not match path,
+            or type does not match the target privilege.'
       summary: Update a wildcard type privilege.
       tags:
       - 'Security management: privileges'
@@ -18221,14 +19474,14 @@ paths:
     get:
       operationId: listSecurityRealmsActive
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   type: string
                 type: array
-          description: default response
+          description: successful operation
       summary: List the active realm IDs in order
       tags:
       - 'Security management: realms'
@@ -18243,10 +19496,10 @@ paths:
               type: array
         description: The realm IDs
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Set the active security realms in the order they should be used
       tags:
       - 'Security management: realms'
@@ -18254,14 +19507,14 @@ paths:
     get:
       operationId: listSecurityRealmsAvailable
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/RealmApiXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List the available realms
       tags:
       - 'Security management: realms'
@@ -18279,6 +19532,14 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoleXOResponse'
+                type: array
+          description: Roles returned
         '400':
           description: The specified source does not exist
         '403':
@@ -18296,9 +19557,46 @@ paths:
         description: A role configuration
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleXOResponse'
+          description: Role created
         '403':
           description: Insufficient permissions to create role
       summary: Create role
+      tags:
+      - 'Security management: roles'
+  /v1/security/roles/assignable:
+    get:
+      operationId: listSecurityRolesAssignable
+      parameters:
+      - description: The id of the user source to filter the roles by, if supplied.
+          Otherwise roles from default user source will be returned. Available sources
+          can be fetched using the 'User Sources' endpoint.
+        explode: true
+        in: query
+        name: source
+        required: false
+        schema:
+          default: default
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RoleXOResponse'
+                type: array
+          description: Assignable roles returned
+        '400':
+          description: The specified source does not exist
+        '403':
+          description: Insufficient permissions to read roles
+      summary: Get assignable roles
       tags:
       - 'Security management: roles'
   /v1/security/roles/{id}:
@@ -18348,6 +19646,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleXOResponse'
+          description: Role returned
         '400':
           description: The specified source does not exist
         '403':
@@ -18401,6 +19705,10 @@ paths:
       operationId: listSecuritySaml
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlConfigurationXO'
           description: SAML configuration returned
         '401':
           description: Authentication required
@@ -18452,13 +19760,14 @@ paths:
     get:
       operationId: listSecuritySamlPem
       parameters:
-      - description: 'Type of certificate to return: ''signing'' or ''decryption''.
-          Defaults to ''signing'' if not provided.'
+      - description: 'Type of certificate to return: SIGNING or DECRYPTION. Defaults
+          to SIGNING if not provided.'
         explode: true
         in: query
         name: type
         required: false
         schema:
+          default: SIGNING
           enum:
           - SIGNING
           - DECRYPTION
@@ -18490,6 +19799,12 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SamlUserXO'
+                type: array
           description: List of SAML users returned
         '403':
           description: Insufficient permissions
@@ -18551,6 +19866,10 @@ paths:
         style: simple
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlUserXO'
           description: SAML user returned
         '403':
           description: Insufficient permissions
@@ -18621,6 +19940,12 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiCertificate'
+          description: Certificate details retrieved
         '400':
           description: A certificate could not be retrieved, see the message for details.
         '403':
@@ -18632,6 +19957,14 @@ paths:
     get:
       operationId: listSecuritySslTruststore
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiCertificate'
+                type: array
+          description: Trust store certificates returned
         '403':
           description: Insufficient permissions to list certificates in the trust
             store.
@@ -18686,6 +20019,10 @@ paths:
       operationId: listSecuritySsrfProtection
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SsrfProtectionConfigurationXO'
           description: SSRF protection settings returned
         '401':
           description: Authentication required
@@ -18704,6 +20041,10 @@ paths:
         required: true
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SsrfProtectionConfigurationXO'
           description: SSRF protection settings updated
         '400':
           description: Invalid configuration
@@ -18718,6 +20059,14 @@ paths:
     get:
       operationId: listSecurityUserSources
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiUserSource'
+                type: array
+          description: User sources returned
         '403':
           description: The user does not have permission to perform the operation.
       summary: Retrieve a list of the available user sources.
@@ -18727,21 +20076,21 @@ paths:
     delete:
       operationId: deleteSecurityUserTokens
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: user tokens'
     get:
       operationId: listSecurityUserTokens
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokensApiModel'
-          description: default response
+          description: successful operation
       summary: Show if the user token capability is enabled or not
       tags:
       - 'Security management: user tokens'
@@ -18754,12 +20103,12 @@ paths:
               $ref: '#/components/schemas/UserTokensApiModel'
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserTokensApiModel'
-          description: default response
+          description: successful operation
       tags:
       - 'Security management: user tokens'
   /v1/security/user-tokens/tokens:
@@ -18830,6 +20179,12 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/UserTokenListXO'
+                - $ref: '#/components/schemas/UserTokenXO'
           description: Success. In list mode (no 'namecode' param) returns UserTokenListXO.
             In lookup mode ('namecode' present) returns a single UserTokenXO.
         '400':
@@ -18869,6 +20224,14 @@ paths:
           type: string
         style: form
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ApiUser'
+                type: array
+          description: Users returned
         '400':
           description: Password was not supplied in the body of the request
         '403':
@@ -18887,6 +20250,12 @@ paths:
         description: A representation of the user to create.
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiUser'
+          description: User created
         '400':
           description: Password was not supplied in the body of the request
         '403':
@@ -19666,6 +21035,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -20292,6 +21669,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -20410,6 +21795,10 @@ paths:
       operationId: listStatusCheck
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                type: object
           description: The system status check results
       summary: Health check endpoint that returns the results of the system status
         checks
@@ -20453,6 +21842,10 @@ paths:
               $ref: '#/components/schemas/SupportZipGeneratorRequest'
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportZipXO'
           description: successful operation
         '403':
           description: Insufficient permissions to generate support zip
@@ -20464,6 +21857,10 @@ paths:
       operationId: listSystemEula
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EulaStatus'
           description: Successful response
       summary: Get the current Community Eula status.
       tags:
@@ -20487,22 +21884,22 @@ paths:
     delete:
       operationId: deleteSystemLicense
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Uninstall license if present.
       tags:
       - Product licensing
     get:
       operationId: listSystemLicense
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiLicenseDetailsXO'
-          description: default response
+          description: successful operation
       summary: Get the current license status.
       tags:
       - Product licensing
@@ -20516,12 +21913,12 @@ paths:
               type: object
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiLicenseDetailsXO'
-          description: default response
+          description: successful operation
       summary: Upload a new license file.
       tags:
       - Product licensing
@@ -20538,6 +21935,12 @@ paths:
     get:
       operationId: listSystemNode
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInformation'
+          description: Node information returned
         '403':
           description: Insufficient permissions to update settings
       summary: Get information about this node
@@ -20557,12 +21960,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTagXO'
-          description: default response
+          description: successful operation
       summary: List tags
       tags:
       - Tags
@@ -20576,6 +21979,10 @@ paths:
         required: true
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagXO'
           description: Tag was added
         '400':
           description: Bad request. Check tag name and attributes. Name can only contain
@@ -21115,6 +22522,14 @@ paths:
         explode: true
         in: query
         name: pypi.summary
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
         required: false
         schema:
           type: string
@@ -21748,6 +23163,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: Raw asset filename (basename)
+        explode: true
+        in: query
+        name: raw.name
+        required: false
+        schema:
+          type: string
+        style: form
       - description: RubyGems description
         explode: true
         in: query
@@ -21876,6 +23299,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagXO'
+          description: Tag returned
         '404':
           description: Tag not found
       summary: Get a tag
@@ -21898,6 +23327,12 @@ paths:
               $ref: '#/components/schemas/BaseTagXO'
         required: true
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagXO'
+          description: Tag updated
         '400':
           description: Bad request. Check tag attributes. The attributes is a JSON
             document which cannot exceed 20k
@@ -21919,12 +23354,12 @@ paths:
           type: string
         style: form
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageTaskXO'
-          description: default response
+          description: successful operation
       summary: List tasks
       tags:
       - Tasks
@@ -21950,14 +23385,14 @@ paths:
     get:
       operationId: listTasksTemplates
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 items:
                   $ref: '#/components/schemas/TaskTemplateXO'
                 type: array
-          description: default response
+          description: successful operation
       summary: List tasks of template tasks. This is the base to create new tasks
       tags:
       - Tasks
@@ -21973,12 +23408,12 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskTemplateXO'
-          description: default response
+          description: successful operation
       summary: Get task template by type. This is the base to create new tasks
       tags:
       - Tasks
@@ -21994,10 +23429,10 @@ paths:
           type: string
         style: simple
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Delete task by id
       tags:
       - Tasks
@@ -22013,6 +23448,12 @@ paths:
           type: string
         style: simple
       responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskXO'
+          description: Task returned
         '404':
           description: Task not found
       summary: Get a single task by id
@@ -22110,10 +23551,10 @@ paths:
               - notificationCondition
         required: true
       responses:
-        default:
+        '200':
           content:
             application/json: {}
-          description: default response
+          description: successful operation
       summary: Update an existing task
       tags:
       - Tasks

@@ -138,6 +138,50 @@ For example, to perform a "patch" release, add a commit to `main` with a comment
 fix: the problem resolved goes here
 ```
 
+### Go module versioning is special-cased
+
+The policy above (MAJOR.MINOR tracks NXRM's MAJOR.MINOR) applies to the Python, Java and TypeScript clients. The
+**Go** client cannot follow it directly, because Go's module system enforces
+[semantic import versioning](https://go.dev/ref/mod#major-version-suffixes): once a module reaches major version 2+,
+its import path must carry a `/vN` suffix that matches the major version of every tag published for it, and a Go
+build can only ever resolve **one version per import path** - there is no way for a consumer to depend on two
+incompatible generations of the same Go module at once (unlike npm, which lets two majors of a package coexist via
+nested `node_modules`).
+
+This matters here because generator-output changes between NXRM releases are sometimes breaking for Go specifically
+- renamed `operationId`s become renamed methods, renamed/restructured models become renamed/restructured Go types,
+pointer-vs-value field changes break call sites - even when the same spec change is a compatible/additive change for
+Python, Java and TypeScript. When that happens, downstream Go consumers that need to migrate gradually (e.g.
+`terraform-provider-sonatyperepo`) need the old and new generations to be importable side by side, which Go only
+allows if they live at different `/vN` import paths.
+
+To satisfy that constraint while still keeping the version traceable back to NXRM, the Go client uses:
+
+```
+Go major = (NXRM major * 100) + (NXRM minor at which the current generation started)
+Go minor = the live NXRM minor version
+Go patch = this repo's own release counter within that NXRM minor (as PATCH has always meant here)
+```
+
+For example, a generator-output breaking change introduced in NXRM `3.95.0` starts a new generation at Go major
+`395`. The Go module's import path becomes `.../nexus-repo-api-client-go/v395`, and its tags become `v395.95.0`,
+`v395.95.1`, etc. If NXRM `3.96.0` ships with no further Go-breaking changes, that same generation continues and the
+next Go tag is `v395.96.0` - still on the `/v395` import path - rather than bumping to a new major every NXRM minor.
+
+The Go major version (the "generation") only bumps again when a future spec update introduces another
+generator-output breaking change for Go. The single source of truth for the current generation number is the
+[`.generation`](./.generation) file in this repo, which must always match `go.yaml`'s `packageName` - the release
+workflow validates this and fails the release if they drift apart.
+
+Because of this, a jump in the Go module's major version (e.g. `v3` -> `v395`) does **not** imply any equivalent
+jump for Python, Java or TypeScript, and does not by itself indicate a breaking change in the underlying NXRM API -
+it only reflects Go's own import-path requirements. Also see the equivalent notice in the generated
+[`nexus-repo-api-client-go`](https://github.com/sonatype-nexus-community/nexus-repo-api-client-go) repository.
+
+`v3.94.0` of the Go client was published with extensive generator-output breaking changes relative to `v3.93.2` that
+were never intended for release; that generation is [retracted](https://go.dev/ref/mod#go-mod-file-retract) via a
+`retract` directive in `go.mod` and should not be used - depend on `v395.x.x` (or later) instead.
+
 ## The Fine Print
 
 Remember:

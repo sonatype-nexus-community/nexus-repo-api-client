@@ -1,0 +1,13 @@
+# Durable source of truth for the Go module's `retract` directives (see .generation for the related
+# import-path/generation scheme).
+#
+# go.mod in the generated repository (sonatype-nexus-community/nexus-repo-api-client-go) is fully
+# regenerated from openapi-generator templates on every release, so it cannot carry this content on its
+# own - the release-go job in .github/workflows/release.yaml reads this file and appends a `retract`
+# line to go.mod for every entry here, before every release, forever.
+#
+# Format: one entry per line - <version> # <reason>. Add an entry (never remove one) whenever a
+# published Go version must not be depended on (e.g. it shipped with unintended generator-output
+# breaking changes, per https://go.dev/ref/mod#go-mod-file-retract).
+
+v3.94.0 # shipped with extensive generator-output breaking changes relative to v3.93.2 (renamed operationIds/methods, renamed model types, pointer-vs-value field changes) that were never intended for release; predates the /v395 import path

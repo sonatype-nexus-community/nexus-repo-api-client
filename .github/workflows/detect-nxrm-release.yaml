@@ -184,6 +184,10 @@ jobs:
 
                   - [ ] Review `spec/openapi.yaml` diff for unexpected changes
                   - [ ] Confirm all CI checks pass below
+                  - [ ] Decide whether this spec update introduces generator-output breaking changes
+                        (operationId/method renames, model type renames, field type changes) for any
+                        target language. If so, bump the generation number in `.generation` and
+                        `go.yaml`'s `packageName` to match before merging - see `.generation` for details.
                   PREOF
 
                   URL=$(gh pr create \

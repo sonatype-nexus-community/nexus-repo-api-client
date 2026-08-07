@@ -55,6 +55,9 @@ jobs:
         needs: generate-library-code
 
         steps:
+            - name: Checkout Generator Repository
+              uses: actions/checkout@v4
+
             - name: Setup Go
               uses: actions/setup-go@v5
               with:
@@ -67,6 +70,25 @@ jobs:
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
                   path: out/go
+
+            - name: Compute and Validate Go Module Tag
+              id: go_tag
+              run: |
+                  GENERATION=$(grep -Ev '^#|^$' .generation | tail -1 | tr -d '[:space:]')
+                  PACKAGE_NAME=$(grep -oP 'packageName:\s*v\K[0-9]+' go.yaml)
+
+                  if [ "${GENERATION}" != "${PACKAGE_NAME}" ]; then
+                      echo "::error::.generation (${GENERATION}) does not match go.yaml packageName (v${PACKAGE_NAME}) - keep these in sync before releasing"
+                      exit 1
+                  fi
+
+                  NXRM_MINOR=$(echo "${{ env.THIS_VERSION }}" | cut -d '.' -f2)
+                  NXRM_PATCH=$(echo "${{ env.THIS_VERSION }}" | cut -d '.' -f3)
+                  GO_TAG="v${GENERATION}.${NXRM_MINOR}.${NXRM_PATCH}"
+
+                  echo "Computed Go module tag ${GO_TAG} from NXRM version ${{ env.THIS_VERSION }} and generation ${GENERATION}"
+                  echo "tag=${GO_TAG}" >> "$GITHUB_OUTPUT"
+                  echo "generation=${GENERATION}" >> "$GITHUB_OUTPUT"
 
             - name: Setup git config
               run: |
@@ -100,13 +122,37 @@ jobs:
                   go test -v ./test/
               working-directory: out/go
 
+            - name: Inject durable Go module notices (retract, versioning note)
+              if: ${{ github.ref_type == 'tag' }}
+              run: |
+                  {
+                      echo ""
+                      grep -Ev '^#|^$' .go-retractions | sed -E 's/^([^ ]+)[[:space:]]*#[[:space:]]*(.*)$/retract \1 \/\/ \2/'
+                  } >> out/go/go.mod
+
+                  NOTICE_FILE=$(mktemp)
+                  cat > "${NOTICE_FILE}" << EOF
+
+                  ## Version Generation Notice
+
+                  This client's Go module major version (\`/v${{ steps.go_tag.outputs.generation }}\` in the import
+                  path) does not track NXRM's own version number one-to-one. See the ["Go module versioning is
+                  special-cased"](https://github.com/sonatype-nexus-community/nexus-repo-api-client#go-module-versioning-is-special-cased)
+                  section of the generator repository's README for the full rationale and scheme, and this module's
+                  \`retract\` directives in \`go.mod\` for versions that must not be depended on.
+                  EOF
+
+                  TMP=$(mktemp)
+                  { head -1 out/go/README.md; cat "${NOTICE_FILE}"; tail -n +2 out/go/README.md; } > "${TMP}"
+                  mv "${TMP}" out/go/README.md
+
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
               run: |
                   echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
                   git add *
-                  git commit -m "Automated Release v${{ env.THIS_VERSION }}"
-                  git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
+                  git commit -m "Automated Release ${{ steps.go_tag.outputs.tag }} (generated from NXRM v${{ env.THIS_VERSION }})"
+                  git tag -a "${{ steps.go_tag.outputs.tag }}" -m "Automated Release ${{ steps.go_tag.outputs.tag }} (generated from NXRM v${{ env.THIS_VERSION }})"
                   git push
                   git push --tags
               working-directory: out/go
