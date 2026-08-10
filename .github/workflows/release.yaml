@@ -25,14 +25,13 @@ jobs:
                 language: ['go', 'java-webclient', 'python', 'typescript']
         steps:
             - name: Checkout
-              # see https://github.com/actions/checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Create Output Directory
               run: mkdir out/${{ matrix.language }}
 
             - name: Run OpenAPI Generator
-              uses: addnab/docker-run-action@v3
+              uses: addnab/docker-run-action@4f65fabd2431ebc8d299f8e5a018d79a769ae185 # v3
               with:
                   username: ${{ secrets.DOCKER_HUB_USERNAME }}
                   password: ${{ secrets.DOCKER_HUB_PAT }}
@@ -44,7 +43,7 @@ jobs:
               run: cp LICENSE *.sh ./out/${{ matrix.language }}
             
             - name: Save to Cache
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/${{ matrix.language }}
                   key: '${{ matrix.language }}-${{ github.sha }}'
@@ -55,18 +54,40 @@ jobs:
         needs: generate-library-code
 
         steps:
-            - name: Setup Go
-              uses: actions/setup-go@v5
-              with:
-                  go-version: 1.22
+            - name: Checkout Generator Repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Checkout Go Library Repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   repository: sonatype-nexus-community/nexus-repo-api-client-go
                   ref: main
                   token: ${{ secrets.GO_LIB_GH_ACTION_TOKEN }}
                   path: out/go
+
+            - name: Setup Go
+              uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # @v7.0.0
+              with:
+                  go-version-file: 'out/go/go.mod'
+
+            - name: Compute and Validate Go Module Tag
+              id: go_tag
+              run: |
+                  GENERATION=$(grep -Ev '^#|^$' .generation | tail -1 | tr -d '[:space:]')
+                  PACKAGE_NAME=$(grep -oP 'packageName:\s*v\K[0-9]+' go.yaml)
+
+                  if [ "${GENERATION}" != "${PACKAGE_NAME}" ]; then
+                      echo "::error::.generation (${GENERATION}) does not match go.yaml packageName (v${PACKAGE_NAME}) - keep these in sync before releasing"
+                      exit 1
+                  fi
+
+                  NXRM_MINOR=$(echo "${{ env.THIS_VERSION }}" | cut -d '.' -f2)
+                  NXRM_PATCH=$(echo "${{ env.THIS_VERSION }}" | cut -d '.' -f3)
+                  GO_TAG="v${GENERATION}.${NXRM_MINOR}.${NXRM_PATCH}"
+
+                  echo "Computed Go module tag ${GO_TAG} from NXRM version ${{ env.THIS_VERSION }} and generation ${GENERATION}"
+                  echo "tag=${GO_TAG}" >> "$GITHUB_OUTPUT"
+                  echo "generation=${GENERATION}" >> "$GITHUB_OUTPUT"
 
             - name: Setup git config
               run: |
@@ -81,7 +102,7 @@ jobs:
               run: ls -lR ${{ github.workspace }}
 
             - name: Get generated code from cache
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/go
                   key: 'go-${{ github.sha }}'
@@ -100,13 +121,37 @@ jobs:
                   go test -v ./test/
               working-directory: out/go
 
+            - name: Inject durable Go module notices (retract, versioning note)
+              if: ${{ github.ref_type == 'tag' }}
+              run: |
+                  {
+                      echo ""
+                      grep -Ev '^#|^$' .go-retractions | sed -E 's/^([^ ]+)[[:space:]]*#[[:space:]]*(.*)$/retract \1 \/\/ \2/'
+                  } >> out/go/go.mod
+
+                  NOTICE_FILE=$(mktemp)
+                  cat > "${NOTICE_FILE}" << EOF
+
+                  ## Version Generation Notice
+
+                  This client's Go module major version (\`/v${{ steps.go_tag.outputs.generation }}\` in the import
+                  path) does not track NXRM's own version number one-to-one. See the ["Go module versioning is
+                  special-cased"](https://github.com/sonatype-nexus-community/nexus-repo-api-client#go-module-versioning-is-special-cased)
+                  section of the generator repository's README for the full rationale and scheme, and this module's
+                  \`retract\` directives in \`go.mod\` for versions that must not be depended on.
+                  EOF
+
+                  TMP=$(mktemp)
+                  { head -1 out/go/README.md; cat "${NOTICE_FILE}"; tail -n +2 out/go/README.md; } > "${TMP}"
+                  mv "${TMP}" out/go/README.md
+
             - name: Commit, Tag and Push
               if: ${{ github.ref_type == 'tag' }}
               run: |
                   echo "BRANCH=${{ github.ref }}\nSHA=${{ github.sha }}" > GIT_VERSION
                   git add *
-                  git commit -m "Automated Release v${{ env.THIS_VERSION }}"
-                  git tag -a "${{ github.ref_name }}" -m "Automated Release v${{ env.THIS_VERSION }}"
+                  git commit -m "Automated Release ${{ steps.go_tag.outputs.tag }} (generated from NXRM v${{ env.THIS_VERSION }})"
+                  git tag -a "${{ steps.go_tag.outputs.tag }}" -m "Automated Release ${{ steps.go_tag.outputs.tag }} (generated from NXRM v${{ env.THIS_VERSION }})"
                   git push
                   git push --tags
               working-directory: out/go
@@ -118,18 +163,15 @@ jobs:
 
       steps:
         - name: Set up Python
-          uses: actions/setup-python@v5
+          uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
           with:
             python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
 
-        - name: Install poetry
-          # see https://github.com/marketplace/actions/setup-poetry
-          uses: Gr1N/setup-poetry@v9
-          with:
-            poetry-version: ${{ env.POETRY_VERSION }}
+        - name: Install Poetry
+          run: pipx install poetry==${{ env.POETRY_VERSION }}
 
         - name: Get generated code from cache
-          uses: actions/cache/restore@v4
+          uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
             path: out/python
             key: 'python-${{ github.sha }}'
@@ -157,7 +199,7 @@ jobs:
 
         steps:
           - name: Set Java JDK 17 and Maven Central Repository
-            uses: actions/setup-java@v4
+            uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
             with:
               java-version: '17'
               distribution: 'temurin'
@@ -168,12 +210,12 @@ jobs:
               gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
           - name: Set up Maven
-            uses: stCarolas/setup-maven@v5
+            uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
             with:
               maven-version: 3.9.4
 
           - name: Get generated code from cache
-            uses: actions/cache/restore@v4
+            uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
             with:
               path: out/java-webclient
               key: 'java-webclient-${{ github.sha }}'
@@ -197,22 +239,26 @@ jobs:
 
         steps:
             - name: Setup Node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: latest
+
             - name: Get generated code from cache
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/typescript
                   key: 'typescript-${{ github.sha }}'
                   fail-on-cache-miss: true
+                  
             - name: Set Version
               run: |
                   npm version ${{ env.THIS_VERSION }}
               working-directory: out/typescript
+
             - name: Build Typescript API Client
               run: npm i && npm run build
               working-directory: out/typescript
+              
             - name: Publish
               run: |
                   npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}

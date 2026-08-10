@@ -5,4 +5,4 @@ gitRepoId: nexus-repo-api-client-go
 additionalProperties:
   goImportAlias: sonatyperepo
   isGoSubmodule: true
-  packageName: v3
+  packageName: v395

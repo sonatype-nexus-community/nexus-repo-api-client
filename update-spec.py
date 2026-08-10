@@ -838,6 +838,85 @@ json_spec['paths']['/v1/repositories/alpine/group/{repositoryName}']['get']['res
 }
 print('     Done')
 
+print('Fix `SwiftHostedRepositoryApiRequest` schema (missing `component`)')
+json_spec['components']['schemas']['SwiftHostedRepositoryApiRequest']['properties']['component'] = {
+    '$ref': '#/components/schemas/ComponentAttributes'
+}
+print('     Done')
+
+# Remaining GET /v1/repositories/{format}/{hosted|proxy|group}/{repositoryName} paths whose response
+# schema still resolves to the generic, 5-field `AbstractApiRepository` instead of the rich, real
+# response NXRM actually sends (see the Alpine/Yum/Conan/Raw patches above for the same fix applied
+# by hand). Every one of these formats already has a `{base}{Type}RepositoryApiRequest` schema that
+# matches the real response shape except for `format`/`type`/`url`, so compose it via `allOf` rather
+# than redeclaring every property.
+print('Correcting response schema for remaining GET /v1/repositories/{format}/{type}/{repositoryName}...')
+repository_get_paths_to_fix = [
+    ('apt', 'hosted', 'Apt'),
+    ('apt', 'proxy', 'Apt'),
+    ('cargo', 'hosted', 'Cargo'),
+    ('cocoapods', 'proxy', 'Cocoapods'),
+    ('composer', 'group', 'Composer'),
+    ('composer', 'hosted', 'Composer'),
+    ('composer', 'proxy', 'Composer'),
+    ('conan', 'hosted', 'Conan'),
+    ('conda', 'hosted', 'Conda'),
+    ('conda', 'proxy', 'Conda'),
+    ('gitlfs', 'hosted', 'GitLfs'),
+    ('go', 'group', 'Golang'),
+    ('go', 'hosted', 'Golang'),
+    ('go', 'proxy', 'Golang'),
+    ('helm', 'hosted', 'Helm'),
+    ('helm', 'proxy', 'Helm'),
+    ('huggingface', 'proxy', 'HuggingFace'),
+    ('maven', 'group', 'Maven'),
+    ('maven', 'hosted', 'Maven'),
+    ('maven', 'proxy', 'Maven'),
+    ('npm', 'hosted', 'Npm'),
+    ('nuget', 'group', 'Nuget'),
+    ('nuget', 'hosted', 'Nuget'),
+    ('oci', 'group', 'Oci'),
+    ('oci', 'hosted', 'Oci'),
+    ('oci', 'proxy', 'Oci'),
+    ('p2', 'proxy', 'P2'),
+    ('pub', 'group', 'Pub'),
+    ('pub', 'hosted', 'Pub'),
+    ('pub', 'proxy', 'Pub'),
+    ('pypi', 'hosted', 'Pypi'),
+    ('r', 'group', 'R'),
+    ('r', 'hosted', 'R'),
+    ('r', 'proxy', 'R'),
+    ('rubygems', 'group', 'RubyGems'),
+    ('rubygems', 'hosted', 'RubyGems'),
+    ('rubygems', 'proxy', 'RubyGems'),
+    ('swift', 'hosted', 'Swift'),
+]
+for fmt, typ, base in repository_get_paths_to_fix:
+    request_schema = f'{base}{typ.capitalize()}RepositoryApiRequest'
+    response_schema = f'{base}{typ.capitalize()}ApiRepository'
+    json_spec['components']['schemas'][response_schema] = {
+        'allOf': [
+            {
+                '$ref': f'#/components/schemas/{request_schema}'
+            },
+            {
+                'type': 'object',
+                'required': ['format', 'type', 'url'],
+                'properties': {
+                    'format': {'type': 'string', 'default': fmt},
+                    'type': {'type': 'string', 'default': typ},
+                    'url': {'type': 'string'}
+                }
+            }
+        ]
+    }
+    path = f'/v1/repositories/{fmt}/{typ}/{{repositoryName}}'
+    ensure_response(path, 'get', '200', 'successful operation')
+    json_spec['paths'][path]['get']['responses']['200']['content']['application/json']['schema'] = {
+        '$ref': f'#/components/schemas/{response_schema}'
+    }
+print(f'   Fixed {len(repository_get_paths_to_fix)} Repository GET response schemas')
+
 # NXRM has, on occasion, dropped `description` from the `200` response of repository-format GET
 # endpoints across many/all formats (not just the ones patched by name above). OpenAPI Generator
 # requires it, so backfill it wherever it's missing rather than special-casing every format.

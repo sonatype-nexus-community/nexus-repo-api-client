@@ -30,13 +30,13 @@ jobs:
         steps:
             - name: Checkout
               # see https://github.com/actions/checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Create Output Directory
               run: mkdir out/${{ matrix.language }}
 
             - name: Run OpenAPI Generator
-              uses: addnab/docker-run-action@v3
+              uses: addnab/docker-run-action@4f65fabd2431ebc8d299f8e5a018d79a769ae185 # v3
               with:
                   username: ${{ secrets.DOCKER_HUB_USERNAME }}
                   password: ${{ secrets.DOCKER_HUB_PAT }}
@@ -48,7 +48,7 @@ jobs:
               run: cp LICENSE *.sh ./out/${{ matrix.language }}
 
             - name: Save to Cache
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/${{ matrix.language }}
                   key: '${{ matrix.language }}-${{ github.run_id }}'
@@ -59,17 +59,17 @@ jobs:
         needs: generate-library-code
 
         steps:
-            - name: Setup Go
-              uses: actions/setup-go@v5
-              with:
-                  go-version: 1.22
-
             - name: Get generated code from cache
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/go
                   key: 'go-${{ github.run_id }}'
                   fail-on-cache-miss: true
+
+            - name: Setup Go
+              uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # @v7.0.0
+              with:
+                  go-version-file: 'out/go/go.mod'
 
             - name: Build Go API Client
               run: go build -v ./
@@ -88,18 +88,15 @@ jobs:
 
       steps:
         - name: Set up Python
-          uses: actions/setup-python@v5
+          uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
           with:
             python-version: ${{ env.PYTHON_VERSION_DEFAULT }}
 
-        - name: Install poetry
-          # see https://github.com/marketplace/actions/setup-poetry
-          uses: Gr1N/setup-poetry@v9
-          with:
-            poetry-version: ${{ env.POETRY_VERSION }}
+        - name: Install Poetry
+          run: pipx install poetry==${{ env.POETRY_VERSION }}
 
         - name: Get generated code from cache
-          uses: actions/cache/restore@v4
+          uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
             path: out/python
             key: 'python-${{ github.run_id }}'
@@ -126,19 +123,19 @@ jobs:
 
         steps:
             - name: Set up JDK 17 for x64
-              uses: actions/setup-java@v4
+              uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
               with:
                 java-version: '17'
                 distribution: 'temurin'
                 architecture: x64
 
             - name: Set up Maven
-              uses: stCarolas/setup-maven@v5
+              uses: stCarolas/setup-maven@12eb41b233df95d49b0c11fc1b5bc8312e5d4ce0 # v5.1
               with:
                 maven-version: 3.9.4
 
             - name: Get generated code from cache
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/java-webclient
                   key: 'java-webclient-${{ github.run_id }}'
@@ -157,15 +154,17 @@ jobs:
 
         steps:
             - name: Setup Node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: latest
+
             - name: Get generated code from cache
-              uses: actions/cache/restore@v4
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: out/typescript
                   key: 'typescript-${{ github.run_id }}'
                   fail-on-cache-miss: true
+                  
             - name: Build Typescript API Client
               run: npm i && npm run build
               working-directory: out/typescript

@@ -1,0 +1,20 @@
+# Single source of truth for the Go "generation" identifier - the major version of the published
+# Go module's import path (github.com/sonatype-nexus-community/nexus-repo-api-client-go/vN).
+#
+# Value = (NXRM major * 100) + (NXRM minor at which this generation started), e.g. NXRM 3.95 -> 395.
+# It stays FIXED across subsequent NXRM minor releases (3.96, 3.97, ...) as long as those releases
+# don't introduce further generator-output breaking changes - the live NXRM minor moves into the Go
+# module's own *minor* version component instead (e.g. NXRM 3.96.0 -> go tag v395.96.0, still on this
+# same generation/import path). This mirrors how the other three languages already fold NXRM's
+# MAJOR.MINOR into their own release version, just shifted one slot to satisfy Go's requirement that
+# the module's major version live in its import path (https://go.dev/ref/mod#major-version-suffixes).
+#
+# Bump this number - to (NXRM major * 100) + the NXRM minor that introduced the break - only when an
+# NXRM spec update introduces generator-output breaking changes for at least one target language
+# (operationId/method renames, model type renames, field type changes - not purely additive
+# fields/endpoints). Python/Java/TypeScript are not import-path-versioned and are unaffected by this
+# file - they keep tracking the NXRM version directly per README.md's "Releasing" policy.
+#
+# When bumping, update go.yaml's packageName to match (`vN`), and document the jump in README.md and
+# in the generated Go repository (sonatype-nexus-community/nexus-repo-api-client-go).
+395
