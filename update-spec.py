@@ -917,6 +917,31 @@ for fmt, typ, base in repository_get_paths_to_fix:
     }
 print(f'   Fixed {len(repository_get_paths_to_fix)} Repository GET response schemas')
 
+print('Correcting response schema for GET /v1/cleanup-policies...')
+ensure_response('/v1/cleanup-policies', 'get', '200', 'The list of existing policies')
+json_spec['paths']['/v1/cleanup-policies']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            'type': 'array',
+            'items': {
+                '$ref': '#/components/schemas/CleanupPolicyResourceXO'
+            }
+        }
+    }
+}
+print('     Done')
+
+print('Correcting response schema for GET /v1/cleanup-policies/{name}...')
+ensure_response('/v1/cleanup-policies/{name}', 'get', '200', 'Policy if exists')
+json_spec['paths']['/v1/cleanup-policies/{name}']['get']['responses']['200']['content'] = {
+    'application/json': {
+        'schema': {
+            '$ref': '#/components/schemas/CleanupPolicyResourceXO'
+        }
+    }
+}
+print('     Done')
+
 # NXRM has, on occasion, dropped `description` from the `200` response of repository-format GET
 # endpoints across many/all formats (not just the ones patched by name above). OpenAPI Generator
 # requires it, so backfill it wherever it's missing rather than special-casing every format.
