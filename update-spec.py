@@ -328,6 +328,7 @@ json_spec['components']['schemas'].update({
     'PyPiProxyApiRepository': {
         'properties': {
             'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
+            'firewall': {'$ref': '#/components/schemas/FirewallAttributes'},
             'format': {'type': 'string', 'default': 'pypi'},
             'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
             'name': {
