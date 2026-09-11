@@ -38,18 +38,23 @@ def parse_version_from_server_header(header: str) -> str:
 
 
 def ensure_response(path: str, method: str, code: str, description: str) -> None:
-    """NXRM has, on occasion, dropped a response entirely from the generated Swagger doc.
-    Recreate it (matching the last known-good spec) before patching its content. The skeleton
-    includes an empty `application/json` schema so call sites that only patch a nested key
-    (e.g. `...['content']['application/json']['schema']['$ref'] = ...`) have something to patch."""
-    json_spec['paths'][path][method]['responses'].setdefault(code, {
-        'description': description,
-        'content': {
-            'application/json': {
-                'schema': {}
+    """NXRM has, on occasion, dropped a response entirely from the generated Swagger doc,
+    or left the response in place but stripped its `content` (e.g. `{"description": "Success"}`
+    with no schema). Recreate whichever part is missing (matching the last known-good spec)
+    before patching its content. The skeleton includes an empty `application/json` schema so
+    call sites that only patch a nested key (e.g. `...['content']['application/json']['schema']
+    ['$ref'] = ...`) have something to patch."""
+    responses = json_spec['paths'][path][method]['responses']
+    existing = responses.get(code)
+    if existing is None or 'content' not in existing:
+        responses[code] = {
+            'description': existing.get('description', description) if existing else description,
+            'content': {
+                'application/json': {
+                    'schema': {}
+                }
             }
         }
-    })
 
 
 json_spec_response_v2 = requests.get(f'{NXRM_SERVER_URL}{NXRM_SPEC_PATH}')
@@ -230,6 +235,9 @@ operations_to_fix = [
     {'path': '/v1/plan', 'method': 'delete', 'operation_id': 'deleteAllPlans'},
     {'path': '/v1/plan', 'method': 'put', 'operation_id': 'executeAllPlans'},
     {'path': '/v1/plan/{planId}', 'method': 'put', 'operation_id': 'executePlan'},
+    # `GET /v2/security/saml/users` was introduced reusing the `listSecuritySamlUsers`
+    # operationId from `GET /v1/security/saml/users` - disambiguate by version.
+    {'path': '/v2/security/saml/users', 'method': 'get', 'operation_id': 'listSecuritySamlUsersV2'},
 ]
 i = 0
 print('Overriding operation IDs...')
