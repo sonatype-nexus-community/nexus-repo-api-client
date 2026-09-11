@@ -38,18 +38,23 @@ def parse_version_from_server_header(header: str) -> str:
 
 
 def ensure_response(path: str, method: str, code: str, description: str) -> None:
-    """NXRM has, on occasion, dropped a response entirely from the generated Swagger doc.
-    Recreate it (matching the last known-good spec) before patching its content. The skeleton
-    includes an empty `application/json` schema so call sites that only patch a nested key
-    (e.g. `...['content']['application/json']['schema']['$ref'] = ...`) have something to patch."""
-    json_spec['paths'][path][method]['responses'].setdefault(code, {
-        'description': description,
-        'content': {
-            'application/json': {
-                'schema': {}
+    """NXRM has, on occasion, dropped a response entirely from the generated Swagger doc,
+    or left the response in place but stripped its `content` (e.g. `{"description": "Success"}`
+    with no schema). Recreate whichever part is missing (matching the last known-good spec)
+    before patching its content. The skeleton includes an empty `application/json` schema so
+    call sites that only patch a nested key (e.g. `...['content']['application/json']['schema']
+    ['$ref'] = ...`) have something to patch."""
+    responses = json_spec['paths'][path][method]['responses']
+    existing = responses.get(code)
+    if existing is None or 'content' not in existing:
+        responses[code] = {
+            'description': existing.get('description', description) if existing else description,
+            'content': {
+                'application/json': {
+                    'schema': {}
+                }
             }
         }
-    })
 
 
 json_spec_response_v2 = requests.get(f'{NXRM_SERVER_URL}{NXRM_SPEC_PATH}')

@@ -1730,6 +1730,9 @@ components:
           description: The name of an existing container to be used for storage.
           pattern: ^[a-z0-9][a-z0-9-]{2,62}$
           type: string
+        preSignedUrlEnabled:
+          description: Whether direct download via SAS URLs is enabled.
+          type: boolean
       required:
       - accountName
       - authentication
@@ -2250,6 +2253,46 @@ components:
           description: Components in this repository count as proprietary for namespace
             conflict attacks (requires Sonatype Nexus Firewall)
           type: boolean
+      type: object
+    ComponentVersionXO:
+      description: One distinct version of a component and the repositories containing
+        it
+      properties:
+        lastUpdated:
+          description: The most recent modification time across the repositories holding
+            this version
+          format: date-time
+          type: string
+        repositories:
+          description: Names of the repositories containing this version
+          items:
+            description: Names of the repositories containing this version
+            type: string
+          type: array
+        version:
+          description: The component version
+          type: string
+      type: object
+    ComponentVersionsPageXO:
+      description: One page of a component's distinct versions
+      properties:
+        items:
+          description: The versions on this page, ordered as requested
+          items:
+            $ref: '#/components/schemas/ComponentVersionXO'
+          type: array
+        page:
+          description: Zero-based index of this page
+          format: int32
+          type: integer
+        size:
+          description: Requested page size
+          format: int32
+          type: integer
+        total:
+          description: Total number of distinct versions matching the query
+          format: int64
+          type: integer
       type: object
     ComponentXO:
       properties:
@@ -2916,6 +2959,20 @@ components:
       - enabled
       - realmActive
       - url
+      type: object
+    CurrentIpXO:
+      description: The caller's IP address and whether it is permitted by the IP Allow
+        List
+      properties:
+        allowed:
+          description: Whether the address would be permitted if enforcement were
+            enabled
+          example: true
+          type: boolean
+        ip:
+          description: The caller's IP address, or "unknown" if it cannot be determined
+          example: 10.0.0.5
+          type: string
       type: object
     DataStoreApiUpdateXO:
       properties:
@@ -4353,6 +4410,8 @@ components:
           type: string
         storage:
           $ref: '#/components/schemas/StorageAttributes'
+        xet:
+          $ref: '#/components/schemas/HuggingFaceXetAttributes'
       required:
       - httpClient
       - name
@@ -4360,6 +4419,21 @@ components:
       - online
       - proxy
       - storage
+      type: object
+    HuggingFaceXetAttributes:
+      properties:
+        xetCasUrl:
+          type: string
+        xetCasUrlOrDefault:
+          type: string
+        xetTransferHostAllowList:
+          items:
+            type: string
+          type: array
+        xetTransferHostAllowListOrDefault:
+          items:
+            type: string
+          type: array
       type: object
     InputStream:
       format: binary
@@ -4881,6 +4955,63 @@ components:
       required:
       - mode
       type: object
+    MonthlyMetricXO:
+      description: Aggregated usage metrics for a single month
+      properties:
+        componentCount:
+          description: Total components for the month
+          example: 435623
+          format: int64
+          type: integer
+        metricDate:
+          description: Date the metrics were recorded
+          example: '2025-03-01T00:00:00Z'
+          format: date-time
+          type: string
+        peakStorage:
+          description: Peak storage in bytes for the month
+          example: 1610612736
+          format: int64
+          type: integer
+        percentageChangeComponent:
+          description: Percentage change from the previous month as a number, or the
+            string "N/A" when it cannot be computed
+          oneOf:
+          - format: int64
+            type: integer
+          - type: string
+        percentageChangeEgress:
+          description: Percentage change from the previous month as a number, or the
+            string "N/A" when it cannot be computed
+          oneOf:
+          - format: int64
+            type: integer
+          - type: string
+        percentageChangeRequest:
+          description: Percentage change from the previous month as a number, or the
+            string "N/A" when it cannot be computed
+          oneOf:
+          - format: int64
+            type: integer
+          - type: string
+        percentageChangeStorage:
+          description: Percentage change from the previous month as a number, or the
+            string "N/A" when it cannot be computed
+          oneOf:
+          - format: int64
+            type: integer
+          - type: string
+        requestCount:
+          description: Total content requests for the month
+          example: 123890
+          format: int64
+          type: integer
+        responseSize:
+          description: Total response bytes served for the month
+          example: 805306368
+          format: int64
+          type: integer
+      type: object
     NegativeCacheAttributes:
       properties:
         enabled:
@@ -5258,54 +5389,6 @@ components:
       - proxy
       - storage
       type: object
-    OAuth2OidcConfigurationXO:
-      properties:
-        authorizationCustomParams:
-          additionalProperties:
-            type: string
-          type: object
-        clientId:
-          type: string
-        clientSecret:
-          type: string
-        emailClaim:
-          type: string
-        exactMatchClaims:
-          additionalProperties:
-            type: string
-          type: object
-        firstNameClaim:
-          type: string
-        groupsClaim:
-          type: string
-        idpAuthorizationUrl:
-          type: string
-        idpJwks:
-          type: string
-        idpJwksUrl:
-          type: string
-        idpJwsAlgorithm:
-          minLength: 1
-          type: string
-        idpLogoutUrl:
-          type: string
-        idpTokenUrl:
-          type: string
-        lastNameClaim:
-          type: string
-        tokenRequestCustomParams:
-          additionalProperties:
-            type: string
-          type: object
-        useTrustStore:
-          type: boolean
-        usernameClaim:
-          minLength: 1
-          type: string
-      required:
-      - idpJwsAlgorithm
-      - usernameClaim
-      type: object
     OciAttributes:
       properties:
         forceBasicAuth:
@@ -5643,6 +5726,15 @@ components:
         items:
           items:
             $ref: '#/components/schemas/ReconcilePlanXO'
+          type: array
+      type: object
+    PageSamlUserXO:
+      properties:
+        continuationToken:
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/SamlUserXO'
           type: array
       type: object
     PageTagXO:
@@ -6683,6 +6775,26 @@ components:
       required:
       - preemptivePullEnabled
       type: object
+    RepositoriesForVersionResponse:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/RepositoryForVersion'
+          type: array
+        totalCount:
+          format: int32
+          type: integer
+      type: object
+    RepositoryForVersion:
+      properties:
+        repositoryName:
+          type: string
+        type:
+          type: string
+        versionCount:
+          format: int64
+          type: integer
+      type: object
     RepositoryXO:
       properties:
         attributes:
@@ -7317,6 +7429,18 @@ components:
           type: boolean
       required:
       - enabled
+      type: object
+    StagingResponse:
+      properties:
+        data:
+          additionalProperties:
+            type: object
+          type: object
+        message:
+          type: string
+        status:
+          format: int32
+          type: integer
       type: object
     StorageAttributes:
       properties:
@@ -8311,6 +8435,42 @@ components:
         type:
           type: string
       type: object
+    UsageHistoryPointXO:
+      description: A single data point in a usage history series
+      properties:
+        date:
+          description: 'Period covered: yyyy-MM-dd for daily series, yyyy-MM for monthly'
+          example: '2026-08-01'
+          type: string
+        value:
+          description: Metric value recorded for the period
+          example: 150
+          format: int64
+          type: integer
+      type: object
+    UsageHistoryXO:
+      description: Historical usage metrics for a single metric type and period
+      properties:
+        data:
+          description: Data points ordered oldest to newest
+          items:
+            $ref: '#/components/schemas/UsageHistoryPointXO'
+          type: array
+        metric:
+          description: Metric type requested
+          enum:
+          - requests
+          - components
+          example: requests
+          type: string
+        period:
+          description: Period requested
+          enum:
+          - daily
+          - monthly
+          example: daily
+          type: string
+      type: object
     UserTokenListXO:
       properties:
         continuationToken:
@@ -8580,12 +8740,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.95.0-07.
+    as of version 3.96.0-09.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.95.0-07
+  version: 3.96.0-09
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -10683,6 +10843,12 @@ paths:
       operationId: listMonthlyMetrics
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MonthlyMetricXO'
+                type: array
           description: Successful response
       summary: Get the last 12 months of metrics.
       tags:
@@ -14870,7 +15036,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RawGroupApiRepository'
-          description: successful operation
+          description: Success
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Repository not found
       summary: Get repository
       tags:
       - Repository Management
@@ -16369,6 +16541,8 @@ paths:
           description: Script executed successfully
         '404':
           description: No script with the specified name
+        '410':
+          description: Script execution is disabled
         '500':
           description: Script execution failed with exception
       summary: Run stored script by name
@@ -18390,6 +18564,47 @@ paths:
       summary: Search and download asset
       tags:
       - Search
+  /v1/search/repositories:
+    get:
+      operationId: listSearchRepositories
+      parameters:
+      - explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: namespace
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: version
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoriesForVersionResponse'
+          description: successful operation
+      tags:
+      - Search
   /v1/search/suggest:
     get:
       description: Returns lightweight component suggestions matching the query. Optimized
@@ -18433,6 +18648,101 @@ paths:
         '400':
           description: Query too short (minimum 2 characters)
       summary: Get search suggestions for autocomplete
+      tags:
+      - Search
+  /v1/search/versions:
+    get:
+      operationId: listSearchVersions
+      parameters:
+      - description: Component format (e.g., maven2, npm, nuget)
+        explode: true
+        in: query
+        name: format
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: Component namespace or group; omit for formats without one
+        explode: true
+        in: query
+        name: group
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Component name
+        explode: true
+        in: query
+        name: name
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: Filter to versions containing this substring
+        explode: true
+        in: query
+        name: version
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Zero-based page index
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      - description: Page size, 1 to 250
+        explode: true
+        in: query
+        name: size
+        required: false
+        schema:
+          default: 20
+          format: int32
+          type: integer
+        style: form
+      - description: 'Sort key: version, lastUpdated, or repositories'
+        explode: true
+        in: query
+        name: sort
+        required: false
+        schema:
+          default: version
+          enum:
+          - version
+          - lastUpdated
+          - repositories
+          type: string
+        style: form
+      - description: 'Sort direction: asc or desc'
+        explode: true
+        in: query
+        name: direction
+        required: false
+        schema:
+          default: desc
+          enum:
+          - asc
+          - desc
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentVersionsPageXO'
+          description: A page of distinct versions
+        '400':
+          description: Invalid parameter value
+        '401':
+          description: Authentication required
+      summary: Browse the distinct versions of a component
       tags:
       - Search
   /v1/secrets/encryption/re-encrypt:
@@ -18690,6 +19000,10 @@ paths:
       operationId: listSecurityIpAllowlistCurrentIp
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentIpXO'
           description: Current IP and allowed status retrieved
         '403':
           description: Insufficient permissions
@@ -18890,18 +19204,6 @@ paths:
       summary: Update the IP Allow List operational mode
       tags:
       - 'Security: IP Allow List'
-  /v1/security/jwt:
-    put:
-      operationId: updateSecurityJwt
-      responses:
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions
-      summary: Reset JWT secret (note that session will be expired for the all logged-in
-        users)
-      tags:
-      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: listSecurityLdap
@@ -19142,60 +19444,6 @@ paths:
       summary: Update LDAP server
       tags:
       - 'Security management: LDAP'
-  /v1/security/oauth2:
-    delete:
-      operationId: deleteSecurityOauth2
-      responses:
-        '204':
-          description: OAuth2/OIDC configuration successfully removed
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions to delete OAuth2/OIDC configuration
-        '500':
-          description: An error occurred removing the configuration
-      summary: Remove OAuth2/OIDC configuration
-      tags:
-      - 'Security: OAuth2/OIDC'
-    get:
-      operationId: listSecurityOauth2
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuth2OidcConfigurationXO'
-          description: OAuth2/OIDC configuration retrieved successfully
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions to read OAuth2/OIDC configuration
-      summary: Retrieve the current OAuth2/OIDC configuration
-      tags:
-      - 'Security: OAuth2/OIDC'
-    put:
-      operationId: updateSecurityOauth2
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OAuth2OidcConfigurationXO'
-        description: The OAuth2/OIDC configuration to create or update
-        required: true
-      responses:
-        '204':
-          description: OAuth2/OIDC configuration successfully updated
-        '400':
-          description: Invalid configuration provided
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient permissions to update OAuth2/OIDC configuration
-        '500':
-          description: An error occurred updating the configuration
-      summary: Create or update OAuth2/OIDC configuration
-      tags:
-      - 'Security: OAuth2/OIDC'
   /v1/security/privileges:
     get:
       operationId: getAllPrivileges
@@ -19675,6 +19923,17 @@ paths:
       - 'Security management: roles'
     post:
       operationId: createSecurityRoles
+      parameters:
+      - description: The id of the user source to create the role in. Available sources
+          can be fetched using the 'User Sources' endpoint.
+        explode: true
+        in: query
+        name: source
+        required: false
+        schema:
+          default: default
+          type: string
+        style: form
       requestBody:
         content:
           application/json:
@@ -19689,6 +19948,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/RoleXOResponse'
           description: Role created
+        '400':
+          description: The specified source does not exist, the role already exists,
+            a referenced role or privilege was not found, or the role contains itself
         '403':
           description: Insufficient permissions to create role
       summary: Create role
@@ -19738,10 +20000,22 @@ paths:
           minLength: 1
           type: string
         style: simple
+      - description: The id of the user source that contains the role. Available sources
+          can be fetched using the 'User Sources' endpoint.
+        explode: true
+        in: query
+        name: source
+        required: false
+        schema:
+          default: default
+          type: string
+        style: form
       responses:
         '204':
           content: {}
           description: Success
+        '400':
+          description: The specified source does not exist, or the role is read-only
         '403':
           description: Insufficient permissions to delete role
         '404':
@@ -19799,6 +20073,16 @@ paths:
           minLength: 1
           type: string
         style: simple
+      - description: The id of the user source that contains the role. Available sources
+          can be fetched using the 'User Sources' endpoint.
+        explode: true
+        in: query
+        name: source
+        required: false
+        schema:
+          default: default
+          type: string
+        style: form
       requestBody:
         content:
           application/json:
@@ -19807,6 +20091,9 @@ paths:
         description: A role configuration
         required: true
       responses:
+        '400':
+          description: The specified source does not exist, a referenced role or privilege
+            was not found, the role is read-only, or the role contains itself
         '403':
           description: Insufficient permissions to update role
         '404':
@@ -19872,6 +20159,10 @@ paths:
       operationId: listSecuritySamlMetadata
       responses:
         '200':
+          content:
+            application/xml:
+              schema:
+                type: string
           description: Metadata Returned
         '401':
           description: Authentication required
@@ -19901,6 +20192,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/x-pem-file:
+              schema:
+                type: string
           description: PEM file Returned
         '401':
           description: Authentication required
@@ -21259,6 +21554,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StagingResponse'
           description: Delete Successful
         '400':
           description: Invalid client request
@@ -21893,6 +22192,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StagingResponse'
           description: Move Successful
         '400':
           description: Invalid client request
@@ -23708,6 +24011,10 @@ paths:
         style: form
       responses:
         '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageHistoryXO'
           description: Usage history retrieved successfully
         '400':
           description: Invalid metric or period specified
@@ -23716,6 +24023,42 @@ paths:
       summary: Get usage history for sparklines
       tags:
       - Usage History
+  /v2/security/saml/users:
+    get:
+      description: Returns SAML users in pages of 100, ordered by userid. When a further
+        page is available the response carries a continuationToken; pass it back on
+        the next request to retrieve that page. A response without a continuationToken
+        is the last page. Offsets beyond 100,000 are rejected.
+      operationId: listSecuritySamlUsers
+      parameters:
+      - description: An optional term to search userids for.
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: A token returned by a prior request. Use this to get the next
+          page of results. Omit the parameter to retrieve the first page; supplying
+          it with an empty value is rejected.
+        explode: true
+        in: query
+        name: continuationToken
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          description: Paginated list of SAML users returned
+        '400':
+          description: Invalid continuation token
+        '403':
+          description: Insufficient permissions
+      summary: Retrieve a paginated list of SAML users.
+      tags:
+      - 'Security management: SAML users (v2)'
 security:
 - BasicAuth: []
 servers:
