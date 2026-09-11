@@ -24029,7 +24029,7 @@ paths:
         page is available the response carries a continuationToken; pass it back on
         the next request to retrieve that page. A response without a continuationToken
         is the last page. Offsets beyond 100,000 are rejected.
-      operationId: listSecuritySamlUsers
+      operationId: listSecuritySamlUsersV2
       parameters:
       - description: An optional term to search userids for.
         explode: true

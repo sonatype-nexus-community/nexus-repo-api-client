@@ -235,6 +235,9 @@ operations_to_fix = [
     {'path': '/v1/plan', 'method': 'delete', 'operation_id': 'deleteAllPlans'},
     {'path': '/v1/plan', 'method': 'put', 'operation_id': 'executeAllPlans'},
     {'path': '/v1/plan/{planId}', 'method': 'put', 'operation_id': 'executePlan'},
+    # `GET /v2/security/saml/users` was introduced reusing the `listSecuritySamlUsers`
+    # operationId from `GET /v1/security/saml/users` - disambiguate by version.
+    {'path': '/v2/security/saml/users', 'method': 'get', 'operation_id': 'listSecuritySamlUsersV2'},
 ]
 i = 0
 print('Overriding operation IDs...')
