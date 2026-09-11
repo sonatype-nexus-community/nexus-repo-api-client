@@ -5389,6 +5389,54 @@ components:
       - proxy
       - storage
       type: object
+    OAuth2OidcConfigurationXO:
+      properties:
+        authorizationCustomParams:
+          additionalProperties:
+            type: string
+          type: object
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+        emailClaim:
+          type: string
+        exactMatchClaims:
+          additionalProperties:
+            type: string
+          type: object
+        firstNameClaim:
+          type: string
+        groupsClaim:
+          type: string
+        idpAuthorizationUrl:
+          type: string
+        idpJwks:
+          type: string
+        idpJwksUrl:
+          type: string
+        idpJwsAlgorithm:
+          minLength: 1
+          type: string
+        idpLogoutUrl:
+          type: string
+        idpTokenUrl:
+          type: string
+        lastNameClaim:
+          type: string
+        tokenRequestCustomParams:
+          additionalProperties:
+            type: string
+          type: object
+        useTrustStore:
+          type: boolean
+        usernameClaim:
+          minLength: 1
+          type: string
+      required:
+      - idpJwsAlgorithm
+      - usernameClaim
+      type: object
     OciAttributes:
       properties:
         forceBasicAuth:
@@ -19204,6 +19252,18 @@ paths:
       summary: Update the IP Allow List operational mode
       tags:
       - 'Security: IP Allow List'
+  /v1/security/jwt:
+    put:
+      operationId: updateSecurityJwt
+      responses:
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Reset JWT secret (note that session will be expired for the all logged-in
+        users)
+      tags:
+      - 'Security management: JWT'
   /v1/security/ldap:
     get:
       operationId: listSecurityLdap
@@ -19444,6 +19504,60 @@ paths:
       summary: Update LDAP server
       tags:
       - 'Security management: LDAP'
+  /v1/security/oauth2:
+    delete:
+      operationId: deleteSecurityOauth2
+      responses:
+        '204':
+          description: OAuth2/OIDC configuration successfully removed
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions to delete OAuth2/OIDC configuration
+        '500':
+          description: An error occurred removing the configuration
+      summary: Remove OAuth2/OIDC configuration
+      tags:
+      - 'Security: OAuth2/OIDC'
+    get:
+      operationId: listSecurityOauth2
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2OidcConfigurationXO'
+          description: OAuth2/OIDC configuration retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions to read OAuth2/OIDC configuration
+      summary: Retrieve the current OAuth2/OIDC configuration
+      tags:
+      - 'Security: OAuth2/OIDC'
+    put:
+      operationId: updateSecurityOauth2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2OidcConfigurationXO'
+        description: The OAuth2/OIDC configuration to create or update
+        required: true
+      responses:
+        '204':
+          description: OAuth2/OIDC configuration successfully updated
+        '400':
+          description: Invalid configuration provided
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions to update OAuth2/OIDC configuration
+        '500':
+          description: An error occurred updating the configuration
+      summary: Create or update OAuth2/OIDC configuration
+      tags:
+      - 'Security: OAuth2/OIDC'
   /v1/security/privileges:
     get:
       operationId: getAllPrivileges
