@@ -445,7 +445,8 @@ json_spec['components']['schemas'].update({
     'RawProxyApiRepository': {
         'properties': {
             'cleanup': {'$ref': '#/components/schemas/CleanupPolicyAttributes'},
-            'format': {'type': 'string', 'default': 'pypi'},
+            'firewall': {'$ref': '#/components/schemas/FirewallAttributes'},
+            'format': {'type': 'string', 'default': 'raw'},
             'httpClient': {'$ref': '#/components/schemas/HttpClientAttributes'},
             'name': {
                 'description': 'A unique identifier for this repository',
