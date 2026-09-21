@@ -6434,8 +6434,10 @@ components:
       properties:
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
+        firewall:
+          $ref: '#/components/schemas/FirewallAttributes'
         format:
-          default: pypi
+          default: raw
           type: string
         httpClient:
           $ref: '#/components/schemas/HttpClientAttributes'
