@@ -952,6 +952,27 @@ json_spec['paths']['/v1/cleanup-policies/{name}']['get']['responses']['200']['co
 }
 print('     Done')
 
+# NXRM's own Swagger doc declares these list operations as returning the generic, untyped `Page`
+# schema (`items: object`) even though the response body is actually a page of a specific XO type -
+# NXRM already defines the matching typed `Page*XO` schema (proven by `search`/`search/assets`,
+# which reuse the very same typed schemas), it just isn't wired up to these operations. Point each
+# at its typed schema so the generated Go/Java/Python/TS clients return real structs instead of
+# maps, matching the actual response shape.
+print('Correcting response schema for GET operations mistakenly typed as generic `Page`...')
+page_operations_to_type: dict[str, str] = {
+    '/v1/components': 'PageComponentXO',
+    '/v1/assets': 'PageAssetXO',
+    '/v1/configuration/assets': 'PageAssetXO',
+    '/v1/plan': 'PageReconcilePlanXO',
+    '/v1/plan/details': 'PageReconcilePlanDetailsXO',
+}
+for p, typed_schema in page_operations_to_type.items():
+    json_spec['paths'][p]['get']['responses']['200']['content']['application/json']['schema'] = {
+        '$ref': f'#/components/schemas/{typed_schema}'
+    }
+    print(f'    Set {p} to `{typed_schema}`')
+print('     Done')
+
 # NXRM has, on occasion, dropped `description` from the `200` response of repository-format GET
 # endpoints across many/all formats (not just the ones patched by name above). OpenAPI Generator
 # requires it, so backfill it wherever it's missing rather than special-casing every format.

@@ -9014,7 +9014,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/PageAssetXO'
           description: Assets returned
         '403':
           description: Insufficient permissions to list assets
@@ -9791,7 +9791,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/PageComponentXO'
           description: Components returned
         '403':
           description: Insufficient permissions to list components
@@ -10276,7 +10276,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/PageAssetXO'
           description: Successful Operation
         '400':
           content:
@@ -10935,7 +10935,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/PageReconcilePlanXO'
           description: List of plans found
         '401':
           description: Authentication required
@@ -11074,7 +11074,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Page'
+                $ref: '#/components/schemas/PageReconcilePlanDetailsXO'
           description: Reconciliation plan details found
         '401':
           description: Authentication required
