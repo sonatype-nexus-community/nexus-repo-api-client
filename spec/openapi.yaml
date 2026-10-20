@@ -2669,7 +2669,7 @@ components:
         firewall:
           $ref: '#/components/schemas/FirewallAttributes'
         httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
+          $ref: '#/components/schemas/HttpClientAttributesWithPreemptiveAuth'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -2691,7 +2691,6 @@ components:
         storage:
           $ref: '#/components/schemas/StorageAttributes'
       required:
-      - httpClient
       - name
       - negativeCache
       - online
@@ -3222,7 +3221,6 @@ components:
         blobStoreName:
           description: Blob store used to store repository contents
           example: default
-          minLength: 1
           type: string
         latestPolicy:
           description: Whether to allow redeploying the 'latest' tag but defer to
@@ -3330,6 +3328,14 @@ components:
         indexUrl:
           description: Url of Docker Index to use
           type: string
+        layerDownloadTimeoutMinutes:
+          description: Maximum time to wait for each container image layer to download
+            during Firewall scanning (minutes)
+          example: 10
+          format: int32
+          maximum: 1440
+          minimum: 1
+          type: integer
       required:
       - indexType
       type: object
@@ -3484,6 +3490,15 @@ components:
           $ref: '#/components/schemas/BlobStoreConfiguration'
       required:
       - path
+      type: object
+    FilterInfo:
+      properties:
+        format:
+          type: string
+        monitoring:
+          type: string
+        search:
+          type: string
       type: object
     FirewallAttributes:
       properties:
@@ -3706,6 +3721,121 @@ components:
       - name
       - online
       - storage
+      type: object
+    GlobalEvaluationSettingsXO:
+      properties:
+        activityTimeFrame:
+          description: Number of days to look back for activity
+          example: 30
+          format: int32
+          minimum: 1
+          type: integer
+        artifactLatestVersions:
+          description: Number of latest versions to evaluate per artifact
+          example: 5
+          format: int32
+          minimum: 1
+          type: integer
+        autoEnrollNewRepos:
+          description: Whether to automatically enroll new repositories for monitoring
+          example: false
+          type: boolean
+        monitoredRepoCount:
+          description: Number of repositories currently being monitored
+          example: 42
+          format: int32
+          readOnly: true
+          type: integer
+        numberOfCustomRepositories:
+          description: Number of repositories with custom evaluation settings overrides
+          example: 2
+          format: int32
+          readOnly: true
+          type: integer
+        policyEvaluationStage:
+          description: Policy evaluation stage
+          enum:
+          - BUILD
+          - STAGE_RELEASE
+          - RELEASE
+          - OPERATE
+          example: RELEASE
+          pattern: ^(BUILD|STAGE_RELEASE|RELEASE|OPERATE)$
+          type: string
+        totalRepoCount:
+          description: Total number of repositories in the system
+          example: 100
+          format: int32
+          readOnly: true
+          type: integer
+      required:
+      - activityTimeFrame
+      - artifactLatestVersions
+      - policyEvaluationStage
+      type: object
+    GlobalSettingsWithRepositoriesResponseXO:
+      properties:
+        errorCode:
+          description: Error code (only present on failure)
+          example: 500
+          format: int32
+          type: integer
+        message:
+          description: Response message
+          example: Global settings updated successfully
+          type: string
+        success:
+          description: Success status
+          example: true
+          type: boolean
+      type: object
+    GlobalSettingsWithRepositoriesXO:
+      properties:
+        activityTimeFrame:
+          description: Number of days to look back for activity
+          example: 30
+          format: int32
+          minimum: 1
+          type: integer
+        artifactLatestVersions:
+          description: Number of latest versions to evaluate per artifact
+          example: 5
+          format: int32
+          minimum: 1
+          type: integer
+        autoEnrollNewRepos:
+          description: Whether to automatically enroll new repositories for monitoring
+          example: false
+          type: boolean
+        policyEvaluationStage:
+          description: Policy evaluation stage
+          enum:
+          - BUILD
+          - STAGE_RELEASE
+          - RELEASE
+          - OPERATE
+          example: RELEASE
+          pattern: ^(BUILD|STAGE_RELEASE|RELEASE|OPERATE)$
+          type: string
+        repositoryIds:
+          description: List of repository IDs to enable monitoring for
+          example:
+          - uuid1
+          - uuid2
+          - uuid3
+          items:
+            description: List of repository IDs to enable monitoring for
+            example: '["uuid1","uuid2","uuid3"]'
+            type: string
+          maxItems: 5000
+          minItems: 1
+          type: array
+      required:
+      - activityTimeFrame
+      - artifactLatestVersions
+      - autoEnrollNewRepos
+      - policyEvaluationStage
+      - repositoryIds
       type: object
     GolangGroupApiRepository:
       allOf:
@@ -4195,7 +4325,6 @@ components:
         blobStoreName:
           description: Blob store used to store repository contents
           example: default
-          minLength: 1
           type: string
         strictContentTypeValidation:
           description: Whether to validate uploaded content's MIME type appropriate
@@ -4422,9 +4551,12 @@ components:
       type: object
     HuggingFaceXetAttributes:
       properties:
+        enabled:
+          type: boolean
         xetCasUrl:
           type: string
         xetCasUrlOrDefault:
+          readOnly: true
           type: string
         xetTransferHostAllowList:
           items:
@@ -4433,6 +4565,7 @@ components:
         xetTransferHostAllowListOrDefault:
           items:
             type: string
+          readOnly: true
           type: array
       type: object
     InputStream:
@@ -4514,9 +4647,9 @@ components:
       description: IP Allow List settings
       properties:
         effectiveMode:
-          description: Effective mode after applying forceDisable and feature flag
-            overrides. May differ from 'mode' when the feature is force-disabled or
-            the feature flag is off.
+          description: The mode currently being applied. May differ from 'mode' when
+            the feature is force-disabled, or when the mode is ENFORCE with an empty
+            allow list (which is not enforced, as it would deny all requests).
           enum:
           - DISABLED
           - MONITOR
@@ -4780,6 +4913,13 @@ components:
           format: int64
           type: integer
       type: object
+    MandatoryTelemetryAcknowledgementStatus:
+      properties:
+        acknowledgement:
+          description: Whether an administrator has acknowledged that telemetry is
+            mandatory
+          type: boolean
+      type: object
     MavenAttributes:
       properties:
         contentDisposition:
@@ -5034,6 +5174,16 @@ components:
         nodeId:
           type: string
       type: object
+    NpmAttributes:
+      deprecated: true
+      description: Deprecated legacy npm PCCS settings. Use the firewall block instead.
+      properties:
+        removeQuarantinedVersions:
+          deprecated: true
+          description: Deprecated legacy PCCS toggle. On responses this is derived
+            from firewall.mode (true when PCCS). Use firewall.mode instead.
+          type: boolean
+      type: object
     NpmGroupRepositoryApiRequest:
       properties:
         group:
@@ -5117,6 +5267,8 @@ components:
           type: string
         negativeCache:
           $ref: '#/components/schemas/NegativeCacheAttributes'
+        npm:
+          $ref: '#/components/schemas/NpmAttributes'
         online:
           description: Whether this repository accepts incoming requests
           example: true
@@ -5165,6 +5317,8 @@ components:
           type: string
         negativeCache:
           $ref: '#/components/schemas/NegativeCacheAttributes'
+        npm:
+          $ref: '#/components/schemas/NpmAttributes'
         online:
           description: Whether this repository accepts incoming requests
           example: true
@@ -5173,9 +5327,6 @@ components:
           $ref: '#/components/schemas/ProxyAttributes'
         replication:
           $ref: '#/components/schemas/ReplicationAttributes'
-        routingRule:
-          type: string
-          writeOnly: true
         routingRuleName:
           type: string
         storage:
@@ -5436,6 +5587,47 @@ components:
       required:
       - idpJwsAlgorithm
       - usernameClaim
+      type: object
+    OAuth2UserXO:
+      properties:
+        emailAddress:
+          description: The email address of the OAuth2 user
+          format: email
+          maxLength: 200
+          minLength: 0
+          type: string
+        firstName:
+          description: The first name of the OAuth2 user
+          maxLength: 200
+          minLength: 0
+          type: string
+        lastName:
+          description: The last name of the OAuth2 user
+          maxLength: 200
+          minLength: 0
+          type: string
+        roles:
+          description: The roles assigned to the OAuth2 user
+          items:
+            description: The roles assigned to the OAuth2 user
+            type: string
+          type: array
+          uniqueItems: true
+        status:
+          description: 'The status of the OAuth2 user. One of: active, locked, disabled'
+          enum:
+          - active
+          - locked
+          - disabled
+          type: string
+        userId:
+          description: The userid for the OAuth2 user
+          maxLength: 200
+          minLength: 0
+          type: string
+      required:
+      - status
+      - userId
       type: object
     OciAttributes:
       properties:
@@ -5739,6 +5931,9 @@ components:
           items:
             type: object
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageAssetXO:
       properties:
@@ -5748,6 +5943,9 @@ components:
           items:
             $ref: '#/components/schemas/AssetXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageComponentXO:
       properties:
@@ -5757,6 +5955,9 @@ components:
           items:
             $ref: '#/components/schemas/ComponentXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageReconcilePlanDetailsXO:
       properties:
@@ -5766,6 +5967,9 @@ components:
           items:
             $ref: '#/components/schemas/ReconcilePlanDetailsXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageReconcilePlanXO:
       properties:
@@ -5775,6 +5979,9 @@ components:
           items:
             $ref: '#/components/schemas/ReconcilePlanXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageSamlUserXO:
       properties:
@@ -5784,6 +5991,9 @@ components:
           items:
             $ref: '#/components/schemas/SamlUserXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageTagXO:
       properties:
@@ -5793,6 +6003,9 @@ components:
           items:
             $ref: '#/components/schemas/TagXO'
           type: array
+        total:
+          format: int64
+          type: integer
       type: object
     PageTaskXO:
       properties:
@@ -5802,6 +6015,120 @@ components:
           items:
             $ref: '#/components/schemas/TaskXO'
           type: array
+        total:
+          format: int64
+          type: integer
+      type: object
+    PaginationInfo:
+      properties:
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean
+        page:
+          format: int32
+          type: integer
+        pageSize:
+          format: int32
+          type: integer
+        selectedCount:
+          format: int32
+          type: integer
+        totalItems:
+          format: int32
+          type: integer
+        totalPages:
+          format: int32
+          type: integer
+        unselectedCount:
+          format: int32
+          type: integer
+      type: object
+    PatchGlobalSettingsAndRepositoriesRequestXO:
+      description: PatchGlobalSettingsAndRepositoriesRequest
+      properties:
+        activityTimeFrame:
+          description: Activity time frame in days (optional)
+          example: 30
+          format: int32
+          minimum: 1
+          type: integer
+        addRepositoryIds:
+          description: Repository IDs to add to monitoring (optional)
+          example:
+          - 550e8400-e29b-41d4-a716-446655440000
+          items:
+            description: Repository IDs to add to monitoring (optional)
+            example: '["550e8400-e29b-41d4-a716-446655440000"]'
+            type: string
+          maxItems: 500
+          minItems: 0
+          type: array
+        artifactLatestVersions:
+          description: Number of latest artifact versions to track (optional)
+          example: 5
+          format: int32
+          minimum: 1
+          type: integer
+        autoEnrollNewRepos:
+          description: Enable auto-enrollment for new hosted repositories (optional)
+          example: false
+          type: boolean
+        policyEvaluationStage:
+          description: Policy evaluation stage (optional)
+          enum:
+          - BUILD
+          - STAGE_RELEASE
+          - RELEASE
+          - OPERATE
+          example: RELEASE
+          type: string
+        removeRepositoryIds:
+          description: Repository IDs to remove from monitoring (optional)
+          example:
+          - 550e8400-e29b-41d4-a716-446655440001
+          items:
+            description: Repository IDs to remove from monitoring (optional)
+            example: '["550e8400-e29b-41d4-a716-446655440001"]'
+            type: string
+          maxItems: 500
+          minItems: 0
+          type: array
+      type: object
+    PatchGlobalSettingsAndRepositoriesResponseXO:
+      description: PatchGlobalSettingsAndRepositoriesResponse
+      properties:
+        errorMessage:
+          description: Error message if operation failed
+          example: At least one parameter required
+          type: string
+        failed:
+          additionalProperties:
+            description: Map of repository IDs that failed with error messages
+            example: '{"550e8400-e29b-41d4-a716-446655440000":"Repository not found"}'
+            type: string
+          description: Map of repository IDs that failed with error messages
+          example:
+            550e8400-e29b-41d4-a716-446655440000: Repository not found
+          type: object
+        repositoriesAdded:
+          description: Count of repositories added to monitoring
+          example: 2
+          format: int32
+          type: integer
+        repositoriesRemoved:
+          description: Count of repositories removed from monitoring
+          example: 1
+          format: int32
+          type: integer
+        settingsUpdated:
+          description: Whether global settings were updated
+          example: true
+          type: boolean
+        success:
+          description: Whether the operation succeeded
+          example: true
+          type: boolean
       type: object
     PermissionChainXo:
       description: The permission chains showing how access is granted (user -> role
@@ -6052,8 +6379,14 @@ components:
       - url
     PyPiProxyAttributes:
       properties:
-        indexPath:
-          description: Remote Index Path
+        removeQuarantinedVersions:
+          deprecated: true
+          description: Deprecated legacy PCCS toggle. On responses this is derived
+            from firewall.mode (true when PCCS). Use firewall.mode instead.
+          type: boolean
+        suffix:
+          description: Remote index path suffix appended to the remote URL for PyPI
+            Simple API access. Defaults to /simple when absent or empty.
           example: /simple
           type: string
       type: object
@@ -6835,6 +7168,100 @@ components:
           format: int32
           type: integer
       type: object
+    RepositoryDashboard:
+      properties:
+        format:
+          type: string
+        hasCustomConfig:
+          type: boolean
+        isSelected:
+          type: boolean
+        lastUpdated:
+          format: date-time
+          type: string
+        numberOfComponents:
+          format: int32
+          type: integer
+        repositoryId:
+          type: string
+        repositoryName:
+          type: string
+        selectedAt:
+          format: date-time
+          type: string
+        size:
+          format: int64
+          type: integer
+      required:
+      - format
+      - lastUpdated
+      - repositoryId
+      - repositoryName
+      type: object
+    RepositoryDashboardResponse:
+      properties:
+        filters:
+          $ref: '#/components/schemas/FilterInfo'
+        globalConfigAvailable:
+          type: boolean
+        hasSelections:
+          type: boolean
+        items:
+          items:
+            $ref: '#/components/schemas/RepositoryDashboard'
+          type: array
+        numberOfMonitoredRepositories:
+          format: int32
+          type: integer
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        sort:
+          $ref: '#/components/schemas/SortInfo'
+        totalRepositories:
+          format: int32
+          type: integer
+      type: object
+    RepositoryEvaluationSettingsXO:
+      description: Repository evaluation settings
+      properties:
+        activityTimeFrame:
+          description: Activity time frame in days (inherited from global settings
+            when mode is INHERIT)
+          example: 30
+          format: int32
+          maximum: 365
+          minimum: 1
+          type: integer
+        artifactLatestVersions:
+          description: Number of latest artifact versions to evaluate (inherited from
+            global settings when mode is INHERIT)
+          example: 1
+          format: int32
+          maximum: 100
+          minimum: 1
+          type: integer
+        mode:
+          description: Evaluation mode
+          enum:
+          - INHERIT
+          - OVERRIDE
+          - DISABLE
+          example: INHERIT
+          type: string
+        policyEvaluationStage:
+          description: Policy evaluation stage (inherited from global settings when
+            mode is INHERIT)
+          enum:
+          - build
+          - stage-release
+          - release
+          - operate
+          example: build
+          pattern: build|stage-release|release|operate
+          type: string
+      required:
+      - mode
+      type: object
     RepositoryForVersion:
       properties:
         repositoryName:
@@ -7201,7 +7628,7 @@ components:
             $ref: '#/components/schemas/S3BlobStoreApiFailoverBucket'
           type: array
         preSignedUrlEnabled:
-          description: Whether pre assigned URL is enabled or not.
+          description: Enables redirecting downloads to S3 pre-signed URLs. (Pro feature)
           example: true
           type: boolean
         security:
@@ -7363,6 +7790,61 @@ components:
       - name
       - type
       type: object
+    ServiceAccountCreateXO:
+      properties:
+        description:
+          maxLength: 256
+          minLength: 0
+          type: string
+        expirationDays:
+          format: int32
+          minimum: 1
+          type: integer
+        name:
+          maxLength: 128
+          minLength: 0
+          pattern: ^[a-zA-Z0-9_-]+$
+          type: string
+        roleId:
+          type: string
+      required:
+      - name
+      - roleId
+      type: object
+    ServiceAccountCreatedXO:
+      properties:
+        expiresAt:
+          format: date-time
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        token:
+          type: string
+      type: object
+    ServiceAccountXO:
+      properties:
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          type: string
+        description:
+          type: string
+        expiresAt:
+          format: date-time
+          type: string
+        id:
+          type: string
+        lastUsedAt:
+          format: date-time
+          type: string
+        name:
+          type: string
+        roleId:
+          type: string
+      type: object
     SimpleApiGroupDeployRepository:
       properties:
         format:
@@ -7449,6 +7931,13 @@ components:
           format: int32
           type: integer
       type: object
+    SortInfo:
+      properties:
+        sortBy:
+          type: string
+        sortOrder:
+          type: string
+      type: object
     SsrfProtectionConfigurationXO:
       properties:
         allowedDomains:
@@ -7497,7 +7986,6 @@ components:
         blobStoreName:
           description: Blob store used to store repository contents
           example: default
-          minLength: 1
           type: string
         strictContentTypeValidation:
           description: Whether to validate uploaded content's MIME type appropriate
@@ -8405,6 +8893,36 @@ components:
           type: boolean
       required: *id001
       type: object
+    UpdateScheduleRequest:
+      properties:
+        cronExpression:
+          type: string
+      type: object
+    UpdateSettingsRequestXO:
+      properties:
+        activityTimeFrame:
+          format: int32
+          maximum: 365
+          minimum: 1
+          type: integer
+        artifactLatestVersions:
+          format: int32
+          maximum: 20
+          minimum: 1
+          type: integer
+        autoEnrollNewRepos:
+          type: boolean
+        policyEvaluationStage:
+          pattern: ^(BUILD|STAGE_RELEASE|RELEASE|OPERATE)$
+          type: string
+      type: object
+    UpdateSettingsResponseXO:
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+      type: object
     UpdateTaskTemplateXO:
       description: Task template for updating existing tasks (type field is immutable)
       example: null
@@ -8790,12 +9308,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.96.0-09.
+    as of version 3.97.0-13.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.96.0-09
+  version: 3.97.0-13
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -9818,7 +10336,7 @@ paths:
             schema:
               properties:
                 alpine.asset:
-                  description: 'alpine Asset '
+                  description: alpine Asset
                   format: binary
                   type: string
                 alpine.repository:
@@ -9831,7 +10349,7 @@ paths:
                   description: alpine Alpine Version
                   type: string
                 ansiblegalaxy.asset:
-                  description: 'ansiblegalaxy Asset '
+                  description: ansiblegalaxy Asset
                   format: binary
                   type: string
                 ansiblegalaxy.name:
@@ -9847,17 +10365,27 @@ paths:
                   description: ansiblegalaxy Version
                   type: string
                 apt.asset:
-                  description: 'apt Asset '
+                  description: apt Asset
                   format: binary
                   type: string
                 apt.tag:
                   description: apt Tag
                   type: string
+                composer.asset:
+                  description: composer Asset
+                  format: binary
+                  type: string
+                composer.tag:
+                  description: composer Tag
+                  type: string
+                composer.version:
+                  description: composer Version
+                  type: string
                 conda.arch:
                   description: conda Architecture
                   type: string
                 conda.asset:
-                  description: 'conda Asset '
+                  description: conda Asset
                   format: binary
                   type: string
                 conda.build:
@@ -9873,7 +10401,7 @@ paths:
                   description: conda Version
                   type: string
                 go.asset:
-                  description: 'go Asset '
+                  description: go Asset
                   format: binary
                   type: string
                 go.tag:
@@ -9883,7 +10411,7 @@ paths:
                   description: go Version
                   type: string
                 helm.asset:
-                  description: 'helm Asset '
+                  description: helm Asset
                   format: binary
                   type: string
                 helm.tag:
@@ -9938,21 +10466,21 @@ paths:
                   description: maven2 Version
                   type: string
                 npm.asset:
-                  description: 'npm Asset '
+                  description: npm Asset
                   format: binary
                   type: string
                 npm.tag:
                   description: npm Tag
                   type: string
                 nuget.asset:
-                  description: 'nuget Asset '
+                  description: nuget Asset
                   format: binary
                   type: string
                 nuget.tag:
                   description: nuget Tag
                   type: string
                 pub.asset:
-                  description: 'pub Asset '
+                  description: pub Asset
                   format: binary
                   type: string
                 pub.name:
@@ -9965,18 +10493,18 @@ paths:
                   description: pub Version
                   type: string
                 pypi.asset:
-                  description: 'pypi Asset '
+                  description: pypi Asset
                   format: binary
                   type: string
                 pypi.tag:
                   description: pypi Tag
                   type: string
                 r.asset:
-                  description: 'r Asset '
+                  description: r Asset
                   format: binary
                   type: string
                 r.asset.pathId:
-                  description: r Asset  Package Path
+                  description: r Asset Package Path
                   type: string
                 r.tag:
                   description: r Tag
@@ -10009,14 +10537,14 @@ paths:
                   description: raw Tag
                   type: string
                 rubygems.asset:
-                  description: 'rubygems Asset '
+                  description: rubygems Asset
                   format: binary
                   type: string
                 rubygems.tag:
                   description: rubygems Tag
                   type: string
                 swift.asset:
-                  description: 'swift Asset '
+                  description: swift Asset
                   format: binary
                   type: string
                 swift.name:
@@ -10035,7 +10563,7 @@ paths:
                   description: terraform Architecture
                   type: string
                 terraform.asset:
-                  description: 'terraform Asset '
+                  description: terraform Asset
                   format: binary
                   type: string
                 terraform.name:
@@ -10066,11 +10594,11 @@ paths:
                   description: terraform Version
                   type: string
                 yum.asset:
-                  description: 'yum Asset '
+                  description: yum Asset
                   format: binary
                   type: string
                 yum.asset.filename:
-                  description: yum Asset  Filename
+                  description: yum Asset Filename
                   type: string
                 yum.directory:
                   description: yum Directory
@@ -10142,7 +10670,8 @@ paths:
     get:
       operationId: listConfiguration
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10181,7 +10710,8 @@ paths:
     put:
       operationId: updateConfiguration
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10226,7 +10756,8 @@ paths:
     get:
       operationId: listConfigurationAssets
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10295,7 +10826,8 @@ paths:
     post:
       operationId: createConfigurationAssetsImport
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10349,7 +10881,8 @@ paths:
     delete:
       operationId: deleteConfigurationCipher
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10394,7 +10927,8 @@ paths:
     post:
       operationId: createConfigurationCipher
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10447,7 +10981,8 @@ paths:
     post:
       operationId: createConfigurationTransferComplete
       parameters:
-      - description: Migration protocol version (must be '1')
+      - description: Migration protocol version spoken by the calling migration tool,
+          for example '2'. A version this instance cannot serve is rejected with 400.
         explode: false
         in: header
         name: X-Nexus-Migration-Protocol-Version
@@ -10524,7 +11059,7 @@ paths:
       operationId: updateEmail
       requestBody:
         content:
-          '*/*':
+          application/json:
             schema:
               $ref: '#/components/schemas/ApiEmailConfiguration'
         required: true
@@ -10545,6 +11080,7 @@ paths:
         content:
           '*/*':
             schema:
+              format: email
               type: string
         description: An email address to send a test email to
         required: true
@@ -10566,6 +11102,148 @@ paths:
       summary: Send a test email to the email address provided in the request body
       tags:
       - Email
+  /v1/evaluation/repositories:
+    patch:
+      operationId: updateEvaluationRepositories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesRequestXO'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesResponseXO'
+          description: Repository monitoring updated successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesResponseXO'
+          description: Invalid input - at least one of addRepositoryIds or removeRepositoryIds
+            required
+        '403':
+          description: Insufficient permissions to update repository monitoring
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesResponseXO'
+          description: Failed to update monitoring for some repositories
+      summary: Independently update monitored repositories (add/remove without changing
+        settings)
+      tags:
+      - Hosted Repository Evaluation
+  /v1/evaluation/settings:
+    get:
+      operationId: listEvaluationSettings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalEvaluationSettingsXO'
+          description: Global evaluation settings retrieved successfully
+        '403':
+          description: Insufficient permissions to read global evaluation settings
+      summary: Get global evaluation settings
+      tags:
+      - Hosted Repository Evaluation
+    patch:
+      operationId: updateEvaluationSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingsRequestXO'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSettingsResponseXO'
+          description: Settings updated successfully
+        '400':
+          description: Invalid input
+        '403':
+          description: Insufficient permissions
+        '409':
+          description: "Settings not yet initialised \u2014 use PUT first"
+      summary: Update global evaluation settings
+      tags:
+      - Hosted Repository Evaluation
+  /v1/evaluation/settings-with-repos:
+    patch:
+      operationId: patchEvaluationSettingsWithRepos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesRequestXO'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesResponseXO'
+          description: Global evaluation settings and/or repository monitoring updated
+            successfully. A scope or stage change is then applied to existing evaluation
+            jobs in the background.
+        '400':
+          description: Invalid input - at least one parameter required
+        '403':
+          description: Insufficient permissions to update global evaluation settings
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchGlobalSettingsAndRepositoriesResponseXO'
+          description: Failed to update - transaction rolled back
+      summary: Partially update global evaluation settings and/or repository monitoring
+        (PATCH)
+      tags:
+      - Hosted Repository Evaluation
+    put:
+      operationId: updateEvaluationSettingsWithRepos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlobalSettingsWithRepositoriesXO'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalSettingsWithRepositoriesResponseXO'
+          description: Global evaluation settings and repository monitoring updated
+            successfully in a single transaction. A scope or stage change is then
+            applied to existing evaluation jobs in the background.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalSettingsWithRepositoriesResponseXO'
+          description: Invalid input - bad request
+        '403':
+          description: Insufficient permissions to update global evaluation settings
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GlobalSettingsWithRepositoriesResponseXO'
+          description: Failed to enable monitoring for some repositories - entire
+            transaction rolled back
+      summary: Atomically update global evaluation settings and enable repository
+        monitoring (PUT)
+      tags:
+      - Hosted Repository Evaluation
   /v1/formats/upload-specs:
     get:
       operationId: listFormatsUploadSpecs
@@ -10603,6 +11281,77 @@ paths:
       summary: Get upload field requirements for the desired format
       tags:
       - Formats
+  /v1/hosted-repository-evaluation/jobs/count:
+    get:
+      operationId: listHostedRepositoryEvaluationJobsCount
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Get total count of evaluation jobs
+      tags:
+      - Hosted Repository Evaluation Jobs
+  /v1/hosted-repository-evaluation/jobs/queued:
+    get:
+      operationId: listHostedRepositoryEvaluationJobsQueued
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Get all queued evaluation jobs
+      tags:
+      - Hosted Repository Evaluation Jobs
+  /v1/hosted-repository-evaluation/jobs/scheduler/start:
+    post:
+      operationId: createHostedRepositoryEvaluationJobsSchedulerStart
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Start/enable the evaluation scheduler
+      tags:
+      - Hosted Repository Evaluation Jobs
+  /v1/hosted-repository-evaluation/jobs/scheduler/status:
+    get:
+      operationId: listHostedRepositoryEvaluationJobsSchedulerStatus
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Get scheduler status and schedule
+      tags:
+      - Hosted Repository Evaluation Jobs
+  /v1/hosted-repository-evaluation/jobs/scheduler/stop:
+    post:
+      operationId: createHostedRepositoryEvaluationJobsSchedulerStop
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Stop/disable the evaluation scheduler
+      tags:
+      - Hosted Repository Evaluation Jobs
+  /v1/hosted-repository-evaluation/jobs/scheduler/update-schedule:
+    post:
+      operationId: createHostedRepositoryEvaluationJobsSchedulerUpdateSchedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduleRequest'
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: successful operation
+      summary: Update the scheduler cron expression
+      tags:
+      - Hosted Repository Evaluation Jobs
   /v1/http:
     delete:
       operationId: deleteHttp
@@ -16219,6 +16968,64 @@ paths:
       summary: List browse nodes for a repository path
       tags:
       - Repository Browse
+  /v1/repositories/{repositoryName}/evaluation-settings:
+    get:
+      operationId: get{repositoryname}Evaluation-settingsRepository
+      parameters:
+      - description: Repository name
+        explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryEvaluationSettingsXO'
+          description: Evaluation settings retrieved successfully
+        '400':
+          description: Invalid repository type or request
+        '403':
+          description: Insufficient permissions to access repository
+        '404':
+          description: Repository not found
+      summary: Get evaluation settings for a repository
+      tags:
+      - Hosted Repository Evaluation
+    put:
+      operationId: update{repositoryname}Evaluation-settingsRepository
+      parameters:
+      - description: Repository name
+        explode: false
+        in: path
+        name: repositoryName
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepositoryEvaluationSettingsXO'
+        description: Evaluation settings
+        required: true
+      responses:
+        '200':
+          description: Evaluation settings updated successfully
+        '400':
+          description: Invalid settings provided
+        '403':
+          description: Insufficient permissions to modify repository
+        '404':
+          description: Repository not found
+      summary: Update evaluation settings for a repository
+      tags:
+      - Hosted Repository Evaluation
   /v1/repositories/{repositoryName}/health-check:
     delete:
       operationId: deleteRepositoriesHealthCheck
@@ -16331,6 +17138,88 @@ paths:
         repositories only.
       tags:
       - Repository Management
+  /v1/repository-dashboard:
+    get:
+      operationId: listRepositoryDashboard
+      parameters:
+      - explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int32
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 50
+          format: int32
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: sortBy
+        required: false
+        schema:
+          default: name
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: sortOrder
+        required: false
+        schema:
+          default: asc
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: format
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: monitoring
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryDashboardResponse'
+          description: successful operation
+      tags:
+      - REPOSITORY_DASHBOARD
+  /v1/repository-dashboard/formats:
+    get:
+      operationId: listRepositoryDashboardFormats
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: successful operation
+      tags:
+      - REPOSITORY_DASHBOARD
   /v1/repositorySettings:
     get:
       operationId: listRepositorySettings
@@ -19560,6 +20449,133 @@ paths:
       summary: Create or update OAuth2/OIDC configuration
       tags:
       - 'Security: OAuth2/OIDC'
+  /v1/security/oauth2/users:
+    get:
+      description: Returns the OAuth2 user records cached in the Nexus Repository
+        database. The response is limited to 1,000 users.
+      operationId: listSecurityOauth2Users
+      parameters:
+      - description: An optional term to search user IDs for.
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OAuth2UserXO'
+                type: array
+          description: List of OAuth2 users returned
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+      summary: Retrieve a list of cached OAuth2 users
+      tags:
+      - 'Security management: OAuth2 users'
+    post:
+      description: 'This operation applies only to the OAuth2 user records cached
+        in the Nexus Repository database. Nothing is sent to the remote OAuth2 identity
+        provider. This allows an administrator to pre-assign roles that apply from
+        the moment the record is created until the user''s first login. Those roles
+        are not durable: at first login the identity provider''s groups claim replaces
+        them, along with the first name, last name and email address.'
+      operationId: createSecurityOauth2Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2UserXO'
+        description: The OAuth2 user to create
+        required: true
+      responses:
+        '201':
+          description: OAuth2 user created
+        '400':
+          description: Invalid user data
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+        '409':
+          description: A record already exists for this user ID
+      summary: Create a cached OAuth2 user record
+      tags:
+      - 'Security management: OAuth2 users'
+  /v1/security/oauth2/users/{userId}:
+    get:
+      description: This operation applies only to the OAuth2 user records cached in
+        the Nexus Repository database. Nothing is sent to the remote OAuth2 identity
+        provider.
+      operationId: getSecurityOauth2Users
+      parameters:
+      - description: The user ID the request should apply to.
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2UserXO'
+          description: OAuth2 user returned
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: User not found
+      summary: Retrieve a cached OAuth2 user by user ID
+      tags:
+      - 'Security management: OAuth2 users'
+    put:
+      description: 'This operation applies only to the OAuth2 user records cached
+        in the Nexus Repository database. Nothing is sent to the remote OAuth2 identity
+        provider. Only the status is updated: the first name, last name, email address
+        and roles are re-applied from the ID token on every login, so changes to those
+        fields would not survive the user''s next sign-in and are ignored.'
+      operationId: updateSecurityOauth2Users
+      parameters:
+      - description: The user ID the request should apply to.
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2UserXO'
+        description: The OAuth2 user to update
+        required: true
+      responses:
+        '204':
+          description: OAuth2 user updated
+        '400':
+          description: Invalid user data, or user ID in path does not match the body
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: User not found
+      summary: Update the status of a cached OAuth2 user
+      tags:
+      - 'Security management: OAuth2 users'
   /v1/security/privileges:
     get:
       operationId: getAllPrivileges
@@ -20445,6 +21461,68 @@ paths:
       summary: Update a SAML user's roles and attributes.
       tags:
       - 'Security management: SAML users'
+  /v1/security/service-account-tokens:
+    get:
+      operationId: listSecurityServiceAccountTokens
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccountXO'
+          description: Service account list returned
+        '403':
+          description: "Insufficient permissions \u2014 requires nexus:service-accounts:read"
+      summary: List all service account tokens (never exposes secret material)
+      tags:
+      - 'Security management: service account tokens'
+    post:
+      operationId: createSecurityServiceAccountTokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceAccountCreateXO'
+        description: Service account to create
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccountCreatedXO'
+          description: Service account created; token returned exactly once
+        '400':
+          description: 'Validation error: invalid name, missing required field, or
+            unknown roleId'
+        '403':
+          description: "Insufficient permissions \u2014 requires nexus:service-accounts:create;\
+            \ or roleId is not assignable by the caller"
+      summary: Create a new service account token
+      tags:
+      - 'Security management: service account tokens'
+  /v1/security/service-account-tokens/{id}:
+    delete:
+      operationId: deleteSecurityServiceAccountTokens
+      parameters:
+      - description: Service account id
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: Service account deleted
+        '403':
+          description: "Insufficient permissions \u2014 requires nexus:service-accounts:delete"
+        '404':
+          description: Service account not found
+      summary: Hard-delete a service account and its associated token
+      tags:
+      - 'Security management: service account tokens'
   /v1/security/ssl:
     get:
       operationId: listSecuritySsl
@@ -20650,16 +21728,16 @@ paths:
       - 'Security management: user tokens'
   /v1/security/user-tokens/tokens:
     get:
-      description: "Without 'namecode': lists all tokens with optional realm/userId\
+      description: "Without 'nameCode': lists all tokens with optional realm/userId\
         \ filters and pagination. Returns metadata only \u2014 passCode is never returned.\
-        \ With 'namecode': switches to single-token lookup mode. Returns a single\
+        \ With 'nameCode': switches to single-token lookup mode. Returns a single\
         \ UserTokenXO (200) if the nameCode exists (expired tokens included), or 404\
         \ if not found. The userId, includeExpired, skip, and limit parameters are\
         \ ignored in lookup mode."
       operationId: listSecurityUserTokensTokens
       parameters:
       - description: Filter by realm (optional). Also acts as a realm constraint in
-          namecode lookup mode.
+          nameCode lookup mode.
         explode: true
         in: query
         name: realm
@@ -20667,7 +21745,7 @@ paths:
         schema:
           type: string
         style: form
-      - description: Filter by user ID (optional). Ignored when 'namecode' is provided.
+      - description: Filter by user ID (optional). Ignored when 'nameCode' is provided.
         explode: true
         in: query
         name: userId
@@ -20680,13 +21758,13 @@ paths:
           always included in lookup results.
         explode: true
         in: query
-        name: namecode
+        name: nameCode
         required: false
         schema:
           type: string
         style: form
       - description: "Include expired tokens in list results (default: false). Ignored\
-          \ in namecode lookup mode \u2014 expired tokens are always included."
+          \ in nameCode lookup mode \u2014 expired tokens are always included."
         explode: true
         in: query
         name: includeExpired
@@ -20722,8 +21800,8 @@ paths:
                 oneOf:
                 - $ref: '#/components/schemas/UserTokenListXO'
                 - $ref: '#/components/schemas/UserTokenXO'
-          description: Success. In list mode (no 'namecode' param) returns UserTokenListXO.
-            In lookup mode ('namecode' present) returns a single UserTokenXO.
+          description: Success. In list mode (no 'nameCode' param) returns UserTokenListXO.
+            In lookup mode ('nameCode' present) returns a single UserTokenXO.
         '400':
           description: Invalid request parameters, or user token capability is disabled.
         '403':
@@ -20733,11 +21811,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleApiResponse'
-          description: No user token found with the given namecode. Only returned
-            when 'namecode' is provided.
+          description: No user token found with the given nameCode. Only returned
+            when 'nameCode' is provided.
         '500':
           description: Unexpected server error. Please try again later.
-      summary: List user tokens or look up a token owner by namecode
+      summary: List user tokens or look up a token owner by nameCode
       tags:
       - 'Security management: user tokens'
   /v1/security/users:
@@ -20794,7 +21872,7 @@ paths:
                 $ref: '#/components/schemas/ApiUser'
           description: User created
         '400':
-          description: Password was not supplied in the body of the request
+          description: Invalid user data supplied
         '403':
           description: The user does not have permission to perform the operation.
       summary: Create a new user in the default source.
@@ -22467,6 +23545,41 @@ paths:
       summary: Upload a new license file.
       tags:
       - Product licensing
+  /v1/system/mandatory-telemetry-acknowledgement:
+    get:
+      operationId: listSystemMandatoryTelemetryAcknowledgement
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MandatoryTelemetryAcknowledgementStatus'
+          description: Successful response
+        '403':
+          description: Insufficient permissions to get the mandatory telemetry acknowledgement
+      summary: Get the mandatory telemetry acknowledgement record
+      tags:
+      - Mandatory Telemetry Acknowledgement
+    post:
+      description: Records that an administrator has acknowledged the mandatory telemetry
+        requirement
+      operationId: createSystemMandatoryTelemetryAcknowledgement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MandatoryTelemetryAcknowledgementStatus'
+      responses:
+        '204':
+          description: Acknowledgement recorded
+        '400':
+          description: Acknowledgement was not true
+        '403':
+          description: Insufficient permissions to record the mandatory telemetry
+            acknowledgement
+      summary: Record mandatory telemetry acknowledgement
+      tags:
+      - Mandatory Telemetry Acknowledgement
   /v1/system/node:
     delete:
       operationId: deleteSystemNode
