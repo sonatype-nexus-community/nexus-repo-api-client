@@ -11178,7 +11178,7 @@ paths:
       - Hosted Repository Evaluation
   /v1/evaluation/settings-with-repos:
     patch:
-      operationId: updateEvaluationSettingsWithRepos
+      operationId: patchEvaluationSettingsWithRepos
       requestBody:
         content:
           application/json:

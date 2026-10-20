@@ -238,6 +238,9 @@ operations_to_fix = [
     # `GET /v2/security/saml/users` was introduced reusing the `listSecuritySamlUsers`
     # operationId from `GET /v1/security/saml/users` - disambiguate by version.
     {'path': '/v2/security/saml/users', 'method': 'get', 'operation_id': 'listSecuritySamlUsersV2'},
+    # `PUT` and `PATCH /v1/evaluation/settings-with-repos` share the `updateEvaluationSettingsWithRepos`
+    # operationId - disambiguate the partial update (PATCH).
+    {'path': '/v1/evaluation/settings-with-repos', 'method': 'patch', 'operation_id': 'patchEvaluationSettingsWithRepos'},
 ]
 i = 0
 print('Overriding operation IDs...')
