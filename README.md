@@ -182,6 +182,11 @@ it only reflects Go's own import-path requirements. Also see the equivalent noti
 were never intended for release; that generation is [retracted](https://go.dev/ref/mod#go-mod-file-retract) via a
 `retract` directive in `go.mod` and should not be used - depend on `v395.x.x` (or later) instead.
 
+`v395.97.0` of the Go client (generated from NXRM `3.97.0`) was published on the `/v395` import path, but NXRM `3.97.0`
+introduces generator-output breaking changes for Go. It is retracted, and a new generation starts at Go major `397`
+(import path `.../nexus-repo-api-client-go/v397`, first tag `v397.97.1`). Depend on `v395.96.x` or earlier if you cannot
+yet migrate to `/v397`.
+
 ## The Fine Print
 
 Remember:
