@@ -1924,6 +1924,11 @@ components:
         name:
           description: Display name of the capability type
           type: string
+        requiresSettingsUpdate:
+          description: Whether managing a capability of this type additionally requires
+            the nexus:settings:update permission because it activates or configures
+            a security realm
+          type: boolean
       type: object
     CargoAttributes:
       properties:
@@ -2016,6 +2021,8 @@ components:
         type: object
     CargoHostedRepositoryApiRequest:
       properties:
+        cargo:
+          $ref: '#/components/schemas/CargoAttributes'
         cleanup:
           $ref: '#/components/schemas/CleanupPolicyAttributes'
         component:
@@ -3668,6 +3675,8 @@ components:
         blobCount:
           format: int64
           type: integer
+        globalDistributionEnabled:
+          type: boolean
         name:
           type: string
         softQuota:
@@ -6630,24 +6639,6 @@ components:
           - ATTACHMENT
           example: ATTACHMENT
           type: string
-        excludedQueryParameters:
-          description: List of query parameter names to exclude from forwarding (case-insensitive).
-            Maximum 100 entries.
-          example:
-          - apiKey
-          - token
-          items:
-            description: List of query parameter names to exclude from forwarding
-              (case-insensitive). Maximum 100 entries.
-            example: '["apiKey","token"]'
-            type: string
-          maxItems: 100
-          minItems: 0
-          type: array
-        forwardQueryParameters:
-          description: Whether to forward query parameters to the upstream repository
-          example: true
-          type: boolean
       type: object
     RawGroupApiRepository:
       properties:
@@ -8172,6 +8163,37 @@ components:
       - online
       - storage
       type: object
+    SwiftHttpClientAttributes:
+      properties:
+        authentication:
+          $ref: '#/components/schemas/HttpClientConnectionAuthenticationAttributes'
+        autoBlock:
+          description: Whether to auto-block outbound connections if remote peer is
+            detected as unreachable/unresponsive
+          example: true
+          type: boolean
+        autoBlockStatusCodes:
+          description: Only the HTTP status codes listed here trigger auto-blocking
+            for this repository; any code not listed will not auto-block. When omitted,
+            the Swift format default applies.
+          items:
+            description: Only the HTTP status codes listed here trigger auto-blocking
+              for this repository; any code not listed will not auto-block. When omitted,
+              the Swift format default applies.
+            format: int32
+            maximum: 599
+            minimum: 100
+            type: integer
+          maxItems: 500
+          minItems: 0
+          type: array
+        blocked:
+          description: Whether to block outbound connections on the repository
+          example: false
+          type: boolean
+        connection:
+          $ref: '#/components/schemas/HttpClientConnectionAttributes'
+      type: object
     SwiftProxyApiRepository:
       properties:
         cleanup:
@@ -8184,7 +8206,7 @@ components:
           minLength: 1
           type: string
         httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
+          $ref: '#/components/schemas/SwiftHttpClientAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -8219,7 +8241,6 @@ components:
           type: string
       required:
       - format
-      - httpClient
       - name
       - negativeCache
       - online
@@ -8234,7 +8255,7 @@ components:
         firewall:
           $ref: '#/components/schemas/FirewallAttributes'
         httpClient:
-          $ref: '#/components/schemas/HttpClientAttributes'
+          $ref: '#/components/schemas/SwiftHttpClientAttributes'
         name:
           description: A unique identifier for this repository
           example: internal
@@ -9308,12 +9329,12 @@ info:
     name: Sonatype Community Maintainers
     url: https://github.com/sonatype-nexus-community
   description: This documents the available APIs into [Sonatype Nexus Repository Manager](https://www.sonatype.com/products/sonatype-nexus-repository)
-    as of version 3.97.0-13.
+    as of version 3.98.1-01.
   license:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Sonatype Nexus Repository Manager
-  version: 3.97.0-13
+  version: 3.98.1-01
 openapi: 3.0.1
 paths:
   /beta/data-store:
@@ -18008,6 +18029,22 @@ paths:
         schema:
           type: string
         style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
+        required: false
+        schema:
+          type: string
+        style: form
       - description: p2 plugin name
         explode: true
         in: query
@@ -18683,6 +18720,22 @@ paths:
         schema:
           type: string
         style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
+        required: false
+        schema:
+          type: string
+        style: form
       - description: p2 plugin name
         explode: true
         in: query
@@ -19344,6 +19397,22 @@ paths:
         explode: true
         in: query
         name: oci.contentDigest
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
         required: false
         schema:
           type: string
@@ -21972,11 +22041,63 @@ paths:
       summary: Change a user's password.
       tags:
       - 'Security management: users'
+  /v1/security/users/{userId}/{realm}/format-tokens/{format}:
+    delete:
+      description: 'Removes only the token of the given format, so that clients using
+        it are rejected immediately and a new token is issued the next time the user
+        requests one for that format. The user token, the tokens of other formats
+        and other API keys, such as service-account tokens, are not affected. Succeeds
+        whether or not the user holds a token of that format. Allowed formats: conan,
+        docker, huggingface, npm, nuget, oci, terraform. The format is not case sensitive.
+        To reset all tokens at once use DELETE /user-token-reset.'
+      operationId: deleteSecurityUsersFormatTokens
+      parameters:
+      - description: The userId of the user to reset the token for
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The realm of the user to reset the token for
+        explode: false
+        in: path
+        name: realm
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: 'The format whose token is reset: conan, docker, huggingface,
+          npm, nuget, oci or terraform'
+        explode: false
+        in: path
+        name: format
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '204':
+          description: Format token successfully reset
+        '400':
+          description: User tokens are not enabled
+        '403':
+          description: Insufficient permissions to reset the token
+        '404':
+          description: User not found
+        '422':
+          description: Invalid realm or unsupported format
+      summary: Reset the token of a single format for the given user.
+      tags:
+      - 'Security management: users'
   /v1/security/users/{userId}/{realm}/user-token:
     delete:
       description: Deletes the user token for the specified user. Both userId and
         realm are required parameters. The token will be invalidated immediately and
-        can no longer be used.
+        can no longer be used. Format tokens (npm, Docker, etc.) are not affected.
+        To revoke those as well, use DELETE /user-token-reset, or DELETE /format-tokens/{format}
+        for a single format.
       operationId: deleteSecurityUsersUserToken
       parameters:
       - description: The userId of the user to delete the token for
@@ -22098,9 +22219,12 @@ paths:
   /v1/security/users/{userId}/{realm}/user-token-reset:
     delete:
       deprecated: true
-      description: Resetting the user token will invalidate the current token and
-        force a new token to be created the next time it is accessed. This endpoint
-        is deprecated, use DELETE /user-token instead.
+      description: Removes the user token and the format tokens of the given user
+        (npm, Docker, OCI, Conan, Hugging Face, Terraform, NuGet). Other API keys,
+        such as service-account tokens, are not affected. A new user token is created
+        the next time it is accessed. Unlike DELETE /user-token, which removes only
+        the user token, this operation also revokes the format tokens. To revoke the
+        token of a single format, use DELETE /format-tokens/{format}.
       operationId: deleteSecurityUsersUserTokenReset
       parameters:
       - description: The userId of the user to reset the token for
@@ -22597,6 +22721,22 @@ paths:
         explode: true
         in: query
         name: oci.contentDigest
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
         required: false
         schema:
           type: string
@@ -23235,6 +23375,22 @@ paths:
         explode: true
         in: query
         name: oci.contentDigest
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
         required: false
         schema:
           type: string
@@ -24135,6 +24291,22 @@ paths:
         schema:
           type: string
         style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
+        required: false
+        schema:
+          type: string
+        style: form
       - description: p2 plugin name
         explode: true
         in: query
@@ -24768,6 +24940,22 @@ paths:
         explode: true
         in: query
         name: oci.contentDigest
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension publisher
+        explode: true
+        in: query
+        name: openvsx.publisher
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Open VSX extension target platform
+        explode: true
+        in: query
+        name: openvsx.targetPlatform
         required: false
         schema:
           type: string
