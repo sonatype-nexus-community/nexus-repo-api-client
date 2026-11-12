@@ -262,5 +262,6 @@ jobs:
             - name: Publish
               run: |
                   npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-                  npm publish --access public
+                  # Releases from the 3.96.x maintenance line must never take over the `latest` dist-tag
+                  npm publish --access public --tag release-3.96
               working-directory: out/typescript
