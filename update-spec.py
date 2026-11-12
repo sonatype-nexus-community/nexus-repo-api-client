@@ -493,6 +493,15 @@ json_spec['paths']['/v1/repositories/conan/group/{repositoryName}']['get']['resp
     'schema']['$ref'] = '#/components/schemas/SimpleApiGroupDeployRepository'
 print('     Done')
 
+print('Correcting requestBody schema for POST /v1/system/license...')
+# NXRM declares the `application/octet-stream` body as `type: object`, which generators map to a map/dict type
+# that cannot be serialised as a binary payload (e.g. Go: "invalid body type application/octet-stream").
+json_spec['paths']['/v1/system/license']['post']['requestBody']['content']['application/octet-stream']['schema'] = {
+    'type': 'string',
+    'format': 'binary'
+}
+print('     Done')
+
 print('Injecting requestBody schema for PUT /v1/tasks/{taskId}...')
 json_spec['paths']['/v1/tasks/{taskId}']['put']['requestBody']['content']['application/json']['schema'] = {
     'properties': {
