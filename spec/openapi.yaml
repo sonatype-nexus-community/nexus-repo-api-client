@@ -23689,7 +23689,8 @@ paths:
         content:
           application/octet-stream:
             schema:
-              type: object
+              format: binary
+              type: string
         required: true
       responses:
         '200':
