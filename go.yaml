@@ -3,6 +3,7 @@ outputDir: /local/out/go
 generatorName: go
 gitRepoId: nexus-repo-api-client-go
 additionalProperties:
+  disallowAdditionalPropertiesIfNotPresent: false
   goImportAlias: sonatyperepo
   isGoSubmodule: true
   packageName: v397
